@@ -127,10 +127,10 @@ H_0:& \quad p = q \\
 H_1:& \quad p \neq q
 \end{align*}
 %
-Proceeding as before we can derive a formula for the test statistic.
+Proceeding as before we can derive a formula for the test statistic. This time we denote the test statistic by $t_N$ where $N \coloneqq n + m$.
 %
 \begin{align*}
-t_n &\coloneqq \log \frac{\lik(H_1)}{\lik(H_0)}
+t_N &\coloneqq \log \frac{\lik(H_1)}{\lik(H_0)}
 = \log \frac{\max_{p,q} P(K=k|p) P(L=l|q)}{\max_p P(K=k|p) P(L=l|q=p)} \\
 &= \log \frac
 {\binom{n}{k} \hat{p}^k (1 - \hat{p})^{n-k} \binom{m}{l} \hat{q}^k (1 - \hat{q})^{m-l}}
@@ -144,7 +144,7 @@ t_n &\coloneqq \log \frac{\lik(H_1)}{\lik(H_0)}
 Where, $\hat{p} \coloneqq k/n, \hat{q} \coloneqq l/m, \hat{r} \coloneqq (k+l)/(n+m) = (n\hat{p} + m\hat{q})/(n+m)$. Using the same tricks as before, we can express this in terms of the chi-squared distance between the various parameters:
 %
 \begin{align*}
-t_n &= \frac{n}{2} \chi^2\left(Bern(\hat{p}||\hat{r})\right)
+t_N &= \frac{n}{2} \chi^2\left(Bern(\hat{p}||\hat{r})\right)
 + \frac{m}{2} \chi^2\left(Bern(\hat{q}||\hat{r})\right)
 + \epsilon \\
 &\approx \frac{1}{2\hat{r}(1-\hat{r})} \left(
@@ -154,19 +154,45 @@ n(\hat{p} - \hat{r})^2 + m(\hat{q} - \hat{r})^2
 n\left( \frac{m(\hat{p} - \hat{q})}{n+m}\right)^2 + 
 m\left( \frac{n(\hat{q} - \hat{p})}{n+m}\right)^2
 \right) \\
-&= \frac{nm(\hat{p} - \hat{q})^2}{2\hat{r}(1-\hat{r})(n+m)}
+&= \frac{nm(\hat{p} - \hat{q})^2}{2\hat{r}(1-\hat{r})(n+m)} \\
+&= \frac{1}{2} \left( \sqrt{\frac{nm}{\hat{r}(1-\hat{r})(n+m)}} \left(\hat{p} - \hat{q}\right) \right)^2
 \end{align*}
 %
-Under the null hypothesis $H_0$, we require $p=q(=\mu)$; we introduce this third variable $\mu$ to refer to the true mean to avoid ambiguity. Applying the central limit theorem and combining Gaussians in the standard way, we have that:
+Under the null hypothesis $H_0$, we require $p=q(=\mu)$; we introduce this third variable $\mu$ to refer to the true mean to avoid ambiguity. Applying the central limit theorem (for sufficiently large $n$ and $m$) and combining Gaussians in the standard way, we have that:
+%
+\begin{equation*}
+\begin{gathered}
+\hat{P} \sim \Gaussian \left( \mu, \frac{\mu(1-\mu)}{n} \right) \\
+\hat{Q} \sim \Gaussian \left(\mu, \frac{\mu(1-\mu)}{m} \right) \\
+\hat{R} \sim \Gaussian \left(\mu, \frac{\mu(1-\mu)}{n+m} \right) \\
+\therefore  \sqrt{\frac{nm}{\mu(1-\mu)(n+m)}} (\hat{P} - \hat{Q}) = Z \sim \Gaussian \left(0, 1 \right) \\
+\delta \hat{R} \coloneqq \hat{R} - \mu \sim \Gaussian \left( 0, \frac{\mu(1-\mu)}{n+m} \right)
+\end{gathered}
+\end{equation*}
+%
+We almost have $T_n$ we just need to demonstrate that $\hat{R}(1-\hat{R})$ is sufficiently close to $\mu(1-\mu)$ for our purposes.
 %
 \begin{align*}
-\hat{P} &\sim \Gaussian \left( \mu, \frac{\mu(1-\mu)}{n} \right) \\
-\hat{Q} &\sim \Gaussian \left(\mu, \frac{\mu(1-\mu)}{m} \right) \\
-\hat{R} &\sim \Gaussian \left(\mu, \frac{\mu(1-\mu)}{n+m} \right) \\
-\therefore \hat{P} - \hat{Q} &\sim \Gaussian \left(0, \frac{\mu(1-\mu)(n+m)}{nm} \right) \\
-\delta \hat{R} \coloneqq \hat{R} - \mu &\sim \Gaussian \left( 0, \frac{\mu(1-\mu)}{n+m} \right)
+\hat{R}(1-\hat{R}) &= (\mu + \delta\hat{R})(1-(\mu + \delta \hat{R})) \\
+&= \mu(1-\mu) + O(\delta\hat{R}) \\
+\therefore \frac{1}{\hat{R}(1-\hat{R})} &= \frac{1}{\mu(1-\mu)} \left(\frac{1}{1+O(\delta\hat{R})}\right) \\
+&= \frac{1}{\mu(1-\mu)} (1 + O(\delta\hat{R})) \\
+&\approx \frac{1}{\mu(1-\mu)}
 \end{align*}
 %
+We can neglect the terms of order $\delta\hat{R}$ and higher powers, as it is zero mean and for sufficiently large $n+m$ the variance approaches 0. Therefore, we have the desired expression for $T_N$.
+%
+\begin{equation}
+T_N \approx \frac{1}{2} \left(
+\sqrt{\frac{nm}{\mu(1-\mu)(n+m)}}
+(\hat{P} - \hat{Q})
+\right)^2 = \frac{1}{2} Z^2 \sim \frac{1}{2} \chi^2_1
+\end{equation}
+%
+For this test we can also use the z-statistic instead of the t-statistic. Since the former is distributed like a Gaussian it may be easier to deal with.
+\begin{align}
+z_N = \frac{\hat{p} - \hat{q}}{\sqrt{\hat{r}(1-\hat{r})\left(1/n + 1/m\right)}} \sim \Gaussian(0, 1)
+\end{align}
 \section{Appendix}
 
 \subsection{Proving H.O.T can be neglected}
