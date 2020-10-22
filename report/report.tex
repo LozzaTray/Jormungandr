@@ -12,6 +12,7 @@
 \usepackage{hyperref}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{mathtools}
 
 %package setup
 \graphicspath{{./img/}}
@@ -23,6 +24,10 @@
 \newcommand{\idft}{\mathcal{F}^{-1}}
 \newcommand{\Xcal}{\mathcal{X}}
 \newcommand{\cmplx}{\mathbb{C}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Gaussian}{\mathcal{N}}
+\newcommand{\lik}{\mathcal{L}}
+\newcommand{\kl}{\mathcal{D}}
 \newcommand{\figwidth}{0.55\linewidth}
 
 \begin{document}
@@ -33,6 +38,156 @@
 \end{abstract}
 
 \section{Introduction}
+\section{Hypothesis Testing}
+\subsection{Single Sample against known mean}
+We start with the simple case of determining whether or not a coin is fair. Each coin flip can be represented by a random variable with a Bernoulli distribution $X_i \sim Bern(p)$. Each coin can result in either a Tails or a Heads denoted by $X_i \in \{0, 1\}$. We toss the coin $n$ times leading us to a set $\left\{ X_i \right\}_{i=1}^{n}$. We wish to test the null hypothesis $p=p_0$ against the alternative. We shall keep the $p_0$ notation for generality, though for a fair coin we require $p_0=1/2$.
+%
+\begin{align*}
+H_0:& \quad p = p_0 \\
+H_1:& \quad p \neq p_0
+\end{align*}
+%
+We denote the number of heads with the random variable $K \coloneqq \sum_{i=1}^{n} X_i \sim Bern(p, n)$. For a particular experiment we observe $K=k$. We employ a standard likelihood ratio test. The test statistic $t_n$ is calculated as the log-likelihood ratio of observing $K=k$ under $H_1$ and $H_0$.
+%
+\begin{equation}
+t_n \coloneqq \log \frac{\lik(H_1)}{\lik(H_0)}
+= \log \frac{\max_p P(K=k|p)}{P(K=k|p=p_0)}
+\end{equation} 
+%
+We note that since $K$ is distributed as a binomial, $P(K=k|p)=\binom{n}{k}p^k(1-p)^{n-k}$. If we can vary $p$, this probability is maximised for $p=\hat{p} \coloneqq k/n$. Therefore, the test statistic is given by.
+%
+\begin{equation}
+t_n = \log \frac{\binom{n}{k} \hat{p}^k (1 - \hat{p})^{n-k}}{\binom{n}{k} p_0^k (1 - p_0)^{n-k}}
+=  \log \frac{ \hat{p}^k (1 - \hat{p})^{n-k}}{ p_0^k (1 - p_0)^{n-k}}
+\end{equation}
+%
+The combinatoric term $\binom{n}{k}$ cancels out. This implies that the order in which the heads land does not matter when determining the fairness of the coin. We can work the above expression into a more usable form:
+%
+\begin{align}
+t_n =& k \log \frac{\hat{p}}{p_0} + (n-k) \log \frac{1 - \hat{p}}{1 - p_0} \nonumber \\
+=& n \left( \hat{p} \log \frac{\hat{p}}{p_0} + (1-\hat{p}) \log \frac{1 - \hat{p}}{1-p_0} \right) \nonumber \\
+=& n \kl \left(Bern(\hat{p}) || Bern(p_0) \right)
+\end{align}
+%
+Where $\kl(f | g) \coloneqq \sum_{x \in \Xcal} f(x) \log \frac{f(x)}{g(x)}$ is the Kullback-Leibler divergence between two arbitrary probability mass functions $f$ and $g$. This is also called the relative entropy. The KL divergence has the property that:
+%
+\begin{equation}
+\kl (f || g) \geq 0 \quad \text{with equality iff} \quad f(x) = g(x) \quad \forall x \in \Xcal
+\end{equation}
+%
+We can exploit this result for the case that $f \approx g$ to obtain a simplified expression for the KL divergence. We begin by defining $\delta (x) \coloneqq f(x) - g(x)$. We are interested in the region where $\delta$ is small. We start by substituting for $f=\delta + g$ and then taking the Taylor expansion of $\log 1+x$.
+%
+\begin{align*}
+\kl(f||g) &= \sum_{x \in \Xcal} (\delta + g) \log \left(1 + \frac{\delta}{g} \right) \\
+&= \sum_{x \in \Xcal} (\delta + g) \left( \frac{\delta}{g} - \frac{\delta^2}{2g^2} + O(\delta^3) \right) \\
+&= \sum_{x \in \Xcal} \delta + \frac{1}{2} \sum_{x \in \Xcal} \frac{\delta^2}{g} + O(\delta^3) \\
+&= \frac{1}{2} \sum_{x \in \Xcal} \frac{\delta^2}{g} + O(\delta^3) \\
+&= \frac{1}{2} \chi^2(f||g) + O(\delta^3)
+\end{align*}
+%
+Where the summation over $\delta$ evaluates to 0 because $\delta$ is the difference of two valid p.m.f's which each sum to 1 over $x \in \Xcal$. We are able to neglect the $O(\delta^3)$ terms for $f$ very close to $g$ we shall see what this means later. $\chi^2(f||g)$ is known as the chi-squared distance between two distributions and is defined simply as $\chi^2(f||g) \coloneqq \sum_{x \in \Xcal} (f-g)^2/g$. We now investigate the chi-squared divergence for $f = Bern(p)$ and $g = Bern(q)$.
+%
+\begin{align*}
+\chi^2(Bern(p)||Bern(q)) &= \frac{(p-q)^2}{q} + \frac{((1-p)-(1-q))^2}{1-q} \\
+&= \frac{(p-q)^2}{q(1-q)} \\
+&= \left(\frac{p-q}{\sqrt{q(1-q)}}\right)^2
+\end{align*}
+%
+Now we can exploit these results to get a workable expression for the test statistic $t_n$.
+%
+\begin{align*}
+t_n &= n \kl \left(Bern(\hat{p}) || Bern(p_0)\right) \\
+	&= \frac{n}{2} \chi^2 \left(Bern(\hat{p}) || Bern(p_0) \right) + nO(\delta^3) \\
+	&= \frac{1}{2} \left( \frac{\hat{p} - p_0}{\sqrt{p_0(1-p_0)/n}} \right)^2 + \epsilon
+\end{align*}
+%
+So far we have been treating $t_n$ as deterministic but it is merely an observation a random variable. To make this distinction clear we shall use upper-case to refer to random variables. Therefore, we have that the random variable $T_n$ is a function of $\hat{P} \coloneqq K/n$. For large n, we can find the distribution of $\hat{P}$ by the Central Limit Theorem.
+%
+\begin{align*}
+\hat{P} &= \frac{K}{n} = \frac{1}{n} \sum_{i=1}^{n} X_i \\
+H_0: \E[X_i] &= p_0, Var(X_i) = p_0(1-p_0) \\
+\text{CLT, as }n \rightarrow \infty: \hat{P} &\sim \Gaussian\left(\mu=p_0, \sigma^2=p_0(1-p_0)/n\right) \\
+\therefore \frac{\hat{P}-p_0}{\sqrt{p_0(1-p_0)/n}} = Z &\sim \Gaussian(\mu=0,\sigma^2=1)
+\end{align*}
+%
+Therefore neglecting the error term $\epsilon$\footnote{See the Appendix for proof of negligibility}, we have that under $H_0$, for sufficiently large $n$.
+%
+\begin{align}
+T_n = \frac{1}{2} Z^2 \sim \frac{1}{2} \chi_1^2
+\end{align}
+%
+By the definition of the chi-squared distribution with one degree of freedom. To reject the null hypothesis $H_0$ at the $100(1-\alpha)\%$ confidence level, we require that $P(T_n = t_n | H_0) < \alpha$. In other words, a low probability of observing this result under the null hypothesis.
 
+\subsection{Two samples equality of means}
+
+We now complicate things by introducing a second coin, with throws denoted by $\{Y_i\}_{i=1}^{m}$ where we assume each throw is i.i.d Bernoulli with parameter $q$ ($Y_i \sim Bern(q)$). Note that the population sizes $n$ and $m$ may be different. We define $L \coloneqq \sum_{i=1}^{m} Y_i$ which is the analogue of $K$. We now set up our hypotheses to be:
+%
+\begin{align*}
+H_0:& \quad p = q \\
+H_1:& \quad p \neq q
+\end{align*}
+%
+Proceeding as before we can derive a formula for the test statistic.
+%
+\begin{align*}
+t_n &\coloneqq \log \frac{\lik(H_1)}{\lik(H_0)}
+= \log \frac{\max_{p,q} P(K=k|p) P(L=l|q)}{\max_p P(K=k|p) P(L=l|q=p)} \\
+&= \log \frac
+{\binom{n}{k} \hat{p}^k (1 - \hat{p})^{n-k} \binom{m}{l} \hat{q}^k (1 - \hat{q})^{m-l}}
+{\binom{n}{k} \hat{r}^k (1 - \hat{r})^{n-k} \binom{m}{l} \hat{r}^l (1 - \hat{r})^{m-l}} \\
+&= \log \frac
+{ \hat{p}^k (1 - \hat{p})^{n-k}}
+{ \hat{r}^k (1 - \hat{r})^{n-k}}
++ \log \frac{\hat{q}^k (1 - \hat{q})^{m-l}}{ \hat{r}^l (1 - \hat{r})^{m-l}}
+\end{align*} 
+%
+Where, $\hat{p} \coloneqq k/n, \hat{q} \coloneqq l/m, \hat{r} \coloneqq (k+l)/(n+m) = (n\hat{p} + m\hat{q})/(n+m)$. Using the same tricks as before, we can express this in terms of the chi-squared distance between the various parameters:
+%
+\begin{align*}
+t_n &= \frac{n}{2} \chi^2\left(Bern(\hat{p}||\hat{r})\right)
++ \frac{m}{2} \chi^2\left(Bern(\hat{q}||\hat{r})\right)
++ \epsilon \\
+&\approx \frac{1}{2\hat{r}(1-\hat{r})} \left(
+n(\hat{p} - \hat{r})^2 + m(\hat{q} - \hat{r})^2
+\right) \\
+&= \frac{1}{2\hat{r}(1-\hat{r})} \left(
+n\left( \frac{m(\hat{p} - \hat{q})}{n+m}\right)^2 + 
+m\left( \frac{n(\hat{q} - \hat{p})}{n+m}\right)^2
+\right) \\
+&= \frac{nm(\hat{p} - \hat{q})^2}{2\hat{r}(1-\hat{r})(n+m)}
+\end{align*}
+%
+Under the null hypothesis $H_0$, we require $p=q(=\mu)$; we introduce this third variable $\mu$ to refer to the true mean to avoid ambiguity. Applying the central limit theorem and combining Gaussians in the standard way, we have that:
+%
+\begin{align*}
+\hat{P} &\sim \Gaussian \left( \mu, \frac{\mu(1-\mu)}{n} \right) \\
+\hat{Q} &\sim \Gaussian \left(\mu, \frac{\mu(1-\mu)}{m} \right) \\
+\hat{R} &\sim \Gaussian \left(\mu, \frac{\mu(1-\mu)}{n+m} \right) \\
+\therefore \hat{P} - \hat{Q} &\sim \Gaussian \left(0, \frac{\mu(1-\mu)(n+m)}{nm} \right) \\
+\delta \hat{R} \coloneqq \hat{R} - \mu &\sim \Gaussian \left( 0, \frac{\mu(1-\mu)}{n+m} \right)
+\end{align*}
+%
+\section{Appendix}
+
+\subsection{Proving H.O.T can be neglected}
+We have shown that under the null hypothesis, that for sufficiently large $n$, $(\hat{P}-p_0) \sim \Gaussian(0, \beta/n)$ for some positive finite constant $\beta$ (in this case $\beta = p_0(1-p_0)$ but we just require finiteness for this proof). Therefore, $Q \coloneqq \sqrt{n} (\hat{P} - p_0) \sim \Gaussian(0,\beta)$. Manipulating our expression for the error term $\epsilon$ we can show that it can be expressed as a sum of 
+%
+\begin{equation}
+\begin{gathered}
+\epsilon = n O(\delta^3) \\
+\therefore |\epsilon| \leq n \sum_{i=0}^{\infty} \alpha_i|\hat{P} - p_0|^{3+i} 
+\quad \text{for some finite constants } \alpha_i \geq 0 \\
+|\epsilon| \leq \sum_{i=0}^{\infty} \alpha_i n^{-\frac{1+i}{2}}( \sqrt{n}|\hat{P} - p_0|)^{3+i} \\
+|\epsilon| \leq \sum_{i=0}^{\infty} \alpha_i n^{-\frac{1+i}{2}}|Q|^{3+i}
+\end{gathered}
+\end{equation}
+%
+We know that $Q$ is a Gaussian of zero mean and finite variance, therefore $|Q|$ will be a finite value. However, we see that it is scaled by a negative power of $n$, therefore for sufficiently large $n$ we have that the error term asymptotes to 0. To be precise:
+%
+\begin{equation}
+\begin{gathered}
+\lim_{n \rightarrow \infty} P(|\epsilon| < \eta) = 1 \text{ for arbitrarily small } \eta \ge 0
+\end{gathered}
+\end{equation}
 
 \end{document}
