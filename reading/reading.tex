@@ -13,6 +13,7 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{mathtools}
+\usepackage{parskip}
 
 \usepackage[backend=bibtex]{biblatex}
 \addbibresource{sources.bib}
@@ -23,8 +24,23 @@
 
 \section{Initial Reading}
 
-I read \cite{Abbe}
+Summary of \cite{Abbe}.
 
+Types of recovery:
+\begin{enumerate}
+	\item Exact
+	\item Almost Exact
+	\item Partial
+	\item Weak
+\end{enumerate}
+
+For 2 balanced communities in a SSBM (Symmetric SBM) once can apply linear algebra pproaches to solve efficiently. But for more communities, the state of the art is belief propagation. 
+
+Many properties are given as functions of the number of edges $n$. Therefore can maybe sub-partition graph to see how properties scale with $n$ to fit the most appropriate model.
+
+Best algorithm for Weak recovery is Belief Propagation (linear version in \cite{Linear-ABP}).
+
+\nocite{*}
 \printbibliography
 
 
