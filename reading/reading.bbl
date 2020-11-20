@@ -112,6 +112,45 @@
     \field{year}{2016}
   \endentry
 
+  \entry{SBM-Achieve}{article}{}
+    \name{author}{2}{}{%
+      {{hash=AE}{%
+         family={Abbe},
+         familyi={A\bibinitperiod},
+         given={Emmanuel},
+         giveni={E\bibinitperiod},
+      }}%
+      {{hash=SC}{%
+         family={Sandon},
+         familyi={S\bibinitperiod},
+         given={Colin},
+         giveni={C\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{AESC1}
+    \strng{fullhash}{AESC1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{A}
+    \field{sortinithash}{A}
+    \verb{doi}
+    \verb https://doi.org/10.1002/cpa.21719
+    \endverb
+    \verb{eprint}
+    \verb https://onlinelibrary.wiley.com/doi/pdf/10.1002/cpa.21719
+    \endverb
+    \field{number}{7}
+    \field{pages}{1334\bibrangedash 1406}
+    \field{title}{Proof of the Achievability Conjectures for the General
+  Stochastic Block Model}
+    \verb{url}
+    \verb https://onlinelibrary.wiley.com/doi/abs/10.1002/cpa.21719
+    \endverb
+    \field{volume}{71}
+    \field{journaltitle}{Communications on Pure and Applied Mathematics}
+    \field{year}{2018}
+  \endentry
+
   \entry{SBM-Unknown}{inproceedings}{}
     \name{author}{2}{}{%
       {{hash=AE}{%
