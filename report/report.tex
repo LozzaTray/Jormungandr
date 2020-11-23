@@ -144,10 +144,11 @@ t_N &\coloneqq \log \frac{\lik(H_1)}{\lik(H_0)}
 Where, $\hat{p} \coloneqq k/n, \hat{q} \coloneqq l/m, \hat{r} \coloneqq (k+l)/(n+m) = (n\hat{p} + m\hat{q})/(n+m)$. Using the same tricks as before, we can express this in terms of the chi-squared distance between the various parameters:
 %
 \begin{align*}
-t_N &= \frac{n}{2} \chi^2\left(Bern(\hat{p}||\hat{r})\right)
-+ \frac{m}{2} \chi^2\left(Bern(\hat{q}||\hat{r})\right)
-+ \epsilon \\
-&\approx \frac{1}{2\hat{r}(1-\hat{r})} \left(
+t_N &= n \kl\left(Bern(\hat{p}) || Bern(\hat{r})\right)
++ m \kl\left(Bern(\hat{q}) || Bern(\hat{r})\right) \\ 
+&\approx \frac{n}{2} \chi^2\left(Bern(\hat{p})||Bern(\hat{r}))\right)
++ \frac{m}{2} \chi^2\left(Bern(\hat{q})||Bern(\hat{r}))\right) \\
+&= \frac{1}{2\hat{r}(1-\hat{r})} \left(
 n(\hat{p} - \hat{r})^2 + m(\hat{q} - \hat{r})^2
 \right) \\
 &= \frac{1}{2\hat{r}(1-\hat{r})} \left(
@@ -155,7 +156,7 @@ n\left( \frac{m(\hat{p} - \hat{q})}{n+m}\right)^2 +
 m\left( \frac{n(\hat{q} - \hat{p})}{n+m}\right)^2
 \right) \\
 &= \frac{nm(\hat{p} - \hat{q})^2}{2\hat{r}(1-\hat{r})(n+m)} \\
-&= \frac{1}{2} \left( \sqrt{\frac{nm}{\hat{r}(1-\hat{r})(n+m)}} \left(\hat{p} - \hat{q}\right) \right)^2
+&= \frac{1}{2} \left( \frac{\left(\hat{p} - \hat{q}\right)}{\sqrt{\hat{r}(1-\hat{r})(1/n+1/m)}}  \right)^2
 \end{align*}
 %
 Under the null hypothesis $H_0$, we require $p=q(=\mu)$; we introduce this third variable $\mu$ to refer to the true mean to avoid ambiguity. Applying the central limit theorem (for sufficiently large $n$ and $m$) and combining Gaussians in the standard way, we have that:
@@ -193,6 +194,23 @@ For this test we can also use the z-statistic instead of the t-statistic. Since 
 \begin{align}
 z_N = \frac{\hat{p} - \hat{q}}{\sqrt{\hat{r}(1-\hat{r})\left(1/n + 1/m\right)}} \sim \Gaussian(0, 1)
 \end{align}
+
+\section{ABP}
+
+ABP(r, T) on a graph $G$ with vertex set $V = V(G)$ and edge set $E = E(G)$
+\begin{enumerate}
+	\item Initialise messages for $(v, v')$:
+		\subitem $y^{(0)}_{v' \rightarrow v} \leftarrow \Gaussian(0, 1)$
+	\item Iterate for $1 \leq t \leq T$ and for $(v, v') \in E$:
+		\subitem compute average $s^{(t-1)} \leftarrow \frac{1}{2|E|} \sum_{(v, v') \in E} y^{(t-1)}_{v' \rightarrow v}$
+		\subitem recentre messages $z^{(t-1)}_{v' \rightarrow v} \leftarrow y^{(t-1)}_{v' \rightarrow v} - s^{(t-1)}$ 
+		\subitem sum incoming $y^{(t)}_{v' \rightarrow v} \leftarrow \sum_{(v', v'') \in E \setminus \{v\}}z^{(t-1)}_{v'' \rightarrow v'}$
+		\subitem if $(v''' \rightarrow v \rightarrow v')$ on cycle of length $r' \leq r$ then correct:
+			\subsubitem $y^{(t)}_{v' \rightarrow v} \leftarrow y^{(t)}_{v' \rightarrow v} - \sum_{(v, v'') \in E \setminus \{v', v'''\}}z^{(t-r')}_{v'' \rightarrow v'}$
+	\item Assignment, for all $v \in V$:
+		\subitem Sum incoming $y_v^{(T)} = \sum_{(v, v') \in E} y^{(t)}_{v' \rightarrow v}$
+		\subitem Assign labels $\sigma_v = 1$ if $y_v^{(T)} > 0$ and $0$ otherwise
+\end{enumerate}
 \section{Appendix}
 
 \subsection{Proving H.O.T can be neglected}
