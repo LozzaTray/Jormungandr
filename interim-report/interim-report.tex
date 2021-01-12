@@ -1,0 +1,373 @@
+\documentclass[]{article}
+
+%opening
+\title{Detecting Structure in Graphical Data}
+\author{Lawrence Tray \\ Ioannis Kontoyiannis}
+
+%packages
+\usepackage[margin=0.5in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{mathtools}
+\usepackage{parskip}
+
+%bibliography
+\usepackage[backend=bibtex]{biblatex}
+\addbibresource{interim-sources.bib}
+
+%package setup
+\graphicspath{{./img/}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+%custom commands
+\newcommand{\dft}{\mathcal{F}}
+\newcommand{\idft}{\mathcal{F}^{-1}}
+\newcommand{\Xcal}{\mathcal{X}}
+\newcommand{\Dcal}{\mathcal{D}}
+\newcommand{\cmplx}{\mathbb{C}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Gaussian}{\mathcal{N}}
+\newcommand{\Gcal}{\mathcal{G}}
+\newcommand{\Vcal}{\mathcal{V}}
+\newcommand{\Ecal}{\mathcal{E}}
+\newcommand{\pbold}{\boldsymbol{p}}
+\newcommand{\sigmabold}{\boldsymbol{\sigma}}
+\newcommand{\lik}{\mathcal{L}}
+\newcommand{\kl}{\mathcal{D}}
+\newcommand{\Integers}{\mathbb{Z}}
+\newcommand{\SBM}{\textrm{SBM}}
+\newcommand{\iid}{\stackrel{iid}{\sim}}
+\newcommand{\figwidth}{0.55\linewidth}
+
+
+% definition
+\newtheorem{definition}{Definition}[section]
+
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+So the agenda for today. I will take you through my exploratory work around the field in rough chronological order. We’ll start off with the fundamentals of hypothesis testing. I will then introduce you to the most commonly used graphical model and talk about the ways of verifying structure in a graph with labelled nodes. However, that is not sufficient as we may want to detect structure in an unlabelled graph. Finally I’ll talk about the future direction of the project.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+The title started off as ``detecting causal structure in time series data'' but the emphasis has pivoted to the more generic question: detecting structure in data and specifically graphical data.
+
+There is a wealth of graphical data in the world and more is being produced each second; social networks, website hyperlinks and academic collaborations are just some examples of this data. There is a wealth of algorithms developed to analyse graphical data. Nevertheless, that same principled framework we have for querying classical data (hypothesis testing) is less developed for graphical data. Do my friends vote the same way I do or do researchers collaborate with those of the same gender? We want to answer these questions and not only that, we wish to report our confidence in the answers. To that end there is space to expand the hypothesis testing framework to graphs.
+
+\section{The Stochastic Block Model}
+
+The most popular graphical model in industry and indeed academia is called the Stochastic Block Model (SBM). We use a definition adapted from Abbe \cite{Abbe}.
+
+\begin{definition}
+	\label{defn:sbm}
+	Let $n \in \Integers^+$ be the number of vertices and $k \in \Integers^+$ be the number of communities in an SBM graph. We define a probability vector $\pi = [\pi_1, \pi_2 \dots \pi_K]^T$ to be the prior on the K-communities. Each vertex $v \in \Vcal = \{1, 2 \dots N\}$ has a community label $X_v \in \{1, 2 \dots n\}$. Let $W$ be a symmetric $k \times k$ matrix called the connectivity matrix. We say that the pair $(X, \Gcal) \sim \textrm{SBM}(n, \pi, W)$ if X is an $N$-dimensional vector with each component independently distributed as the community prior $X_v \sim \pi$ and $\Gcal$ is an $N$-vertex graph where each pair of vertices $(i, j)$ is connected with probability $p(i \leftrightarrow j) = W_{X_i, X_j}$ independently of other pairs of vertices. Lastly, we define the community sets as $\Omega_i = \Omega_i(X) \coloneqq \{v \in \Vcal : X_v = i\}$ which groups our partitions the vertex-set.
+\end{definition}
+
+Obviously this definition imposes further constraints on the values that the connectivity matrix $W$ namely: $0 \leq W_{ij} \leq 1$. Though the definition of the SBM is simple, it allows for very deep and rich analysis of graphical datasets.
+
+\section{Verifying Structure}
+
+Armed with this definition we tackle the simplest problem in structure verification. Given a graph $\Gcal$ and vertex-labels $X$, we wish to determine whether the two communities $a$ and $b$ connect differently. Put formally this a hypothesis test on the parameters of $W$. There are three parameters we would wish to test: $W_{aa}, W_{ab}$ and $W_{bb}$ (note that the symmetry constraint requires $W_{ab} = W_{ba}$). To do this we can perform three-pairwise hypothesis tests. Here we test $W_{\alpha}$ against $W_{\beta}$ where $\alpha$ and $\beta$ are unique indices in $\{(a,a), (a, b), (b,b)\}$:
+%
+\begin{equation}
+\begin{aligned}
+	H_0:& \quad W_{\alpha} = W_{\beta} \\
+	H_1:& \quad W_{\alpha} \neq W_{\beta}
+\end{aligned}
+\end{equation}
+
+We formulate this as a likelihood ratio test. Letting $\lik(\Dcal | H)$ denote the likelihood of observing the data $\Dcal = (X, G)$ under hypothesis $H$. For ease of notation. Therefore, the test statistic is given by:
+%
+\begin{equation}
+	t_n \coloneqq \log \frac{\lik(\Dcal | H_1)}{\lik(\Dcal | H_0)}
+	\label{eqn:test-statistic-start}
+\end{equation}
+
+At this point it helps to introduce some more notation. We define $n_i \coloneqq |\Omega_i(X)|$ leading to the result $n = \sum_i n_i$. Furthermore, we define $E_{ij} = E_{ij}(X, \Gcal)$ to denote the number of realised edges between communities $i$ and $j$ (note that $i$ may be equal to $j$). Furthermore, define $M_{ij} = M_{ij}(X)$ as the maximum number of possible edges between the communities. The likelihood function can now be rewritten in more simple terms:
+%
+\begin{align}
+\lik(\Dcal | H) &= p(X| \pi) \cdot p(\Gcal | W, X) \nonumber \\
+&= p(X | \pi) \cdot \prod_{i=1}^{k} \prod_{j=i}^{k} p(E_{ij} | W, X) \nonumber \\
+&= p(X | \pi) \cdot \prod_{i=1}^{k} \prod_{j=i}^{k} W_{ij} ^ {E_{ij}} \cdot \left( 1 - W_{ij} \right) ^ {(M_{ij} - E_{ij})}
+\label{eqn:likelihood-verbose}
+\end{align}
+
+The form of $p(\Gcal | W, X)$ is simply a sequence of Bernoulli trials for each distinct community pair $(i, j)$ (edge present with probability $W_{ij}$ or edge absent with probability $1 - W_{ij}$ for every pair of vertices across those communities). A sequence of Bernoullis is the same as a Binomial distribution without the combinatoric term. By inspecting equation \ref{eqn:likelihood-verbose} we see that only terms involving $W_{\alpha}$ and $W_{\beta}$ are going to differ under the two hypotheses; the rest of the terms will cancel in our calculation. Therefore, we can reqrite the likelihood as follows:
+%
+\begin{equation}
+	\lik (\Dcal | H) \propto f (W_\alpha, E_\alpha, M_\alpha) \cdot f (W_\beta, E_\beta, M_\beta)
+\end{equation} 
+\begin{equation}
+	\textrm{where } f (w, e, m) \coloneqq w^e \cdot (1-w)^{(m - e)}
+\end{equation}
+
+As such we can simplify equation \ref{eqn:test-statistic-start} greatly to give:
+%
+\begin{align}
+	t_n &= \log \frac
+	{
+		\max_{W_{\alpha} \neq W_{\beta}}(f (W_\alpha, E_\alpha, M_\alpha) \cdot f (W_\beta, E_\beta, M_\beta))
+	}
+	{
+		\max_{W_\alpha = W_\beta} (f (W_\alpha, E_\alpha, M_\alpha) \cdot f (W_\beta, E_\beta, M_\beta))
+	} \nonumber \\
+	&= \log \frac{f(E_\alpha / M_\alpha, E_\alpha, M_\alpha) \cdot f(E_\beta / M_\beta, E_\beta, M_\beta)}
+	{f \left( (E_\alpha + E_\beta)/(M_\alpha + M_\beta), E_\alpha + E_\beta, M_\alpha + M_\beta \right)}
+\end{align}
+
+\section{Verifying Structure}
+
+So hypothesis testing. I’ll start with an example that may seem trivial now but will be extremely important later for graphical analysis. This is the test for equality of means. Say we have two coins, X and Y. We assume each flip is an independent Bernoulli trial. Coin X has probability p of coming up heads, Y has parameter q. We flip X, n times and record k heads. Y is flipped m times and l heads.
+
+Given this observed data we want to test the null hypothesis that p=q against the alternative that p != q.
+
+There is a very general theorem for hypothesis tests which states that the log-likelihood ratio test statistic (this is the likelihood of the observed data under H1 divided by the likelihood under H0 all logged) The theorem states that the log-likelihood ratio under the null is distributed like ½ times a chi-squared distribution with p degrees of freedom. Where p is the number of additional degrees of freedom introduced by H1. This allows us to compute the test statistic and reject the null hypothesis if the statistic is large enough.
+
+The first thing I did was formally prove that this theorem holds for the coin flipping example we just spoke about. For brevity I’ll omit the details of the proof but it essentially manipulates the expression into such a form that we can apply the Central Limit Theorem to show that the term in the brackets is distributed as a standard gaussian. So we now have a robust tool for testing populations for equality of means. Put it in your toolbox for now because we will come back to it later.
+
+So now on how to verify evidence of structure in a given graph. Suppose we have a graph G with known vertex labels. We assume it is drawn from a symmetric SBM with probability p of vertices within the same community being connected and probability q across communities. We say it is symmetric because these p and q are the same for all communities. We wish to test the hypothesis that these parameters are different against the null that they are equal. If the null is rejected then we can say that there is sufficient evidence to show the communities interact with one another differently.
+
+And this is where we reap the dividends from the earlier hypothesis test. Two nodes within a community are connected with probability p (this is the equivalent of coming up heads) and they are disconnected with probability 1-p. We can reduce this hypothesis test to exactly the one we had before by assigning the parameters as follows.
+
+n is now the number of possible edges within communities
+m is those possible across
+k is the number that are realised within communities
+And l are those realised across
+
+So we now try to apply this test to a real world dataset. The Stanford Network Analysis Project (SNAP) has a wealth of graphical datasets. In particular I analysed a couple of facebook ego-nets. So that is a graph of all my friends and the connections between them. Each vertex is also labelled by a feature vector which is entirely anonymised. I cannot even tell someone’s gender only whether it is the same as somebody else’s. The graph on the right is one such egonet with all gender-77 vertices coloured orange.
+
+So we apply three hypothesis tests on this graph to determine whether gender impacts how people connect on facebook. In every case, we reject the null with a very high degree of confidence (in one case we even surpass the precision of the chi-squared cdf). We can be certain that gender impacts how people connect but this approach has several limitations.
+
+First of all, we cannot say with certainty how large the impact is. Only that gender does impact graphical structure. Secondly we must be careful to avoid confounding variables. These are variables that we did not account for that could better explain the structure. To give an example, we might find evidence that students in Cambridge are more likely to be friends with those of the same gender. The confounding variable here could be college affiliation especially given the existence of all-female colleges such as Newnham. And lastly these approaches only work if the graph is labelled in advance.
+
+To overcome some of these limitations we now look at the related issue of detecting structure in an unlabeled graph. The question is how well we can recover the communities from the graph. This is dependent on the parameters of the SBM. Each regime here is less strict than the one before. We will focus on weak recovery as that is the regime that most real-life graphs occupy and the same algorithms to solve weak recovery can be applied to more neat graphs.
+
+Formally, weak recovery means that we can assign vertex labels with more accuracy than simply sampling from the community prior. A different way of putting this is that we simply need to partition the graph’s vertices into two sets S and the complement of S such that this partition cuts across communities. Formally, the fraction of nodes from a certain community in our set S is different for different communities.
+
+The most tractable weak recovery algorithm is something called Acyclic Belief Propagation. This is a form of message-passing that runs in O(n log n) on graphs with constant degree. Since we’re pressed on time I’ll skim over the details. We initialise the messages by drawing from a standard Gaussian. We propagate these messages along the edges of the graph correcting for cycles of length less than r and then take the output to be the sum of all incoming messages. If the output of a vertex is positive we assign it into set S.
+
+So we run ABP on our same ego-net and find that weak recovery is satisfied. We partition the graph into two sets and find that the fraction of orange gender in set S is different to the fraction ofpurple gender in set S. 0.41 is not equal to 0.47. But these numbers are still quite close to one another so perhaps gender is not the most important feature by which we can partition the graph. And this is where I want to go to next.
+
+So we can run ABP on an unlabelled graph to partition into the two most distinctive sets. But what if we also have the vertex labels. We could then train a binary classifier to map from feature vectors to classification under ABP. This way we will be able to include all feature variables automatically and rank order them by importance.
+
+We would then start to ask more sophisticated questions of the dataset. Are friends made independent of politics given age? Is the gender of a research partner independent given the research topic? We can start to build a much more powerful tool.
+
+Looking slightly longer term, I would like to formalise this approach and link the ABP partition to a robust hypothesis testing framework. I may look to bring in causality and seeing if we cannot start to predict graph evolution. Remember that almost no graph is static, new vertices and edges are being added all the time. I may also extend this approach to more sophisticated graphical models. Indeed, the standard SBM is not well suited to tightly clustered graphs. The geometric SBM introduces an additional parameter to account for the mutual friends phenomenon. You are much more likely to be friends with a friend of your friend than with a random vertex on the graph.
+
+
+\section{Verifying Structure}
+\subsection{Single Sample against known mean}
+We start with the simple case of determining whether or not a coin is fair. Each coin flip can be represented by a random variable with a Bernoulli distribution $X_i \sim Bern(p)$. Each coin can result in either a Tails or a Heads denoted by $X_i \in \{0, 1\}$. We toss the coin $n$ times leading us to a set $\left\{ X_i \right\}_{i=1}^{n}$. We wish to test the null hypothesis $p=p_0$ against the alternative. We shall keep the $p_0$ notation for generality, though for a fair coin we require $p_0=1/2$.
+%
+\begin{align*}
+H_0:& \quad p = p_0 \\
+H_1:& \quad p \neq p_0
+\end{align*}
+%
+We denote the number of heads with the random variable $K \coloneqq \sum_{i=1}^{n} X_i \sim Bern(p, n)$. For a particular experiment we observe $K=k$. We employ a standard likelihood ratio test. The test statistic $t_n$ is calculated as the log-likelihood ratio of observing $K=k$ under $H_1$ and $H_0$.
+%
+\begin{equation}
+t_n \coloneqq \log \frac{\lik(H_1)}{\lik(H_0)}
+= \log \frac{\max_p P(K=k|p)}{P(K=k|p=p_0)}
+\end{equation} 
+%
+We note that since $K$ is distributed as a binomial, $P(K=k|p)=\binom{n}{k}p^k(1-p)^{n-k}$. If we can vary $p$, this probability is maximised for $p=\hat{p} \coloneqq k/n$. Therefore, the test statistic is given by.
+%
+\begin{equation}
+t_n = \log \frac{\binom{n}{k} \hat{p}^k (1 - \hat{p})^{n-k}}{\binom{n}{k} p_0^k (1 - p_0)^{n-k}}
+=  \log \frac{ \hat{p}^k (1 - \hat{p})^{n-k}}{ p_0^k (1 - p_0)^{n-k}}
+\end{equation}
+%
+The combinatoric term $\binom{n}{k}$ cancels out. This implies that the order in which the heads land does not matter when determining the fairness of the coin. We can work the above expression into a more usable form:
+%
+\begin{align}
+t_n =& k \log \frac{\hat{p}}{p_0} + (n-k) \log \frac{1 - \hat{p}}{1 - p_0} \nonumber \\
+=& n \left( \hat{p} \log \frac{\hat{p}}{p_0} + (1-\hat{p}) \log \frac{1 - \hat{p}}{1-p_0} \right) \nonumber \\
+=& n \kl \left(Bern(\hat{p}) || Bern(p_0) \right)
+\end{align}
+%
+Where $\kl(f | g) \coloneqq \sum_{x \in \Xcal} f(x) \log \frac{f(x)}{g(x)}$ is the Kullback-Leibler divergence between two arbitrary probability mass functions $f$ and $g$. This is also called the relative entropy. The KL divergence has the property that:
+%
+\begin{equation}
+\kl (f || g) \geq 0 \quad \text{with equality iff} \quad f(x) = g(x) \quad \forall x \in \Xcal
+\end{equation}
+%
+We can exploit this result for the case that $f \approx g$ to obtain a simplified expression for the KL divergence. We begin by defining $\delta (x) \coloneqq f(x) - g(x)$. We are interested in the region where $\delta$ is small. We start by substituting for $f=\delta + g$ and then taking the Taylor expansion of $\log 1+x$.
+%
+\begin{align*}
+\kl(f||g) &= \sum_{x \in \Xcal} (\delta + g) \log \left(1 + \frac{\delta}{g} \right) \\
+&= \sum_{x \in \Xcal} (\delta + g) \left( \frac{\delta}{g} - \frac{\delta^2}{2g^2} + O(\delta^3) \right) \\
+&= \sum_{x \in \Xcal} \delta + \frac{1}{2} \sum_{x \in \Xcal} \frac{\delta^2}{g} + O(\delta^3) \\
+&= \frac{1}{2} \sum_{x \in \Xcal} \frac{\delta^2}{g} + O(\delta^3) \\
+&= \frac{1}{2} \chi^2(f||g) + O(\delta^3)
+\end{align*}
+%
+Where the summation over $\delta$ evaluates to 0 because $\delta$ is the difference of two valid p.m.f's which each sum to 1 over $x \in \Xcal$. We are able to neglect the $O(\delta^3)$ terms for $f$ very close to $g$ we shall see what this means later. $\chi^2(f||g)$ is known as the chi-squared distance between two distributions and is defined simply as $\chi^2(f||g) \coloneqq \sum_{x \in \Xcal} (f-g)^2/g$. We now investigate the chi-squared divergence for $f = Bern(p)$ and $g = Bern(q)$.
+%
+\begin{align*}
+\chi^2(Bern(p)||Bern(q)) &= \frac{(p-q)^2}{q} + \frac{((1-p)-(1-q))^2}{1-q} \\
+&= \frac{(p-q)^2}{q(1-q)} \\
+&= \left(\frac{p-q}{\sqrt{q(1-q)}}\right)^2
+\end{align*}
+%
+Now we can exploit these results to get a workable expression for the test statistic $t_n$.
+%
+\begin{align*}
+t_n &= n \kl \left(Bern(\hat{p}) || Bern(p_0)\right) \\
+	&= \frac{n}{2} \chi^2 \left(Bern(\hat{p}) || Bern(p_0) \right) + nO(\delta^3) \\
+	&= \frac{1}{2} \left( \frac{\hat{p} - p_0}{\sqrt{p_0(1-p_0)/n}} \right)^2 + \epsilon
+\end{align*}
+%
+So far we have been treating $t_n$ as deterministic but it is merely an observation a random variable. To make this distinction clear we shall use upper-case to refer to random variables. Therefore, we have that the random variable $T_n$ is a function of $\hat{P} \coloneqq K/n$. For large n, we can find the distribution of $\hat{P}$ by the Central Limit Theorem.
+%
+\begin{align*}
+\hat{P} &= \frac{K}{n} = \frac{1}{n} \sum_{i=1}^{n} X_i \\
+H_0: \E[X_i] &= p_0, Var(X_i) = p_0(1-p_0) \\
+\text{CLT, as }n \rightarrow \infty: \hat{P} &\sim \Gaussian\left(\mu=p_0, \sigma^2=p_0(1-p_0)/n\right) \\
+\therefore \frac{\hat{P}-p_0}{\sqrt{p_0(1-p_0)/n}} = Z &\sim \Gaussian(\mu=0,\sigma^2=1)
+\end{align*}
+%
+Therefore neglecting the error term $\epsilon$\footnote{See the Appendix for proof of negligibility}, we have that under $H_0$, for sufficiently large $n$.
+%
+\begin{align}
+T_n = \frac{1}{2} Z^2 \sim \frac{1}{2} \chi_1^2
+\end{align}
+%
+By the definition of the chi-squared distribution with one degree of freedom. To reject the null hypothesis $H_0$ at the $100(1-\alpha)\%$ confidence level, we require that $P(T_n \geq t_n | H_0) < \alpha$. In other words, a low probability of observing this result under the null hypothesis.
+
+\subsection{Two samples equality of means}
+
+We now complicate things by introducing a second coin, with throws denoted by $\{Y_i\}_{i=1}^{m}$ where we assume each throw is i.i.d Bernoulli with parameter $q$ ($Y_i \sim Bern(q)$). Note that the population sizes $n$ and $m$ may be different. We define $L \coloneqq \sum_{i=1}^{m} Y_i$ which is the analogue of $K$. We now set up our hypotheses to be:
+%
+\begin{align*}
+H_0:& \quad p = q \\
+H_1:& \quad p \neq q
+\end{align*}
+%
+Proceeding as before we can derive a formula for the test statistic. This time we denote the test statistic by $t_N$ where $N \coloneqq n + m$.
+%
+\begin{align*}
+t_N &\coloneqq \log \frac{\lik(H_1)}{\lik(H_0)}
+= \log \frac{\max_{p,q} P(K=k|p) P(L=l|q)}{\max_p P(K=k|p) P(L=l|q=p)} \\
+&= \log \frac
+{\binom{n}{k} \hat{p}^k (1 - \hat{p})^{n-k} \binom{m}{l} \hat{q}^k (1 - \hat{q})^{m-l}}
+{\binom{n}{k} \hat{r}^k (1 - \hat{r})^{n-k} \binom{m}{l} \hat{r}^l (1 - \hat{r})^{m-l}} \\
+&= \log \frac
+{ \hat{p}^k (1 - \hat{p})^{n-k}}
+{ \hat{r}^k (1 - \hat{r})^{n-k}}
++ \log \frac{\hat{q}^k (1 - \hat{q})^{m-l}}{ \hat{r}^l (1 - \hat{r})^{m-l}}
+\end{align*} 
+%
+Where, $\hat{p} \coloneqq k/n, \hat{q} \coloneqq l/m, \hat{r} \coloneqq (k+l)/(n+m) = (n\hat{p} + m\hat{q})/(n+m)$. Using the same tricks as before, we can express this in terms of the chi-squared distance between the various parameters:
+%
+\begin{align*}
+t_N &= n \kl\left(Bern(\hat{p}) || Bern(\hat{r})\right)
++ m \kl\left(Bern(\hat{q}) || Bern(\hat{r})\right) \\ 
+&\approx \frac{n}{2} \chi^2\left(Bern(\hat{p})||Bern(\hat{r}))\right)
++ \frac{m}{2} \chi^2\left(Bern(\hat{q})||Bern(\hat{r}))\right) \\
+&= \frac{1}{2\hat{r}(1-\hat{r})} \left(
+n(\hat{p} - \hat{r})^2 + m(\hat{q} - \hat{r})^2
+\right) \\
+&= \frac{1}{2\hat{r}(1-\hat{r})} \left(
+n\left( \frac{m(\hat{p} - \hat{q})}{n+m}\right)^2 + 
+m\left( \frac{n(\hat{q} - \hat{p})}{n+m}\right)^2
+\right) \\
+&= \frac{nm(\hat{p} - \hat{q})^2}{2\hat{r}(1-\hat{r})(n+m)} \\
+&= \frac{1}{2} \left( \frac{\left(\hat{p} - \hat{q}\right)}{\sqrt{\hat{r}(1-\hat{r})(1/n+1/m)}}  \right)^2
+\end{align*}
+%
+Under the null hypothesis $H_0$, we require $p=q(=\mu)$; we introduce this third variable $\mu$ to refer to the true mean to avoid ambiguity. Applying the central limit theorem (for sufficiently large $n$ and $m$) and combining Gaussians in the standard way, we have that:
+%
+\begin{equation*}
+\begin{gathered}
+\hat{P} \sim \Gaussian \left( \mu, \frac{\mu(1-\mu)}{n} \right) \\
+\hat{Q} \sim \Gaussian \left(\mu, \frac{\mu(1-\mu)}{m} \right) \\
+\hat{R} \sim \Gaussian \left(\mu, \frac{\mu(1-\mu)}{n+m} \right) \\
+\therefore  \sqrt{\frac{nm}{\mu(1-\mu)(n+m)}} (\hat{P} - \hat{Q}) = Z \sim \Gaussian \left(0, 1 \right) \\
+\delta \hat{R} \coloneqq \hat{R} - \mu \sim \Gaussian \left( 0, \frac{\mu(1-\mu)}{n+m} \right)
+\end{gathered}
+\end{equation*}
+%
+We almost have $T_n$ we just need to demonstrate that $\hat{R}(1-\hat{R})$ is sufficiently close to $\mu(1-\mu)$ for our purposes.
+%
+\begin{align*}
+\hat{R}(1-\hat{R}) &= (\mu + \delta\hat{R})(1-(\mu + \delta \hat{R})) \\
+&= \mu(1-\mu) + O(\delta\hat{R}) \\
+\therefore \frac{1}{\hat{R}(1-\hat{R})} &= \frac{1}{\mu(1-\mu)} \left(\frac{1}{1+O(\delta\hat{R})}\right) \\
+&= \frac{1}{\mu(1-\mu)} (1 + O(\delta\hat{R})) \\
+&\approx \frac{1}{\mu(1-\mu)}
+\end{align*}
+%
+We can neglect the terms of order $\delta\hat{R}$ and higher powers, as it is zero mean and for sufficiently large $n+m$ the variance approaches 0. Therefore, we have the desired expression for $T_N$.
+%
+\begin{equation}
+T_N \approx \frac{1}{2} \left(
+\sqrt{\frac{nm}{\mu(1-\mu)(n+m)}}
+(\hat{P} - \hat{Q})
+\right)^2 = \frac{1}{2} Z^2 \sim \frac{1}{2} \chi^2_1
+\end{equation}
+%
+For this test we can also use the z-statistic instead of the t-statistic. Since the former is distributed like a Gaussian it may be easier to deal with.
+\begin{align}
+z_N = \frac{\hat{p} - \hat{q}}{\sqrt{\hat{r}(1-\hat{r})\left(1/n + 1/m\right)}} \sim \Gaussian(0, 1)
+\end{align}
+
+
+\section{Detecting Structure}
+\subsection{ABP}
+
+ABP(r, T) on a graph $G$ with vertex set $V = V(G)$ and edge set $E = E(G)$
+\begin{enumerate}
+	\item Initialise messages for $(v, v')$:
+		\subitem $y^{(0)}_{v' \rightarrow v} \leftarrow \Gaussian(0, 1)$
+	\item Iterate for $1 \leq t \leq T$ and for $(v, v') \in E$:
+		\subitem compute average $s^{(t-1)} \leftarrow \frac{1}{2|E|} \sum_{(v, v') \in E} y^{(t-1)}_{v' \rightarrow v}$
+		\subitem recentre messages $z^{(t-1)}_{v' \rightarrow v} \leftarrow y^{(t-1)}_{v' \rightarrow v} - s^{(t-1)}$ 
+		\subitem sum incoming $y^{(t)}_{v' \rightarrow v} \leftarrow \sum_{(v', v'') \in E \setminus \{v\}}z^{(t-1)}_{v'' \rightarrow v'}$
+		\subitem if $(v''' \rightarrow v \rightarrow v')$ on cycle of length $r' \leq r$ then correct:
+			\subsubitem $y^{(t)}_{v' \rightarrow v} \leftarrow y^{(t)}_{v' \rightarrow v} - \sum_{(v, v'') \in E \setminus \{v', v'''\}}z^{(t-r')}_{v'' \rightarrow v'}$
+	\item Assignment, for all $v \in V$:
+		\subitem Sum incoming $y_v^{(T)} = \sum_{(v, v') \in E} y^{(t)}_{v' \rightarrow v}$
+		\subitem Assign labels $\sigma_v = 1$ if $y_v^{(T)} > 0$ and $0$ otherwise
+\end{enumerate}
+
+\section{Composite Approaches}
+
+\section{Appendix}
+
+\subsection{Proving H.O.T can be neglected}
+We have shown that under the null hypothesis, that for sufficiently large $n$, $(\hat{P}-p_0) \sim \Gaussian(0, \beta/n)$ for some positive finite constant $\beta$ (in this case $\beta = p_0(1-p_0)$ but we just require finiteness for this proof). Therefore, $Q \coloneqq \sqrt{n} (\hat{P} - p_0) \sim \Gaussian(0,\beta)$. Manipulating our expression for the error term $\epsilon$ we can show that it can be expressed as a sum of 
+%
+\begin{equation}
+\begin{gathered}
+\epsilon = n O(\delta^3) \\
+\therefore |\epsilon| \leq n \sum_{i=0}^{\infty} \alpha_i|\hat{P} - p_0|^{3+i} 
+\quad \text{for some finite constants } \alpha_i \geq 0 \\
+|\epsilon| \leq \sum_{i=0}^{\infty} \alpha_i n^{-\frac{1+i}{2}}( \sqrt{n}|\hat{P} - p_0|)^{3+i} \\
+|\epsilon| \leq \sum_{i=0}^{\infty} \alpha_i n^{-\frac{1+i}{2}}|Q|^{3+i}
+\end{gathered}
+\end{equation}
+%
+We know that $Q$ is a Gaussian of zero mean and finite variance, therefore $|Q|$ will be a finite value. However, we see that it is scaled by a negative power of $n$, therefore for sufficiently large $n$ we have that the error term asymptotes to 0. To be precise:
+%
+\begin{equation}
+\begin{gathered}
+\lim_{n \rightarrow \infty} P(|\epsilon| < \eta) = 1 \text{ for arbitrarily small } \eta \ge 0
+\end{gathered}
+\end{equation}
+
+\nocite{*}
+\printbibliography
+
+\end{document}
