@@ -47,6 +47,9 @@
 
 % definition
 \newtheorem{definition}{Definition}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
 
 
 \begin{document}
@@ -94,7 +97,16 @@ We formulate this as a likelihood ratio test. Letting $\lik(\Dcal | H)$ denote t
 	\label{eqn:test-statistic-start}
 \end{equation}
 
-At this point it helps to introduce some more notation. We define $n_i \coloneqq |\Omega_i(X)|$ leading to the result $n = \sum_i n_i$. Furthermore, we define $E_{ij} = E_{ij}(X, \Gcal)$ to denote the number of realised edges between communities $i$ and $j$ (note that $i$ may be equal to $j$). Furthermore, define $M_{ij} = M_{ij}(X)$ as the maximum number of possible edges between the communities. The likelihood function can now be rewritten in more simple terms:
+At this point it helps to introduce some more notation. We define $n_i \coloneqq |\Omega_i(X)|$ leading to the result $n = \sum_i n_i$. Furthermore, we define $E_{ij} = E_{ij}(X, \Gcal)$ to denote the number of realised edges between communities $i$ and $j$ (in generality $i$ may be equal to $j$). Furthermore, define $M_{ij} = M_{ij}(X)$ as the maximum number of possible edges between the communities. For an undirected graph this can be computed simply as follows:
+%
+\begin{equation}
+	M_{ij} = M_{ij} (X) = \begin{cases}
+		n_i n_j &\text{for } i \neq j \\
+		\frac{1}{2}n_i (n_i - 1) &\text{for } i = j
+	\end{cases}
+\end{equation}
+
+With this new notation, likelihood function can be written explicitly:
 %
 \begin{align}
 \lik(\Dcal | H) &= p(X| \pi) \cdot p(\Gcal | W, X) \nonumber \\
@@ -103,16 +115,24 @@ At this point it helps to introduce some more notation. We define $n_i \coloneqq
 \label{eqn:likelihood-verbose}
 \end{align}
 
-The form of $p(\Gcal | W, X)$ is simply a sequence of Bernoulli trials for each distinct community pair $(i, j)$ (edge present with probability $W_{ij}$ or edge absent with probability $1 - W_{ij}$ for every pair of vertices across those communities). A sequence of Bernoullis is the same as a Binomial distribution without the combinatoric term. By inspecting equation \ref{eqn:likelihood-verbose} we see that only terms involving $W_{\alpha}$ and $W_{\beta}$ are going to differ under the two hypotheses; the rest of the terms will cancel in our calculation. Therefore, we can reqrite the likelihood as follows:
+The form of $p(\Gcal | W, X)$ is simply a sequence of Bernoulli trials for each distinct community pair $(i, j)$ (edge present with probability $W_{ij}$ or edge absent with probability $1 - W_{ij}$ for every pair of vertices across those communities). A sequence of Bernoullis is the same as a Binomial distribution without the combinatoric term. By inspecting equation \ref{eqn:likelihood-verbose} we see that only terms involving $W_{\alpha}$ and $W_{\beta}$ are going to differ under the two hypotheses; the rest of the terms will cancel in our calculation. Therefore, we can rewrite the likelihood as follows:
 %
 \begin{equation}
 	\lik (\Dcal | H) \propto f (W_\alpha, E_\alpha, M_\alpha) \cdot f (W_\beta, E_\beta, M_\beta)
 \end{equation} 
 \begin{equation}
 	\textrm{where } f (w, e, m) \coloneqq w^e \cdot (1-w)^{(m - e)}
+	\label{eqn:f-defn}
 \end{equation}
 
-As such we can simplify equation \ref{eqn:test-statistic-start} greatly to give:
+We note that $f(w, e, m)$ is simply the probability of observing a specific sequence of $e$ successes in $m$ independent Bernoulli trials with parameter $w$. Its maximiser with respect to the first argument is easily computed through partial differentiation giving:
+%
+\begin{equation}
+	\argmax_w f(w, e, m) = \hat{w} = e / m
+	\label{eqn:f-maximiser}
+\end{equation}
+
+Furthermore, we spot the following property $f(w, e_1, m_1) \cdot f(w, e_2, m_2) = f(w, e_1 + e_2, m_1 + m_2)$ or in other words, the function $f$ is linear in its second and third arguments given the same first argument. As such we can manipulate equation \ref{eqn:test-statistic-start} greatly to give:
 %
 \begin{align}
 	t_n &= \log \frac
@@ -122,48 +142,89 @@ As such we can simplify equation \ref{eqn:test-statistic-start} greatly to give:
 	{
 		\max_{W_\alpha = W_\beta} (f (W_\alpha, E_\alpha, M_\alpha) \cdot f (W_\beta, E_\beta, M_\beta))
 	} \nonumber \\
-	&= \log \frac{f(E_\alpha / M_\alpha, E_\alpha, M_\alpha) \cdot f(E_\beta / M_\beta, E_\beta, M_\beta)}
-	{f \left( (E_\alpha + E_\beta)/(M_\alpha + M_\beta), E_\alpha + E_\beta, M_\alpha + M_\beta \right)}
+	&= \log \frac{
+		\max_p f(p, E_\alpha, M_\alpha) \cdot \max_q f(q, E_\alpha, M_\alpha)
+	}{
+		\max_r f(r, E_\alpha + E_\beta, M_\alpha + M_\beta)
+	} \nonumber \\
+	&= \log \frac{
+		f(\hat{p}, E_\alpha, M_\alpha) \cdot f(\hat{q}, E_\alpha, M_\alpha)
+	}{
+		f(\hat{r}, E_\alpha + E_\beta, M_\alpha + M_\beta)
+	} \nonumber \\
+	&= \log \frac{f(\hat{p}, E_\alpha, M_\alpha)}{f(\hat{r}, E_\alpha, M_\alpha)} + \log \frac{f(\hat{q}, E_\beta, M_\beta)}{f(\hat{r}, E_\beta, M_\beta)}
 \end{align}
 
-\section{Verifying Structure}
+Where $\hat{p} \coloneqq E_\alpha / M_\alpha$, $\hat{q} \coloneqq E_\beta / M_\beta$ and $\hat{r} \coloneqq (E_\alpha + E_\beta) / (M_\alpha + M_\beta)$. These symbols are introduced to make the notation more succinct.
 
-So hypothesis testing. I’ll start with an example that may seem trivial now but will be extremely important later for graphical analysis. This is the test for equality of means. Say we have two coins, X and Y. We assume each flip is an independent Bernoulli trial. Coin X has probability p of coming up heads, Y has parameter q. We flip X, n times and record k heads. Y is flipped m times and l heads.
+\begin{lemma}
+	With $f$ defined as in equation \ref{eqn:f-defn}, $0 \leq e \leq m$ and $r \in [0, 1]$ then it holds that $\log \frac{f(e/m, e, m)}{f(r, e, m)} = m \cdot \kl \left( \textrm{Bern}(e/m) || \textrm{Bern}(r) \right)$ where $\kl(g || h)$ is the Kullback-Leibler divergence between two probability mass functions $g, h: \Xcal \mapsto [0, 1]$ defined in discrete space as $\kl(g || h) \coloneqq \sum_{x \in \Xcal} g(x) \log \frac{g(x)}{h(x)}$ and $\textrm{Bern(p)}$ denotes the Bernoulli p.m.f with parameter $p$.
+	\label{lem:kl-div}
+\end{lemma}
 
-Given this observed data we want to test the null hypothesis that p=q against the alternative that p != q.
+Proving lemma \ref{lem:kl-div} is simply a case of algebraic manipulation:
+%
+\begin{align}
+	\log \frac{f(e/m, e, m)}{f(r, e, m)} &= e \cdot \log \frac{e/m}{r} + (m-e) \cdot \log \frac{1- e/m}{1 - r} \nonumber \\
+	&= m \cdot \left( (e/m) \cdot \log \frac{e/m}{r} + (1 - e/m) \cdot \log \frac{1- e/m}{1 - r} \right) \nonumber \\
+	&= m \sum_{x \in \{0, 1\}} \textrm{Bern}(x; e/m) \cdot \log \frac{\textrm{Bern}(x; e/m)}{\textrm{Bern}(x; r)} \nonumber \\
+	&= m \kl \left( \textrm{Bern}(e/m) || \textrm{Bern}(r) \right) \quad \therefore \textrm{QED}
+\end{align}
 
-There is a very general theorem for hypothesis tests which states that the log-likelihood ratio test statistic (this is the likelihood of the observed data under H1 divided by the likelihood under H0 all logged) The theorem states that the log-likelihood ratio under the null is distributed like ½ times a chi-squared distribution with p degrees of freedom. Where p is the number of additional degrees of freedom introduced by H1. This allows us to compute the test statistic and reject the null hypothesis if the statistic is large enough.
+Thereby proving lemma \ref{lem:kl-div}. This allows us to simplify the test-statistic into a form that is more numerically stable:
+%
+\begin{equation}
+	t_n = M_\alpha \cdot \kl\left( \textrm{Bern}(\hat{p}) || \textrm{Bern}(\hat{r})\right) + 
+	M_\beta \cdot \kl\left( \textrm{Bern}(\hat{q}) || \textrm{Bern}(\hat{r})\right)
+	\label{eqn:test-stat-compute-form}
+\end{equation}
 
-The first thing I did was formally prove that this theorem holds for the coin flipping example we just spoke about. For brevity I’ll omit the details of the proof but it essentially manipulates the expression into such a form that we can apply the Central Limit Theorem to show that the term in the brackets is distributed as a standard gaussian. So we now have a robust tool for testing populations for equality of means. Put it in your toolbox for now because we will come back to it later.
+\begin{lemma}
+	For $p \approx r$ then 
+\end{lemma}
 
-So now on how to verify evidence of structure in a given graph. Suppose we have a graph G with known vertex labels. We assume it is drawn from a symmetric SBM with probability p of vertices within the same community being connected and probability q across communities. We say it is symmetric because these p and q are the same for all communities. We wish to test the hypothesis that these parameters are different against the null that they are equal. If the null is rejected then we can say that there is sufficient evidence to show the communities interact with one another differently.
+\begin{theorem}
+	We posit that $(X, \Gcal) \sim \textrm{SBM}(n, p, W)$. Given the realised graph and class labels $(X, \Gcal)$ we can perform a hypothesis test on parameters $W_\alpha$ and $W_\beta$ of the connectivity matrix $W$.
+	%
+	\begin{align*}
+	H_0:& \quad W_{\alpha} = W_{\beta} \\
+	H_1:& \quad W_{\alpha} \neq W_{\beta}
+	\end{align*}
+	If the log-likelihood ratio test statistic $t_n$ is computed as in equation \ref{eqn:test-stat-compute-form}, repeated here:
+	%
+	\begin{equation*}
+		t_n \coloneqq  M_\alpha \cdot \kl\left( \textrm{Bern}(\hat{p}) || \textrm{Bern}(\hat{r})\right) + 
+		M_\beta \cdot \kl\left( \textrm{Bern}(\hat{q}) || \textrm{Bern}(\hat{r})\right)
+	\end{equation*}
+	
+	Where $\hat{p} \coloneqq E_\alpha / M_\alpha$, $\hat{q} \coloneqq E_\beta / M_\beta$ and $\hat{r} \coloneqq (E_\alpha + E_\beta) / (M_\alpha + M_\beta)$. Then as the number of vertices $n \rightarrow \infty, t_n \sim \frac{1}{2} \chi^2_1$ under the null $H_0$. Therefore, we reject $H_0$ at the $100(\zeta)\%$ confidence level if and only if $2t_n \geq \psi^{-1}(\zeta)$, where $\psi^{-1}$ is the $\chi^2_1$ inverse cdf satisfying $Pr(Y \leq \psi^{-1}(\zeta)) = \zeta$ given $Y \sim \chi^2_1$.
+	
+	\label{theorem:hyp-test-sbm-chi}
+\end{theorem}
 
-And this is where we reap the dividends from the earlier hypothesis test. Two nodes within a community are connected with probability p (this is the equivalent of coming up heads) and they are disconnected with probability 1-p. We can reduce this hypothesis test to exactly the one we had before by assigning the parameters as follows.
+\begin{corollary}
+	We can also use a slightly simpler test-statistic $z_n$ albeit with some loss of generality. If we define $z_n$ to be:
+	%
+	\begin{equation*}
+		z_n \coloneqq \sqrt{\frac{M_\alpha M_\beta}{\hat{r}(1-\hat{r})(M_\alpha + M_\beta)}} \left( \hat{p} - \hat{q} \right)
+	\end{equation*}
+	
+	With the symbols retaining their previous meanings. Then we show that under the null $H_0$, as $n \rightarrow \infty$ then $z_n \sim \Gaussian(0, 1)$. Meaning that, we can construct a similar test to reject $H_0$ at the $100(\zeta)\%$ confidence level if and only if $|z_n| \geq \phi^{-1}(\zeta)$, where $\phi^{-1}$ is the standard inverse Gaussian cdf on magnitude satisfying $Pr(|Y| \leq \phi^{-1}(\zeta)) = \zeta$ given $Y \sim \Gaussian(0, 1)$
+\end{corollary}
 
-n is now the number of possible edges within communities
-m is those possible across
-k is the number that are realised within communities
-And l are those realised across
+\section{Early results}
 
-So we now try to apply this test to a real world dataset. The Stanford Network Analysis Project (SNAP) has a wealth of graphical datasets. In particular I analysed a couple of facebook ego-nets. So that is a graph of all my friends and the connections between them. Each vertex is also labelled by a feature vector which is entirely anonymised. I cannot even tell someone’s gender only whether it is the same as somebody else’s. The graph on the right is one such egonet with all gender-77 vertices coloured orange.
+We seek to apply theorem \ref{theorem:hyp-test-sbm-chi} to various real-world graphical datasets. We start by analysing social network graphs. The Stanford Network Analysis Project (SNAP for short) \cite{snapnets} offers a wealth of Facebook egonets. An egonet is simply a graph where all vertices (in this case each representing a Facebook user) are guaranteed to be connected to one central node (the ego-node). The data consists of the undirected set of edges $\Gcal$ indicating whether any two vertices (Facebook users) are connected (friends on Facebook). We also have a set of binary labels for each vertex $X$. However, for the sake of privacy these features are anonymised. This is best explained through illustration:
+%
+\begin{verbatim}
+75 first_name;anonymized feature 75
+76 first_name;anonymized feature 76
+77 gender;anonymized feature 77
+78 gender;anonymized feature 78
+79 hometown;id;anonymized feature 79
+\end{verbatim}
 
-So we apply three hypothesis tests on this graph to determine whether gender impacts how people connect on facebook. In every case, we reject the null with a very high degree of confidence (in one case we even surpass the precision of the chi-squared cdf). We can be certain that gender impacts how people connect but this approach has several limitations.
-
-First of all, we cannot say with certainty how large the impact is. Only that gender does impact graphical structure. Secondly we must be careful to avoid confounding variables. These are variables that we did not account for that could better explain the structure. To give an example, we might find evidence that students in Cambridge are more likely to be friends with those of the same gender. The confounding variable here could be college affiliation especially given the existence of all-female colleges such as Newnham. And lastly these approaches only work if the graph is labelled in advance.
-
-To overcome some of these limitations we now look at the related issue of detecting structure in an unlabeled graph. The question is how well we can recover the communities from the graph. This is dependent on the parameters of the SBM. Each regime here is less strict than the one before. We will focus on weak recovery as that is the regime that most real-life graphs occupy and the same algorithms to solve weak recovery can be applied to more neat graphs.
-
-Formally, weak recovery means that we can assign vertex labels with more accuracy than simply sampling from the community prior. A different way of putting this is that we simply need to partition the graph’s vertices into two sets S and the complement of S such that this partition cuts across communities. Formally, the fraction of nodes from a certain community in our set S is different for different communities.
-
-The most tractable weak recovery algorithm is something called Acyclic Belief Propagation. This is a form of message-passing that runs in O(n log n) on graphs with constant degree. Since we’re pressed on time I’ll skim over the details. We initialise the messages by drawing from a standard Gaussian. We propagate these messages along the edges of the graph correcting for cycles of length less than r and then take the output to be the sum of all incoming messages. If the output of a vertex is positive we assign it into set S.
-
-So we run ABP on our same ego-net and find that weak recovery is satisfied. We partition the graph into two sets and find that the fraction of orange gender in set S is different to the fraction ofpurple gender in set S. 0.41 is not equal to 0.47. But these numbers are still quite close to one another so perhaps gender is not the most important feature by which we can partition the graph. And this is where I want to go to next.
-
-So we can run ABP on an unlabelled graph to partition into the two most distinctive sets. But what if we also have the vertex labels. We could then train a binary classifier to map from feature vectors to classification under ABP. This way we will be able to include all feature variables automatically and rank order them by importance.
-
-We would then start to ask more sophisticated questions of the dataset. Are friends made independent of politics given age? Is the gender of a research partner independent given the research topic? We can start to build a much more powerful tool.
-
-Looking slightly longer term, I would like to formalise this approach and link the ABP partition to a robust hypothesis testing framework. I may look to bring in causality and seeing if we cannot start to predict graph evolution. Remember that almost no graph is static, new vertices and edges are being added all the time. I may also extend this approach to more sophisticated graphical models. Indeed, the standard SBM is not well suited to tightly clustered graphs. The geometric SBM introduces an additional parameter to account for the mutual friends phenomenon. You are much more likely to be friends with a friend of your friend than with a random vertex on the graph.
+If we have a total of $f$ features and $n$ vertices, then the feature matrix $X$ would be an $n \times f$ where each row is the feature vector for the corresponding vertex. The features are binary such that $X_{ij} \in \{0, 1\}$ indicating the feature of and on respectively. However, each feature is anonymised to avoid giving away personally identifiable information. I cannot tell whether vertex $v$ is male or female but I can tell whether they are the same gender as another vertex $w$.
 
 
 \section{Verifying Structure}
