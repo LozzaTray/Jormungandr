@@ -2,7 +2,7 @@
 
 %opening
 \title{TMR: Detecting Structure in Graphical Data}
-\author{Lawrence Tray \\ Ioannis Kontoyiannis}
+\author{Lawrence Tray \\ Sup: Ioannis Kontoyiannis}
 
 %packages
 \usepackage[margin=0.5in]{geometry}
@@ -62,7 +62,9 @@
 \maketitle
 
 \begin{abstract}
-This is the Technical Milestone Report for the II-B project: detecting structure in graphical data. We produce vast quantities of graphical data every day and yet the techniques used to analyse their structure are still in their infancy. We start by defining the Stochastic Block Model (SBM) widely used in academia and develop a theorem to verify structure in a given labelled graph.
+We produce vast quantities of graphical data every day and yet the techniques used to analyse their structure are still in their infancy. We start by defining the Stochastic Block Model (SBM) widely used in academia and develop a theorem to verify structure in a labelled graph through a hypothesis test formulation. We explore the results of applying this theorem to Facebook friendship egonets and find that gender does indeed influence how friendships form on Facebook but this binary yes-no result is unsatisfactory.
+
+To rank order input features by importance we instead approach the problem from the opposite direction: given a graph we detect the partitions that are in some sense typical and then develop a crude classifier to map from vertex features to partition. The classifier can then rank order the input features by importance. Nevertheless, work must still be done to refine this classifier and tie it back to the rigorous hypothesis testing framework we have already developed.
 \end{abstract}
 
 \tableofcontents
@@ -384,9 +386,10 @@ One of the most promising weak recovery algorithms is called Acyclic Belief Prop
 		\EndIf
 		\EndFor
 		\EndFor
-		\State $\sigma_v = \sum_{(v, v') \in \Ecal} y^{(T)}_{v' \rightarrow v}$ \Comment{Sum incoming messages}
-		\State $\hat{X}_v \gets 1$ if $\sigma_v > 0$ else $2$ \Comment{Hard assignment}
-		\State \textbf{return} $\hat{X}_v$
+		\State $\sigma_v \gets \sum_{(v, v') \in \Ecal} y^{(T)}_{v' \rightarrow v}$ \Comment{Sum incoming messages}
+		\State $S \gets \{v \in \Vcal : \sigma_v > 0\}$ \Comment{Hard assignment}
+		\State $S^C \gets \{v \in \Vcal : \sigma_v \leq 0\}$
+		\State \textbf{return} $S, S^C$
 		\EndFunction
 	\end{algorithmic}
 \end{algorithm}
@@ -428,6 +431,7 @@ We can evaluate formally whether weak recovery has succeeded by inspecting figur
 Clearly the fraction of each community in the partition $S$ differ substantially so we say that weak recovery is solved. The set $S$ contains a higher proportion of the overall 78-population than of the 77-population.
 
 \subsection{From detection to inference}
+\label{sect:detection-to-inference}
 
 We now have an algorithm (ABP) that partitions our graph into two sets that are most readily explained by an SBM with $k=2$ communities. We can now ask the question of which vertex labels most readily explain the separation. Therefore, we can determine which features have the largest impact on the graphical structure; this circumvents the binary resolution problem with the hypothesis testing approach.
 
@@ -435,7 +439,14 @@ This part of the project is still in its early stages so these are just prelimin
 \footnote{ABP is non-deterministic so each subplot is the result of a different run of ABP. Subfigures use the same partition $S$ but no exact comparison is possible between figures.}
 on figure \ref{fig:abp-output-community-fractions}. It is interesting to note that if two bars on this plot differ substantially then we have satisfied the requirment for weak recovery as defined in \ref{defn:weak-recovery}. We necessarily remove the constraint on the community sets $\Omega_i$ to be disjoint as one vertex can have multiple features turned on. This can be modelled more precisely through a Mixed Membership Model but for now an SBM with $k=2$ communities suffices.
 
-We perform a linear regression on the normalised ABP output $\tilde{\sigma}_v$
+We perform a linear regression on the normalised ABP output vector $\tilde{\sigma}$ with the feature matrix $n \times f$ feature matrix $X$ as the explanatory variables. $X_{ij} = 1$ if vertex $i$ has feature $j$ turned on and $0$ if feature $j$ is off. The equation we try to fit is given below:
+%
+\begin{equation}
+	\tilde{\sigma} = a + X b + \epsilon
+	\label{eqn:lin-regression}
+\end{equation}
+
+Linear regression finds the constant bias $a$ and $f \times 1$ weight vector $b$ that minimises the mean squared prediction error $\epsilon^T \epsilon / n$. The theory for linear regression is well known so omitted here (see \cite{yale-linear-regression} for a reference). We perform a linear regression using only gender and language features available in the dataset and plot the parameter coefficient in order of decreasing magnitude (figure \ref{fig:abp-output-lin-regression}).
 %
 \begin{figure}[!h]
 	\centering
@@ -452,9 +463,21 @@ We perform a linear regression on the normalised ABP output $\tilde{\sigma}_v$
 	\caption{Egonet-0 linear classifier results}
 \end{figure}
 
+The results are rather interesting. Certain languages are a far stronger predictor of community assignment than language. After all, one would hope that a language barrier poses a more tangible obstacle to friendship than gender. The bias term has rather low magnitude which just implies that the partition $S$ and $S^C$ are of similar size. A keen reader would notice that the bias term is included in figure \ref{fig:abp-output-community-fractions}; this is because we implement the bias by augmenting $X$ with an additional feature flag always to $1$ such that the constant term $a$ in equation \ref{eqn:lin-regression} is subsumed into the $b$ vector. Indeed, in figure \ref{fig:abp-output-community-fractions} the fraction of vertices with bias turned on in partition $S$ is very close to 0.5. Since all vertices have the bias feature turned on $\Omega_{bias} = \Vcal$, this is equivalent to the number of vertices in $S$ as a fraction of the total: $|S| / |\Vcal|$.
+
+This analysis is of course rather crude as we have failed to take into account multi-collinearity or even determined if a linear regression model is appropriate; indeed, an $R^2$ value of just 0.113 would suggest that it is not. Nevertheless, this serves as the platform for subsequent more rigorous analysis.
+
 \section{Future Direction}
 
+The immediate next steps for the project are to refine the classification approach outlined in section \ref{sect:detection-to-inference}. Firstly, it should be tied back to the hypothesis testing framework to make sure that the results are proven to be meaningful. Secondly, the exact form of the classifier can be explored; a linear regression model is a good starting point but we can expand to a softmax neural network as that would allow us to generalise to more than just two partitions.
+
+Indeed, ABP is severely limited by the fact that it only outputs 2 partitions $S$ and $S^C$. Therefore, though weak recovery is solved the results from applying the classification approach may not be natural or easy to interpret. We instead would prefer to investigate various different algorithms. Force-directed approaches are the standard in industry. One of the most common is the Fruchterman-Reingold algorithm which treats vertices as repelling objects and edges as attractive forces (springs) and then performs iterative updates on vertex positions for a finite number of iterations. This algorithm is what is used by the NetworkX package \cite{networkx} to determine graph layouts as seen in figures \ref{fig:ego-0-by-gender} and \ref{fig:abp-output-norm}. Song and Bressan \cite{force-directed} have had great success using the Fruchterman-Reingold algorithm followed by k-means clustering for community detection. Nevertheless, though they show the method produces accurate results there is no rigorous proof that it solves weak recovery.
+
+Lastly, the analysis must of course be expanded to more datasets to benchmark efficacy against other methods. Work has already begun analysing the influence of gender academic collaboration graphs from Aminer \cite{aminer}. Nevertheless, this dataset does not contain gender explicitly, only first-name. However, this is cross-referenced with a list of popular baby-names to get a good replacement (as suggested by West et al. \cite{gender-scholarship}). Furthermore, the seminal dataset of political blogs from the 2004 US election \cite{polblogs} which started much of the analysis of the SBM will of course be analysed.
+
 \section{Conclusion}
+
+This concludes the Technical Milestone Report for the project thus far. We start by fully fleshing out the theoretical foundation of the Stochastic Block Model and hypothesis tests on connectivity parameters. Nevertheless, this approach is too narrow in scope to be a useful tool on its own. We therefore set about the problem from the opposite direction; rather than verify structure we are already given, we detect structure in the graph without labels and seek to identify which labels best recreate the detected partition. Early results are promising but this approach needs to be given the same rigorous treatment as the hypothesis testing framework. That will be the emphasis of future work.
 
 \nocite{*}
 \printbibliography

@@ -219,6 +219,55 @@
     \field{year}{2015}
   \endentry
 
+  \entry{polblogs}{inproceedings}{}
+    \name{author}{2}{}{%
+      {{hash=ALA}{%
+         family={Adamic},
+         familyi={A\bibinitperiod},
+         given={Lada\bibnamedelima A.},
+         giveni={L\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=GN}{%
+         family={Glance},
+         familyi={G\bibinitperiod},
+         given={Natalie},
+         giveni={N\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{ALAGN1}
+    \strng{fullhash}{ALAGN1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{A}
+    \field{sortinithash}{A}
+    \field{booktitle}{Proceedings of the WWW-2005 Workshop on the Weblogging
+  Ecosystem}
+    \field{title}{The political blogospher and the 2004 US Election}
+    \field{year}{2005}
+  \endentry
+
+  \entry{gender-scholarship}{article}{}
+    \name{author}{1}{}{%
+      {{hash=eaJW}{%
+         prefix={et},
+         prefixi={e\bibinitperiod},
+         family={al.},
+         familyi={a\bibinitperiod},
+         given={Jevin\bibnamedelima West},
+         giveni={J\bibinitperiod\bibinitdelim W\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{aJWe1}
+    \strng{fullhash}{aJWe1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{A}
+    \field{sortinithash}{A}
+    \field{title}{The role of gender in scholarly authorship}
+    \field{journaltitle}{PLoS One}
+    \field{year}{2013}
+  \endentry
+
   \entry{networkx}{inproceedings}{}
     \name{author}{3}{}{%
       {{hash=HAA}{%
@@ -335,6 +384,106 @@
     \field{journaltitle}{ACM Transactions on Intelligent Systems and Technology
   (TIST)}
     \field{year}{2016}
+  \endentry
+
+  \entry{force-directed}{article}{}
+    \name{author}{2}{}{%
+      {{hash=SY}{%
+         family={Song},
+         familyi={S\bibinitperiod},
+         given={Yi},
+         giveni={Y\bibinitperiod},
+      }}%
+      {{hash=BS}{%
+         family={Bressan},
+         familyi={B\bibinitperiod},
+         given={Stephane},
+         giveni={S\bibinitperiod},
+      }}%
+    }
+    \list{publisher}{1}{%
+      {The National University of Singapore}%
+    }
+    \strng{namehash}{SYBS1}
+    \strng{fullhash}{SYBS1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{S}
+    \field{sortinithash}{S}
+    \field{title}{Force-directed Layout Community Detection}
+    \field{journaltitle}{School of Computing}
+    \field{year}{2013}
+  \endentry
+
+  \entry{aminer}{inproceedings}{}
+    \name{author}{6}{}{%
+      {{hash=TJ}{%
+         family={Tang},
+         familyi={T\bibinitperiod},
+         given={Jie},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=ZJ}{%
+         family={Zhang},
+         familyi={Z\bibinitperiod},
+         given={Jing},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=YL}{%
+         family={Yao},
+         familyi={Y\bibinitperiod},
+         given={Limin},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=LJ}{%
+         family={Li},
+         familyi={L\bibinitperiod},
+         given={Juanzi},
+         giveni={J\bibinitperiod},
+      }}%
+      {{hash=ZL}{%
+         family={Zhang},
+         familyi={Z\bibinitperiod},
+         given={Li},
+         giveni={L\bibinitperiod},
+      }}%
+      {{hash=SZ}{%
+         family={Su},
+         familyi={S\bibinitperiod},
+         given={Zhong},
+         giveni={Z\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{TJ+1}
+    \strng{fullhash}{TJZJYLLJZLSZ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{T}
+    \field{sortinithash}{T}
+    \field{booktitle}{KDD'08}
+    \field{pages}{990\bibrangedash 998}
+    \field{title}{ArnetMiner: Extraction and Mining of Academic Social
+  Networks}
+    \field{year}{2008}
+  \endentry
+
+  \entry{yale-linear-regression}{misc}{}
+    \name{author}{1}{}{%
+      {{hash=Y}{%
+         family={Yale},
+         familyi={Y\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{Y1}
+    \strng{fullhash}{Y1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{Y}
+    \field{sortinithash}{Y}
+    \field{title}{Linear Regression}
+    \verb{url}
+    \verb http://www.stat.yale.edu/Courses/1997-98/101/linreg.htm
+    \endverb
   \endentry
 \enddatalist
 \endinput
