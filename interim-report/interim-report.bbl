@@ -219,6 +219,63 @@
     \field{year}{2015}
   \endentry
 
+  \entry{networkx}{inproceedings}{}
+    \name{author}{3}{}{%
+      {{hash=HAA}{%
+         family={Hagberg},
+         familyi={H\bibinitperiod},
+         given={Aric\bibnamedelima A.},
+         giveni={A\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=SDA}{%
+         family={Schult},
+         familyi={S\bibinitperiod},
+         given={Daniel\bibnamedelima A.},
+         giveni={D\bibinitperiod\bibinitdelim A\bibinitperiod},
+      }}%
+      {{hash=SPJ}{%
+         family={Swart},
+         familyi={S\bibinitperiod},
+         given={Pieter\bibnamedelima J.},
+         giveni={P\bibinitperiod\bibinitdelim J\bibinitperiod},
+      }}%
+    }
+    \name{editor}{3}{}{%
+      {{hash=VG}{%
+         family={Varoquaux},
+         familyi={V\bibinitperiod},
+         given={Ga\"el},
+         giveni={G\bibinitperiod},
+      }}%
+      {{hash=VT}{%
+         family={Vaught},
+         familyi={V\bibinitperiod},
+         given={Travis},
+         giveni={T\bibinitperiod},
+      }}%
+      {{hash=MJ}{%
+         family={Millman},
+         familyi={M\bibinitperiod},
+         given={Jarrod},
+         giveni={J\bibinitperiod},
+      }}%
+    }
+    \strng{namehash}{HAASDASPJ1}
+    \strng{fullhash}{HAASDASPJ1}
+    \field{labelnamesource}{author}
+    \field{labeltitlesource}{title}
+    \field{sortinit}{H}
+    \field{sortinithash}{H}
+    \field{booktitle}{Proceedings of the 7th Python in Science Conference}
+    \field{pages}{11 \bibrangedash  15}
+    \field{title}{Exploring Network Structure, Dynamics, and Function using
+  NetworkX}
+    \list{location}{1}{%
+      {Pasadena, CA USA}%
+    }
+    \field{year}{2008}
+  \endentry
+
   \entry{snapnets}{misc}{}
     \name{author}{2}{}{%
       {{hash=LJ}{%

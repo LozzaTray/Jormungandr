@@ -14,6 +14,8 @@
 \usepackage{subcaption}
 \usepackage{mathtools}
 \usepackage{parskip}
+\usepackage{fancyvrb}
+\usepackage{bbm}
 
 %bibliography
 \usepackage[backend=bibtex]{biblatex}
@@ -42,6 +44,7 @@
 \newcommand{\Integers}{\mathbb{Z}}
 \newcommand{\SBM}{\textrm{SBM}}
 \newcommand{\iid}{\stackrel{iid}{\sim}}
+\newcommand{\one}{\mathbbm{1}}
 \newcommand{\figwidth}{0.55\linewidth}
 
 
@@ -64,8 +67,6 @@ So the agenda for today. I will take you through my exploratory work around the 
 
 \section{Introduction}
 
-The title started off as ``detecting causal structure in time series data'' but the emphasis has pivoted to the more generic question: detecting structure in data and specifically graphical data.
-
 There is a wealth of graphical data in the world and more is being produced each second; social networks, website hyperlinks and academic collaborations are just some examples of this data. There is a wealth of algorithms developed to analyse graphical data. Nevertheless, that same principled framework we have for querying classical data (hypothesis testing) is less developed for graphical data. Do my friends vote the same way I do or do researchers collaborate with those of the same gender? We want to answer these questions and not only that, we wish to report our confidence in the answers. To that end there is space to expand the hypothesis testing framework to graphs.
 
 \section{The Stochastic Block Model}
@@ -74,14 +75,19 @@ The most popular graphical model in industry and indeed academia is called the S
 
 \begin{definition}
 	\label{defn:sbm}
-	Let $n \in \Integers^+$ be the number of vertices and $k \in \Integers^+$ be the number of communities in an SBM graph. We define a probability vector $\pi = [\pi_1, \pi_2 \dots \pi_K]^T$ to be the prior on the K-communities. Each vertex $v \in \Vcal = \{1, 2 \dots N\}$ has a community label $X_v \in \{1, 2 \dots n\}$. Let $W$ be a symmetric $k \times k$ matrix called the connectivity matrix. We say that the pair $(X, \Gcal) \sim \textrm{SBM}(n, \pi, W)$ if X is an $N$-dimensional vector with each component independently distributed as the community prior $X_v \sim \pi$ and $\Gcal$ is an $N$-vertex graph where each pair of vertices $(i, j)$ is connected with probability $p(i \leftrightarrow j) = W_{X_i, X_j}$ independently of other pairs of vertices. Lastly, we define the community sets as $\Omega_i = \Omega_i(X) \coloneqq \{v \in \Vcal : X_v = i\}$ which groups our partitions the vertex-set.
+	Let $n \in \Integers^+$ be the number of vertices and $k \in \Integers^+$ be the number of communities in an SBM graph. We define a probability vector $\pi = [\pi_1, \pi_2 \dots \pi_k]^T$ to be the prior on the k-communities. Each vertex $v \in \Vcal = \{1, 2 \dots N\}$ has a community label $X_v \in \{1, 2 \dots n\}$. Let $W$ be a symmetric $k \times k$ matrix with entries in $[0,1]$ called the connectivity matrix. We say that the pair $(X, \Gcal) \sim \textrm{SBM}(n, \pi, W)$ if X is an $N$-dimensional vector with each component independently distributed as the community prior $X_v \sim \pi$ and $\Gcal$ is an $N$-vertex graph where each pair of vertices $(i, j)$ is connected with probability $p(i \leftrightarrow j) = W_{X_i, X_j}$ independently of other pairs of vertices. Lastly, we define the community sets as $\Omega_i = \Omega_i(X) \coloneqq \{v \in \Vcal : X_v = i\}$ which contains all vertices belonging to community $i$.
 \end{definition}
 
-Obviously this definition imposes further constraints on the values that the connectivity matrix $W$ namely: $0 \leq W_{ij} \leq 1$. Though the definition of the SBM is simple, it allows for very deep and rich analysis of graphical datasets.
+Though the definition of the SBM is simple, it allows for very deep and rich analysis of graphical datasets. For certain problems it helps to define the symmetric SBM.
+
+\begin{definition}
+	\label{defn:sym-sbm}
+	The symmetric SBM is a special case denoted by $\textrm{SSBM}(n, k, q_{in}, q_{out}) \equiv \textrm{SBM}(n, p, W)$ if the community prior $p$ is uniform ($p_i = 1/k$ for $i \in \{1, 2, \dots k\}$) and $W_{ij}$ takes only two values, one on diagonal and another off diagonal such that $W_{ij} = q_{in}$ for $i=j$ and $W_{ij} = q_{out}$ for $i \neq j$.
+\end{definition}
 
 \section{Verifying Structure}
 
-Armed with this definition we tackle the simplest problem in structure verification. Given a graph $\Gcal$ and vertex-labels $X$, we wish to determine whether the two communities $a$ and $b$ connect differently. Put formally this a hypothesis test on the parameters of $W$. There are three parameters we would wish to test: $W_{aa}, W_{ab}$ and $W_{bb}$ (note that the symmetry constraint requires $W_{ab} = W_{ba}$). To do this we can perform three-pairwise hypothesis tests. Here we test $W_{\alpha}$ against $W_{\beta}$ where $\alpha$ and $\beta$ are unique indices in $\{(a,a), (a, b), (b,b)\}$:
+Armed with this definition we tackle the simplest problem in structure verification. Given an undirected graph $\Gcal$ and vertex-labels $X$, we wish to determine whether the two communities $a$ and $b$ connect differently. Put formally, this is a hypothesis test on the parameters of $W$. There are three parameters we would wish to test: $W_{aa}, W_{ab}$ and $W_{bb}$ (note that for an undirected graph $W = W^T$ necessarily so $W_{ab} = W_{ba}$). To do this we can perform three-pairwise hypothesis tests. Here we test $W_{\alpha}$ against $W_{\beta}$ where $\alpha$ and $\beta$ are unique indices in $\{(a,a), (a, b), (b,b)\}$:
 %
 \begin{equation}
 \begin{aligned}
@@ -90,14 +96,14 @@ Armed with this definition we tackle the simplest problem in structure verificat
 \end{aligned}
 \end{equation}
 
-We formulate this as a likelihood ratio test. Letting $\lik(\Dcal | H)$ denote the likelihood of observing the data $\Dcal = (X, G)$ under hypothesis $H$. For ease of notation. Therefore, the test statistic is given by:
+We formulate this as a likelihood ratio test. Letting $\lik(\Dcal | H)$ denote the likelihood of observing the data $\Dcal = (X, G)$ under hypothesis $H$. Therefore, the test statistic is given by:
 %
 \begin{equation}
 	t_n \coloneqq \log \frac{\lik(\Dcal | H_1)}{\lik(\Dcal | H_0)}
 	\label{eqn:test-statistic-start}
 \end{equation}
 
-At this point it helps to introduce some more notation. We define $n_i \coloneqq |\Omega_i(X)|$ leading to the result $n = \sum_i n_i$. Furthermore, we define $E_{ij} = E_{ij}(X, \Gcal)$ to denote the number of realised edges between communities $i$ and $j$ (in generality $i$ may be equal to $j$). Furthermore, define $M_{ij} = M_{ij}(X)$ as the maximum number of possible edges between the communities. For an undirected graph this can be computed simply as follows:
+At this point it helps to introduce some more notation. We define the number of vertices in community $i$ by $n_i \coloneqq |\Omega_i(X)|$ leading to the result $n = \sum_i n_i$. Furthermore, we use $E_{ij} = E_{ij}(X, \Gcal)$ to denote the number of realised edges between communities $i$ and $j$ (in generality $i$ may be equal to $j$) and similarly define $M_{ij} = M_{ij}(X)$ as the maximum number of possible edges between the communities. For an undirected graph this can be computed simply as follows:
 %
 \begin{equation}
 	M_{ij} = M_{ij} (X) = \begin{cases}
@@ -106,7 +112,7 @@ At this point it helps to introduce some more notation. We define $n_i \coloneqq
 	\end{cases}
 \end{equation}
 
-With this new notation, likelihood function can be written explicitly:
+With this new notation, the likelihood function can be written explicitly:
 %
 \begin{align}
 \lik(\Dcal | H) &= p(X| \pi) \cdot p(\Gcal | W, X) \nonumber \\
@@ -115,7 +121,7 @@ With this new notation, likelihood function can be written explicitly:
 \label{eqn:likelihood-verbose}
 \end{align}
 
-The form of $p(\Gcal | W, X)$ is simply a sequence of Bernoulli trials for each distinct community pair $(i, j)$ (edge present with probability $W_{ij}$ or edge absent with probability $1 - W_{ij}$ for every pair of vertices across those communities). A sequence of Bernoullis is the same as a Binomial distribution without the combinatoric term. By inspecting equation \ref{eqn:likelihood-verbose} we see that only terms involving $W_{\alpha}$ and $W_{\beta}$ are going to differ under the two hypotheses; the rest of the terms will cancel in our calculation. Therefore, we can rewrite the likelihood as follows:
+The form of $p(\Gcal | W, X)$ is simply a sequence of Bernoulli trials for each distinct community pair $(i, j)$ (edge present with probability $W_{ij}$ or edge absent with probability $1 - W_{ij}$ for every pair of vertices across those communities). A sequence of Bernoullis is the same as a Binomial distribution without the combinatoric term. By inspecting equation \ref{eqn:likelihood-verbose} we see that only terms involving $W_{\alpha}$ and $W_{\beta}$ are going to differ under the two hypotheses; the rest of the terms will cancel in our calculation of the test-statistic $t_n$. Therefore, we can rewrite the likelihood as follows:
 %
 \begin{equation}
 	\lik (\Dcal | H) \propto f (W_\alpha, E_\alpha, M_\alpha) \cdot f (W_\beta, E_\beta, M_\beta)
@@ -158,7 +164,7 @@ Furthermore, we spot the following property $f(w, e_1, m_1) \cdot f(w, e_2, m_2)
 Where $\hat{p} \coloneqq E_\alpha / M_\alpha$, $\hat{q} \coloneqq E_\beta / M_\beta$ and $\hat{r} \coloneqq (E_\alpha + E_\beta) / (M_\alpha + M_\beta)$. These symbols are introduced to make the notation more succinct.
 
 \begin{lemma}
-	With $f$ defined as in equation \ref{eqn:f-defn}, $0 \leq e \leq m$ and $r \in [0, 1]$ then it holds that $\log \frac{f(e/m, e, m)}{f(r, e, m)} = m \cdot \kl \left( \textrm{Bern}(e/m) || \textrm{Bern}(r) \right)$ where $\kl(g || h)$ is the Kullback-Leibler divergence between two probability mass functions $g, h: \Xcal \mapsto [0, 1]$ defined in discrete space as $\kl(g || h) \coloneqq \sum_{x \in \Xcal} g(x) \log \frac{g(x)}{h(x)}$ and $\textrm{Bern(p)}$ denotes the Bernoulli p.m.f with parameter $p$.
+	With $f$ defined as in equation \ref{eqn:f-defn}, $0 \leq e \leq m$ and $r \in [0, 1]$ it holds that $\log \frac{f(e/m, e, m)}{f(r, e, m)} = m \cdot \kl \left( \textrm{Bern}(e/m) || \textrm{Bern}(r) \right)$ where $\kl(g || h)$ is the Kullback-Leibler divergence between two probability mass functions $g, h: \Xcal \mapsto [0, 1]$ defined in discrete space as $\kl(g || h) \coloneqq \sum_{x \in \Xcal} g(x) \log \frac{g(x)}{h(x)}$ and $\textrm{Bern(p)}$ denotes the Bernoulli p.m.f with parameter $p$.
 	\label{lem:kl-div}
 \end{lemma}
 
@@ -213,19 +219,117 @@ Thereby proving lemma \ref{lem:kl-div}. This allows us to simplify the test-stat
 \end{corollary}
 
 \section{Early results}
+\subsection{Social Networks}
 
-We seek to apply theorem \ref{theorem:hyp-test-sbm-chi} to various real-world graphical datasets. We start by analysing social network graphs. The Stanford Network Analysis Project (SNAP for short) \cite{snapnets} offers a wealth of Facebook egonets. An egonet is simply a graph where all vertices (in this case each representing a Facebook user) are guaranteed to be connected to one central node (the ego-node). The data consists of the undirected set of edges $\Gcal$ indicating whether any two vertices (Facebook users) are connected (friends on Facebook). We also have a set of binary labels for each vertex $X$. However, for the sake of privacy these features are anonymised. This is best explained through illustration:
-%
-\begin{verbatim}
+We seek to apply theorem \ref{theorem:hyp-test-sbm-chi} to various real-world graphical datasets. We start by analysing social network graphs. The Stanford Network Analysis Project (SNAP for short) \cite{snapnets} offers a wealth of Facebook egonets. An egonet is simply a graph where all vertices (in this case each representing a Facebook user) are guaranteed to be connected to one central node (the ego-node). The data consists of the undirected set of edges $\Gcal$ indicating whether any two vertices (Facebook users) are connected (friends on Facebook). We also have a set of binary labels for each vertex $X$. However, for the sake of privacy these features are anonymised. This is best explained through the example below: \\
+
+\begin{center}
+\begin{minipage}{8cm}
+\begin{Verbatim}[fontsize=\small, frame=single, label={\fbox{Example anonymised feature flags}}]
 75 first_name;anonymized feature 75
 76 first_name;anonymized feature 76
 77 gender;anonymized feature 77
 78 gender;anonymized feature 78
 79 hometown;id;anonymized feature 79
-\end{verbatim}
+\end{Verbatim}
+\end{minipage}
+\end{center}
 
-If we have a total of $f$ features and $n$ vertices, then the feature matrix $X$ would be an $n \times f$ where each row is the feature vector for the corresponding vertex. The features are binary such that $X_{ij} \in \{0, 1\}$ indicating the feature of and on respectively. However, each feature is anonymised to avoid giving away personally identifiable information. I cannot tell whether vertex $v$ is male or female but I can tell whether they are the same gender as another vertex $w$.
 
+Each feature is anonymised to avoid disclosing personally identifiable information. I cannot tell whether vertex $v$ is male or female but I can tell whether they are the same gender as another vertex $w$ which suffices for our analysis. If we have a total of $f$ features and $n$ vertices, then the feature matrix $X$ would be an $n \times f$ where each row is the feature vector for the corresponding vertex. The features are binary such that $X_{ij} \in \{0, 1\}$ indicating the feature of and on respectively.
+
+We perform a hypothesis test in the manner described by theorem \ref{theorem:hyp-test-sbm-chi} to determine whether gender influences how friends connect on Facebook. We choose to analyse SNAP egonet with id 0 (the id of the egonet is the id of the single egonode) though any choice is possible. The egonet is plotted on figure \ref{fig:ego-0-by-gender}. We use the Python package NetworkX \cite{networkx} for its visualisation tools. Indeed, we will discuss layout algorithms later as for now we focus on the simple hypothesis test.
+%
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=\figwidth]{ego-0-by-gender.png}
+	\caption{Egonet 0 with nodes coloured by gender}
+	\label{fig:ego-0-by-gender}
+\end{figure}
+
+We use an SBM model with $k=2$ communities (1: gender-77 on and 2: gender-77 off) to model the egonet and perform a three-way hypothesis test on the parameters of the connectivity Matrix $W$.
+%
+\begin{equation}
+	W = \begin{bmatrix}
+		p_1 & q \\
+		q & p_2
+	\end{bmatrix}
+\end{equation}
+
+Therefore, $p_1$ is the probability that two vertices of gender-77 are connected, $q$ is the crossover probability and $p_2$ is the connection probability within the gender-78 community. The results of the hypothesis tests are given in table \ref{tab:egonet-0-hyp-tests} alongside p-values (we choose a 95\% significance level to reject the null). However, in some cases the test statistics were so extreme that the p-value saturated to 0.
+%
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{c c c c c}
+		$n_1$                & $n_2$                & $\hat{p_1}$ & $\hat{q}$ & $\hat{p_2}$       \\ \hline
+		130 & 218 & $8.13 \times 10^{-2}$ & $7.66 \times 10^{-2}$ & $10.6 \times 10^{-2}$
+	\end{tabular}
+	\caption{Egonet-0 properties and parameter estimates}
+	\label{tab:egonet-0-props}
+\end{table}
+
+\begin{table}[!h]
+	\centering
+	\begin{tabular}{cccccc}
+		Test & $H_0$                & $H_1$                & p-value & $H_0$ rejected       \\ \hline
+		1    & $p_1 = q$            & $p_1 \neq q$         & 0.158 &  No                \\
+		2    & $p_1 = p_2$ & $p_1 \neq p_2$ & 0.000 & Yes \\
+		3    & $q = p_2$ & $q \neq p_2$ &  0.000 & Yes
+	\end{tabular}
+	\caption{Egonet-0 hypothesis tests that gender influences friendship formation}
+	\label{tab:egonet-0-hyp-tests}
+\end{table}
+
+Test 2 being rejected gives evidence that one gender has on average more friends from their own gender. We see that gender-78 people (community 2) have on average more friends ($\hat{p_2} > \hat{p_1}$ in table \ref{tab:egonet-0-props}). The rejection of the null in test 3 gives evidence that gender-78 treat gender-77 people differently to their own gender. Indeed, a gender-78 person is more likely to be friends with a fellow 78-er than with a 77-er. However, we do not reject the null in test 1 so there is insufficient evidence to claim the reverse (that 77-ers tend to stay away from 78-ers). Nevertheless, these are results on a single egonet so can hardly be generalised to society as a whole. However, the exercise has highlighted some interesting points:
+
+\begin{enumerate}
+	\item The hypothesis test framework does not quantify the magnitude of the difference just whether or not a difference exists.
+	\item As the degree $n$ increases, the p-values will necessarily become more extreme.
+	\item The method relies on the analyst to specify the features of interest so results may be misleading if third variables are missing from the analysis.
+\end{enumerate} 
+
+To address these shortcomings we instead approach the problem from a different angle. For now we have been given a graph with fully labelled vertices and ask if a given feature affect the structure. Instead, we could take a graph and partition into communities first (without using feature information) and then ask which features most reliably explain the partition. For that we need a way of detecting structure.
+
+\section{Detecting Structure}
+
+This is the problem of recovering the communities from the graph $\Gcal$. We use the notation $\hat{X}$ to denote the produced estimate of the community labels for the $n$ vertices. Obviously, if the SBM is symmetric then we must allow for an arbitrary relabelling of the communities $r: \{1, 2 \dots k\} \mapsto \{1, 2 \dots k\}$ before we compare the agreement of the two vectors $\hat{X}$ and $X$. The agreement $A$ and normalised agreement $\tilde{A}$ between two vectors $x, y$ are computed as below:
+%
+\begin{align}
+	A(x, y) &= \max_r \frac{1}{n} \sum_{i=1}^{n} \one (x_i, r(y_i)) \\
+	\tilde{A}(x, y) &= \max_r \frac{1}{k} \sum_{i=1}^{k} \frac{1}{n_i} \sum_{v \in \Omega_i(x)} \one(x_v, r(y_v))
+\end{align}
+
+The normalised agreement is important for asymmetric SBMs as it takes the agreement averaged over communities rather than vertices. We define 4 recovery regimes (plus the trivial no recovery), such that the following holds (adapted from Abbe \cite{Abbe}):
+
+\begin{definition}
+	For $(X, \Gcal) \sim \textrm{SBM}(m, p, W)$ the following recovery requirements are solved if there exists an algorithm which takes $\Gcal$ and input and outputs a vector of classifications $\hat{X} = \hat{X}(\Gcal)$ such that as $n \rightarrow \infty$:
+	\begin{itemize}
+		\item \textbf{Exact recovery:} $Pr\{A(X, \hat{X}) = 1\} = 1 - o(1)$ correct classification recovered almost surely
+		\item \textbf{Almost exact recovery:} $Pr\{A(X, \hat{X}) = 1 - o(1)\} = 1 - o(1)$ vanishing fraction misclassified almost surely
+		\item \textbf{Partial recovery:} $Pr\{\tilde{A}(X, \hat{X}) \geq \alpha\} = 1 - o(1), 1 > \alpha > 1/k$ better than choosing from uniform prior
+		\item \textbf{Weak recovery:} $Pr\{\tilde{A}(X, \hat{X}) \geq 1/k + \epsilon \} = 1 - o(1), \epsilon > 0$ marginally better than choosing from uniform prior
+		\item \textbf{No recovery:} graph provides no information as to class labels
+	\end{itemize}
+	Where $o(1)$ denotes a family of functions that tend to 0 as $n \rightarrow \infty$. The regime $\Gcal$ occupies depends on the parameters of the SBM. Each recovery regime is weaker than the one above it so Exact recovery implies weak recovery is possible..
+\end{definition}
+
+We choose to focus on weak recovery as it is the least strict of all regimes and in algorithms for weak recovery can solve stricter recovery regimes too. One of the most promising weak recovery algorithms is called Acyclic Belief Propagataion (ABP). We skim over the details here and merely represent our form of the algorithm, adapted from \cite{Linear-ABP}. ABP(r, T) on a graph $\Gcal$ with vertex set $\Vcal = \Vcal(\Gcal)$ and edge set $\Ecal = \Ecal(\Gcal)$:
+
+\begin{enumerate}
+	\item Initialise messages for $(v, v')$:
+	\subitem $y^{(0)}_{v' \rightarrow v} \leftarrow \Gaussian(0, 1)$
+	\item Iterate for $1 \leq t \leq T$ and for $(v, v') \in \Ecal$:
+	\subitem compute average $s^{(t-1)} \leftarrow \frac{1}{2|E|} \sum_{(v, v') \in \Ecal} y^{(t-1)}_{v' \rightarrow v}$
+	\subitem recentre messages $z^{(t-1)}_{v' \rightarrow v} \leftarrow y^{(t-1)}_{v' \rightarrow v} - s^{(t-1)}$ 
+	\subitem sum incoming $y^{(t)}_{v' \rightarrow v} \leftarrow \sum_{(v', v'') \in \Ecal \setminus \{v\}}z^{(t-1)}_{v'' \rightarrow v'}$
+	\subitem if $(v''' \rightarrow v \rightarrow v')$ on cycle of length $r' \leq r$ then correct:
+	\subsubitem $y^{(t)}_{v' \rightarrow v} \leftarrow y^{(t)}_{v' \rightarrow v} - \sum_{(v, v'') \in \Ecal \setminus \{v', v'''\}}z^{(t-r')}_{v'' \rightarrow v'}$
+	\item Assignment, for all $v \in V$:
+	\subitem Sum incoming $y_v^{(T)} = \sum_{(v, v') \in \Ecal} y^{(t)}_{v' \rightarrow v}$
+	\subitem Assign labels $\sigma_v = 1$ if $y_v^{(T)} > 0$ and $0$ otherwise
+\end{enumerate}
+
+We implement this algorithm in Python and apply it to the Facebook Egonets described earlier. 
 
 \section{Verifying Structure}
 \subsection{Single Sample against known mean}
