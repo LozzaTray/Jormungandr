@@ -62,9 +62,9 @@
 \maketitle
 
 \begin{abstract}
-We produce vast quantities of graphical data every day and yet the techniques used to analyse their structure are still in their infancy. We start by defining the Stochastic Block Model (SBM) widely used in academia and develop a theorem to verify structure in a labelled graph through a hypothesis test formulation. We explore the results of applying this theorem to Facebook friendship egonets and find that gender does indeed influence how friendships form on Facebook but this binary yes-no result is unsatisfactory.
+We produce vast quantities of graphical data every day and yet the techniques used to analyse their structure are still in their infancy. We start with the definition of the Stochastic Block Model (SBM) widely used in academia and develop a theorem to verify structure in a labelled graph through a hypothesis test. We explore the results of applying this theorem to Facebook friendship egonets and find that gender does indeed influence how friendships form on Facebook. Nevertheless, this binary yes-no result is unsatisfactory.
 
-To rank order input features by importance we instead approach the problem from the opposite direction: given a graph we detect the partitions that are in some sense typical and then develop a crude classifier to map from vertex features to partition. The classifier can then rank order the input features by importance. Nevertheless, work must still be done to refine this classifier and tie it back to the rigorous hypothesis testing framework we have already developed.
+To rank order vertex labels by importance we instead approach the problem from the opposite direction: given a graph we detect the partitions that are in some sense typical and then develop a classifier to map from vertex features to partition. The classifier then implicitly rank orders the input features by importance. Nevertheless, work must still be done to refine this classifier and tie it back to the rigorous hypothesis testing framework already developed.
 \end{abstract}
 
 \section{Introduction}
