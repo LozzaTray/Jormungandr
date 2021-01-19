@@ -1,4 +1,4 @@
-\documentclass[]{article}
+\documentclass[11pt]{article}
 
 %opening
 \title{TMR: Detecting Structure in Graphical Data}
@@ -48,7 +48,7 @@
 \newcommand{\SBM}{\textrm{SBM}}
 \newcommand{\iid}{\stackrel{iid}{\sim}}
 \newcommand{\one}{\mathbbm{1}}
-\newcommand{\figwidth}{\linewidth}
+\newcommand{\figwidth}{0.7\linewidth}
 
 
 % definition
@@ -299,13 +299,9 @@ Therefore, $p_1$ is the probability that two vertices of gender-77 are connected
 	\label{tab:egonet-0-hyp-tests}
 \end{table}
 
-Test 2 rejecting the null gives evidence that gender-78 people (community 2) have on average more same-gender friends than 77-ers have ($\hat{p}_2 > \hat{p}_1$ in table \ref{tab:egonet-0-props}). The rejection of the null in test 3 gives evidence that gender-78 treat gender-77 people differently to their own gender. Indeed, a gender-78 person is more likely to be friends with a fellow 78-er than with a 77-er. However, we do not reject the null in test 1 so there is insufficient evidence to claim the reverse (that 77-ers tend to stay away from 78-ers). Nevertheless, these are results on a single egonet so can hardly be generalised to society as a whole. However, the exercise has highlighted some interesting points:
+Test 2 rejecting the null gives evidence that gender-78 people (community 2) have on average more same-gender friends than 77-ers have ($\hat{p}_2 > \hat{p}_1$ in table \ref{tab:egonet-0-props}). The rejection of the null in test 3 gives evidence that gender-78 treat gender-77 people differently to their own gender. Indeed, a gender-78 person is more likely to be friends with a fellow 78-er than with a 77-er. However, we do not reject the null in test 1 so there is insufficient evidence to claim the reverse (that 77-ers tend to stay away from 78-ers). Nevertheless, these are results on a single egonet so can hardly be generalised to society as a whole.
 
-\begin{itemize}
-	\item The hypothesis test framework does not quantify the magnitude of the difference just whether or not a difference exists.
-	\item As the degree $n$ increases, the p-values will necessarily become more extreme.
-	\item The method relies on the analyst to specify the features of interest so results may be misleading if third variables are missing from the analysis.
-\end{itemize} 
+However, the exercise has highlighted some interesting points. The hypothesis test framework does not quantify the magnitude of the difference just whether or not a difference exists. Furthermore, The method relies on the analyst to specify the features of interest so results may be misleading if third variables are missing from the analysis.
 
 To address these shortcomings we instead approach the problem from a different angle. For now we have been given a graph with fully labelled vertices and ask if a given feature affects the structure. Instead, we could take a graph and partition first (without using feature information) and then ask which features explain the partition. For that we need a way of detecting structure.
 
@@ -325,58 +321,28 @@ Community detection is the problem of recovering the communities from the graph 
 \end{definition}
 
 
-One of the most promising weak recovery algorithms is called Acyclic Belief Propagataion (ABP). This is a message-passing algorithm that solves weak recovery in the sense of definition \ref{defn:weak-recovery}. Algorithm \ref{alg:lin-abp} is heavily adapated from Abbe and Sandon \cite{Linear-ABP}. The original paper goes into much more detail but it works on the premise that one can infer the community of a particular vertex simply from the labels of all its neighbours. The algorithm is non-deterministic and requires the vertex set $\Vcal = \Vcal(\Gcal)$ and edge set $\Ecal = \Ecal(\Gcal)$ as well as two hyper-parameters $r$ (the maximum cyclic length to correct for) and $T$ (the number of iterations).
+One of the most promising weak recovery algorithms is called Acyclic Belief Propagataion (ABP). We implement a linearised version adapted from Abbe and Sandon \cite{Linear-ABP}. This is a message-passing algorithm that solves weak recovery in the sense of definition \ref{defn:weak-recovery}. The original paper goes into much more detail than we have space to discuss here. Nevertheless, the premise is that one can infer the community of a particular vertex simply from the labels of all its neighbours. The algorithm is non-deterministic and requires the vertex set $\Vcal = \Vcal(\Gcal)$ and edge set $\Ecal = \Ecal(\Gcal)$ as well as two hyper-parameters $r$ (the maximum cyclic length to correct for) and $T$ (the number of iterations).
 
-%
-\begin{algorithm}[H]
-	\caption{Linearised Acyclic Belief Propagation (ABP)}
-	\label{alg:lin-abp}
-	\begin{algorithmic}
-		\Function{ABP}{$\Ecal$, $\Vcal$, r, T}
-		\State $y^{(0)}_{v' \rightarrow v} \gets \Gaussian(0, 1)$
-		\For{$t \in \{1, 2 \cdots T\}$ and $(v, v') \in \Ecal$}
-		\State $s^{(t-1)} \gets \frac{1}{2|E|} \sum_{(v, v') \in \Ecal} y^{(t-1)}_{v' \rightarrow v}$ \Comment{average}
-		\State $z^{(t-1)}_{v' \rightarrow v} \gets y^{(t-1)}_{v' \rightarrow v} - s^{(t-1)}$ \Comment{recentre}
-		\State $y^{(t)}_{v' \rightarrow v} \gets \sum_{(v', v'') \in \Ecal \setminus \{v\}}z^{(t-1)}_{v'' \rightarrow v'}$ \Comment{sum} \\
-		\If {$(v''' \rightarrow v \rightarrow v')$ on a cycle of length $r' \leq r$}
-		\State $y^{(t)}_{v' \rightarrow v} \leftarrow y^{(t)}_{v' \rightarrow v} - \sum_{(v, v'') \in \Ecal \setminus \{v', v'''\}}z^{(t-r')}_{v'' \rightarrow v'}$
-		\EndIf
-		\EndFor
-		\State $\sigma_v \gets \sum_{(v, v') \in \Ecal} y^{(T)}_{v' \rightarrow v}$ \Comment{sum final messages}
-		\State $S \gets \{v \in \Vcal : \sigma_v > 0\}$ \Comment{hard assignment}
-		\State $S^C \gets \{v \in \Vcal : \sigma_v \leq 0\}$
-		\State \textbf{return} $S, S^C$
-		\EndFunction
-	\end{algorithmic}
-\end{algorithm}
+We implement linearised ABP in Python and apply it to the Facebook egonets described earlier. We found that the hyperparameter settings $r=3$ and $T=5$ yielded good results. The algorithm returns the belief $\sigma_v$ associated with each vertex $v$. If this value is positive $\sigma_v > 0$ then we assign $v \in S$; $S^C$ contains all vertices with $\sigma_v \leq 0$. As well as the hard partition of $\Vcal$ into $S$ and $S^C$, the magnitude of $\sigma_v$ encodes how strongly we believe that this vertex belongs to its assigned partition. We can rescale the positive and negative components independently to obtain the normalised belief $\tilde{\sigma}_v$ such that $\tilde{\sigma}_v \in [-1, +1]$ and no signs are flipped by the rescaling.
 
-We implement this algorithm in Python and apply it to the Facebook egonets described earlier. We found that the hyperparameter settings $r=3$ and $T=5$ yielded good results. As well as the hard partition of $\Vcal$ into $S$ and $S^C$ we can use the normalised ABP output $\tilde{\sigma}_v$ defined below:
-%
-\begin{equation}
-	\tilde{\sigma}_v \coloneqq \begin{cases}
-		\frac{\sigma_v}{|\sigma_{max}|} \textrm{ for } \sigma_j > 0 \\
-		\frac{\sigma_v}{|\sigma_{min}|} \textrm{ for } \sigma_j \leq 0
-	\end{cases}
-\end{equation}
-
-Where $\sigma_{max}$ is the largest positive value of $\sigma_v$ and $\sigma_{min}$ is the most negative. The normalised quantity has restricted range $\tilde{\sigma}_v \in [-1, +1]$ with $0$ still being the decision boundary for partitioning. We colour each vertex according to this quantity $\tilde{\sigma}_v$ and plot the graph on figure \ref{fig:abp-output-norm}. We see intuitively that ABP has worked. The blue cluster in the lower right is clearly part of the same community. Furthermore, many vertices that do not seem to belong to any cluster have uncertain classifications (the colour is close to green).
+We colour each vertex according to this quantity $\tilde{\sigma}_v$ and plot the graph on figure \ref{fig:abp-output-norm}. We see intuitively that ABP has worked. The blue cluster in the lower right is clearly part of the same community. Furthermore, many vertices that do not seem to belong to any cluster have uncertain classifications (the colour is close to green).
 %
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}{\figwidth}
 		\includegraphics[width=\linewidth]{ego-0-abp.png}
-		\caption{Normalised ABP output $\tilde{\sigma}_v$ colouring vertices}
+		\caption{Normalised ABP output $\tilde{\sigma}_v$ colouring vertices, spring layout}
 		\label{fig:abp-output-norm}
 	\end{subfigure}
 	\begin{subfigure}{\figwidth}
 		\includegraphics[width=\linewidth]{ego-0-abp-by-gender.png}
-		\caption{Vertices grouped by hard ABP assignments and coloured by gender. In assigned community 1 ($S$ - left) we have \{58, 122\} gender-77 and gender-78 respectively and in detected community 2 ($S^C$ - right) we have \{72, 96\}}
+		\caption{Vertices grouped into set $S$ (left cluster) and set $S^C$ (right cluster)}
 		\label{fig:abp-output-by-gender}
 	\end{subfigure}
 	\caption{Egonet-0 weak recovery results}
 \end{figure}
 
-We can evaluate formally whether weak recovery has succeeded by inspecting figure \ref{fig:abp-output-by-gender} and treating gender-77 and gender-78 as the two communities of interest:
+We can evaluate formally whether weak recovery has succeeded by inspecting figure \ref{fig:abp-output-by-gender} and treating gender-77 and gender-78 as the two communities of interest. Within set $S$ we have $\{58, 122\}$ 77-ers and 78-ers respectively and for $S^C$ the breakdown is $\{72, 96\}$. Therefore, the fraction of each gender cohort in set S can be calculated:
 %
 \begin{equation}
 	\begin{aligned}
@@ -385,7 +351,7 @@ We can evaluate formally whether weak recovery has succeeded by inspecting figur
 	\end{aligned}
 \end{equation}
 
-Clearly the fraction of each community in the partition $S$ differ substantially so we say that weak recovery is solved. The set $S$ contains a higher proportion of the overall 78-population than of the 77-population.
+Clearly the fractions of each community in the partition $S$ differ substantially so we say that weak recovery is solved. The set $S$ contains a higher proportion of the overall 78-population than of the 77-population.
 
 \subsection{From detection to inference}
 \label{sect:detection-to-inference}
@@ -396,7 +362,7 @@ This part of the project is still in its early stages so these are just prelimin
 \footnote{ABP is non-deterministic so each subplot is the result of a different run of ABP. Subfigures use the same partition $S$ but no exact comparison is possible between figures.}
 on figure \ref{fig:abp-output-community-fractions}. It is interesting to note that if two bars on this plot differ substantially then we have strong evidence that we have solved weak recovery as in definition \ref{defn:weak-recovery}. In a slight abuse of notation, we necessarily remove the constraint on the community sets $\Omega_i$ to be disjoint as one vertex can have multiple features turned on. These should no longer be thought of as community sets but rather feature sets. This can be modelled more precisely through a Mixed Membership Model but for now an SBM with $k=2$ communities suffices.
 
-We perform a linear regression on the $n \times 1$ normalised ABP output vector $\tilde{\sigma}$ with the $n \times f$ feature matrix $X$ as the explanatory variable. $X_{ij} = 1$ if vertex $i$ has feature $j$ turned on and $0$ if feature $j$ is off. The equation we try to fit is given below:
+We perform a linear regression on the $n \times 1$ normalised belief vector $\tilde{\sigma}$ with the $n \times f$ feature matrix $X$ as the explanatory variable. $X_{ij} = 1$ if vertex $i$ has feature $j$ turned on and $0$ if feature $j$ is off. The equation we try to fit is given below:
 %
 \begin{equation}
 	\tilde{\sigma} = a + X b + \epsilon
@@ -407,14 +373,14 @@ Linear regression finds the constant bias $a$ and $f \times 1$ weight vector $b$
 %
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}{\figwidth}
+	\begin{subfigure}{\linewidth}
 		\includegraphics[width=\linewidth]{ego-0-abp-community-fractions.png}
 		\caption{Community fractions $|\Omega_i \cap S| / |\Omega_i|$}
 		\label{fig:abp-output-community-fractions}
 	\end{subfigure}
-	\begin{subfigure}{\figwidth}
+	\begin{subfigure}{\linewidth}
 		\includegraphics[width=\linewidth]{ego-0-abp-lin-regression.png}
-		\caption{Linear regression of $\tilde{\sigma}_v$ on select feature ($R^2 = 0.113$)}
+		\caption{Linear regression of $\tilde{\sigma}_v$ on select features ($R^2 = 0.113$)}
 		\label{fig:abp-output-lin-regression}
 	\end{subfigure}
 	\caption{Egonet-0 linear classifier results}
