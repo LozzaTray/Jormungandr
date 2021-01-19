@@ -239,9 +239,10 @@
     \field{labeltitlesource}{title}
     \field{sortinit}{L}
     \field{sortinithash}{L}
-    \field{howpublished}{\url{http://snap.stanford.edu/data}}
     \field{title}{{SNAP Datasets}: {Stanford} Large Network Dataset Collection}
-    \field{month}{06}
+    \verb{url}
+    \verb http://snap.stanford.edu/data
+    \endverb
     \field{year}{2014}
   \endentry
 

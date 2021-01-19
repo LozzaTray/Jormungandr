@@ -1,4 +1,4 @@
-\documentclass[11pt]{article}
+\documentclass[10pt]{article}
 
 %opening
 \title{TMR: Detecting Structure in Graphical Data}
@@ -96,14 +96,14 @@ Armed with definition \ref{defn:sbm} we tackle the simplest problem in structure
 	H_1:& \quad W_{\alpha} \neq W_{\beta}
 \end{aligned}
 \end{equation}
-
+%
 We formulate this as a likelihood ratio test. Letting $\lik(D | H)$ denote the likelihood of observing the data $D = (X, \Gcal)$ under hypothesis $H$. Therefore, the test statistic is given by:
 %
 \begin{equation}
 	t_n \coloneqq \log \frac{\lik(D | H_1)}{\lik(D | H_0)}
 	\label{eqn:test-statistic-start}
 \end{equation}
-
+%
 At this point it helps to introduce some more notation. We define the number of vertices in community $i$ by $n_i \coloneqq |\Omega_i(X)|$. Furthermore, we use $E_{ij} = E_{ij}(X, \Gcal)$ to denote the number of realised edges between communities $i$ and $j$ (in generality $i$ may be equal to $j$) and similarly define $M_{ij} = M_{ij}(X)$ as the maximum number of possible edges between communities $i$ and $j$. This is computed simply as follows:
 %
 \begin{equation}
@@ -112,16 +112,16 @@ At this point it helps to introduce some more notation. We define the number of 
 		\frac{1}{2}n_i (n_i - 1) &\text{for } i = j
 	\end{cases}
 \end{equation}
-
+%
 With this new notation, the likelihood function can be written explicitly:
 %
 \begin{align}
 \lik(D | H) &= Pr(X| p) \cdot Pr(\Gcal | W, X) \nonumber \\
-&= Pr(X | p) \cdot \prod_{i=1}^{k} \prod_{j=i}^{k} p(E_{ij} | W, X) \nonumber \\
-&= Pr(X | p) \cdot \prod_{i=1}^{k} \prod_{j=i}^{k} W_{ij} ^ {E_{ij}} \cdot \left( 1 - W_{ij} \right) ^ {(M_{ij} - E_{ij})}
+&= Pr(X | p) \prod_{i=1}^{k} \prod_{j=i}^{k} p(E_{ij} | W, X) \nonumber \\
+&= Pr(X | p) \prod_{i=1}^{k} \prod_{j=i}^{k} W_{ij} ^ {E_{ij}} \left( 1 - W_{ij} \right) ^ {(M_{ij} - E_{ij})}
 \label{eqn:likelihood-verbose}
 \end{align}
-
+%
 The form of $Pr(\Gcal | W, X)$ is simply a sequence of Bernoulli trials for each distinct community pair $(i, j)$; there are $E_{ij}$ edges present each with probability $W_{ij}$ and $(M_{ij} - E_{ij})$ absent with probability $(1 - W_{ij})$. A sequence of Bernoullis is the same as a Binomial distribution without the combinatoric term. By inspecting equation \ref{eqn:likelihood-verbose} we see that only terms involving $W_{\alpha}$ and $W_{\beta}$ are going to differ under the two hypotheses $H_0$ and $H_1$; the rest of the terms will cancel in our calculation of the test-statistic $t_n$. Therefore, we can rewrite the likelihood as follows:
 %
 \begin{equation}
@@ -131,14 +131,14 @@ The form of $Pr(\Gcal | W, X)$ is simply a sequence of Bernoulli trials for each
 	\textrm{where } f (w, e, m) \coloneqq w^e \cdot (1-w)^{(m - e)}
 	\label{eqn:f-defn}
 \end{equation}
-
+%
 We note that $f(w, e, m)$ is simply the probability of observing a specific sequence of $e$ successes in $m$ independent Bernoulli trials with parameter $w$. Its maximiser with respect to the first argument is easily computed through partial differentiation giving:
 %
 \begin{equation}
 	\argmax_w f(w, e, m) = \hat{w} = e / m
 	\label{eqn:f-maximiser}
 \end{equation}
-
+%
 Furthermore, we spot the following property $f(w, e_1, m_1) \cdot f(w, e_2, m_2) = f(w, e_1 + e_2, m_1 + m_2)$ or in other words, the function $f$ is linear in its second and third arguments given the same first argument. As such we can manipulate equation \ref{eqn:test-statistic-start} greatly to give:
 %
 \begin{align}
@@ -156,7 +156,7 @@ Furthermore, we spot the following property $f(w, e_1, m_1) \cdot f(w, e_2, m_2)
 	} \nonumber \\
 	&= \log \frac{f(\hat{p}, E_\alpha, M_\alpha)}{f(\hat{r}, E_\alpha, M_\alpha)} + \log \frac{f(\hat{q}, E_\beta, M_\beta)}{f(\hat{r}, E_\beta, M_\beta)}
 \end{align}
-
+%
 Where $\hat{p} \coloneqq E_\alpha / M_\alpha$, $\hat{q} \coloneqq E_\beta / M_\beta$ and $\hat{r} \coloneqq (E_\alpha + E_\beta) / (M_\alpha + M_\beta)$. These are essentially maximum-likelihood estimates of parameters of $W$ and the symbols are introduced to make the notation more succinct. Note that the max-likelihood estimate of $W_alpha$ under $H_1$ is denoted by the symbol $\hat{p}$ and should not be confused with the community prior $p$ though context will make the distinction apparent. We now state lemma \ref{lem:kl-div}.
 
 \begin{lemma}[KL divergence]
@@ -173,11 +173,12 @@ Where $\hat{p} \coloneqq E_\alpha / M_\alpha$, $\hat{q} \coloneqq E_\beta / M_\b
 Proving lemma \ref{lem:kl-div} is simply a case of algebraic manipulation and is omitted here. However, this allows us to simplify the test-statistic into a form that is more numerically stable (equation \ref{eqn:test-stat-compute-form}). However, we must simplify further still using lemma \ref{lem:kl-approx-chi}.
 %
 \begin{equation}
-	t_n = M_\alpha \kl\left( \textrm{Bern}(\hat{p}) || \textrm{Bern}(\hat{r})\right) + 
-	M_\beta \kl\left( \textrm{Bern}(\hat{q}) || \textrm{Bern}(\hat{r})\right)
+	\begin{aligned}
+	t_n = &M_\alpha \kl\left( \textrm{Bern}(\hat{p}) || \textrm{Bern}(\hat{r})\right) \\
+	&+ M_\beta \kl\left( \textrm{Bern}(\hat{q}) || \textrm{Bern}(\hat{r})\right)
+	\end{aligned}
 	\label{eqn:test-stat-compute-form}
 \end{equation}
-
 %
 \begin{lemma}[$\chi^2$ approximation]
 	\label{lem:kl-approx-chi}
@@ -187,10 +188,9 @@ Proving lemma \ref{lem:kl-div} is simply a case of algebraic manipulation and is
 The proof requires defining $\delta(x) \coloneqq g(x) - h(x)$ and taking a Taylor expansion of $\log 1 + \epsilon$:
 %
 \begin{align*}
-	\kl(g||h) &= \sum_{x \in \Xcal} (\delta + h) \log \left(1 + \frac{\delta}{g} \right) \\
+	\kl(g||h) &= \sum_{x \in \Xcal} (\delta + h) \log \left(1 + \frac{\delta}{h} \right) \\
 	&= \sum_{x \in \Xcal} (\delta + h) \left( \frac{\delta}{h} - \frac{\delta^2}{2h^2} + O(\delta^3) \right)  \\
 	&= \sum_{x \in \Xcal} \delta + \frac{1}{2} \sum_{x \in \Xcal} \frac{\delta^2}{h} + O(\delta^3) \\
-	&= \frac{1}{2} \sum_{x \in \Xcal} \frac{\delta^2}{h} + O(\delta^3) \\
 	&= \frac{1}{2} \chi^2(g||h) + O(\delta^3) \approx \frac{1}{2} \chi^2(h||g) \quad \therefore \textrm{QED}
 \end{align*}
 %
@@ -199,7 +199,7 @@ Where the summation over $\delta$ evaluates to 0 because $\delta$ is the differe
 \begin{equation}
 \chi^2(\textrm{Bern}(p) || \textrm{Bern}(q)) = \left( \frac{p-q}{\sqrt{q(1-q)}} \right)^2
 \end{equation}
-
+%
 We can apply these results to equation \ref{eqn:test-stat-compute-form} to obtain an approximate expression for $t_n$ under the null. Under $H_0$ and for large $n$, the estimates $\hat{p}$, $\hat{q}$ and $\hat{r}$ are all close meaning Lemma \ref{lem:kl-approx-chi} is applicable. This gives:
 %
 \begin{align}
@@ -207,14 +207,10 @@ We can apply these results to equation \ref{eqn:test-stat-compute-form} to obtai
 	M_\alpha \left(\hat{p} - \hat{r}\right)^2 +
 	M_\beta \left(\hat{q} - \hat{r} \right)^2 
 	\right) \nonumber \\
-	&= \frac{1}{2 \hat{r}(1-\hat{r})} \left( 
-	M_\alpha \left(\frac{M_\alpha (\hat{p} - \hat{q})}{M_\alpha + M_\beta} \right)^2 +
-	M_\beta \left(\frac{M_\beta (\hat{q} - \hat{p})}{M_\alpha + M_\beta} \right)^2
-	\right) \nonumber \\
 	&= \frac{1}{2} \left( \frac{\hat{p} - \hat{q}}{\sqrt{\hat{r}(1- \hat{r})(1/M_\alpha + 1/M_\beta)}} \right)^2
 	= \frac{1}{2} z_n^2
 \end{align}
-
+%
 Through application of the Central Limit Theorem (CLT) and Slutsky's Theorem it can be shown that as $n \rightarrow \infty$ under the null $H_0$ the term in brackets on the final line is distributed like a standard Gaussian $z_n \sim \Gaussian(0,1)$. This is because under the same assumptions, assuming that $W_\alpha = W_\beta = \mu$, by the CLT $\hat{p} \sim (\mu, \mu(1 - \mu)/ M_\alpha)$, $\hat{q} \sim (\mu, \mu(1 - \mu)/ M_\beta)$ and $\hat{r} \sim (\mu, \mu(1 - \mu)/ (M_\alpha + M_\beta))$. The proof is long-winded and therefore omitted from this short report. The result leads to theorem \ref{theorem:hyp-test-sbm-chi}.
 
 \begin{theorem}[$\chi^2$ test]
@@ -224,19 +220,12 @@ Through application of the Central Limit Theorem (CLT) and Slutsky's Theorem it 
 	H_0:& \quad W_{\alpha} = W_{\beta} \\
 	H_1:& \quad W_{\alpha} \neq W_{\beta}
 	\end{align*}
-	If the log-likelihood ratio test statistic $t_n$ is computed as in equation \ref{eqn:test-stat-compute-form}, repeated here:
-	%
-	\begin{equation*}
-		t_n \coloneqq  M_\alpha \kl\left( \textrm{Bern}(\hat{p}) || \textrm{Bern}(\hat{r})\right) + 
-		M_\beta \kl\left( \textrm{Bern}(\hat{q}) || \textrm{Bern}(\hat{r})\right)
-	\end{equation*}
-	
-	Where $\hat{p} \coloneqq E_\alpha / M_\alpha$, $\hat{q} \coloneqq E_\beta / M_\beta$ and $\hat{r} \coloneqq (E_\alpha + E_\beta) / (M_\alpha + M_\beta)$. Then as the number of vertices $n \rightarrow \infty, t_n \sim \frac{1}{2} \chi^2_1$ under the null $H_0$. Therefore, we reject $H_0$ at the $100(\zeta)\%$ confidence level if and only if $2t_n \geq \psi^{-1}(\zeta)$, where $\psi^{-1}$ is the $\chi^2_1$ inverse cdf satisfying $Pr(Y \leq \psi^{-1}(\zeta)) = \zeta$ given $Y \sim \chi^2_1$.
+	If the log-likelihood ratio test statistic $t_n$ is computed as in equation \ref{eqn:test-stat-compute-form}, then as the number of vertices $n \rightarrow \infty, t_n \sim \frac{1}{2} \chi^2_1$ under the null $H_0$. Therefore, we reject $H_0$ at the $100(\zeta)\%$ confidence level if and only if $2t_n \geq \psi^{-1}(\zeta)$, where $\psi^{-1}$ is the $\chi^2_1$ inverse cdf satisfying $Pr(Y \leq \psi^{-1}(\zeta)) = \zeta$ given $Y \sim \chi^2_1$.
 	
 	\label{theorem:hyp-test-sbm-chi}
 \end{theorem}
 
-Note that an alternative test is possible by comparing $z_n$ to a Gaussian.
+Indeed, a related test is possible by comparing $z_n$ to a standard Gaussian.
 
 \subsection{Early results}
 
@@ -255,7 +244,7 @@ We seek to apply theorem \ref{theorem:hyp-test-sbm-chi} to real-world graphical 
 \end{center}
 
 
-Each feature is given an anonymised signature to avoid disclosing personally identifiable information. We cannot tell whether vertex $v$ is male or female but we can tell whether they are the same gender as another vertex $w$ which suffices for our analysis. If we have a total of $f$ features and $n$ vertices, then the feature matrix $X$ would be an $n \times f$ where each row is the feature vector for the corresponding vertex. The features are binary such that $X_{ij} \in \{0, 1\}$ indicating the feature being turned off and on respectively.
+Each feature is given an anonymised signature to avoid disclosing personally identifiable information. If we have a total of $f$ features and $n$ vertices, then the feature matrix $X$ would have shape $n \times f$ where each row is the feature vector for the corresponding vertex. Each feature is encoded with a binary flag such that $X_{ij} \in \{0, 1\}$ indicating feature turned off and on respectively.
 
 We perform a hypothesis test in the manner described by theorem \ref{theorem:hyp-test-sbm-chi} to determine whether gender influences how friends connect on Facebook. We choose to analyse SNAP egonet with id 0 (the id of the egonet is the id of the single egonode) though any choice is possible. The egonet is plotted on figure \ref{fig:ego-0-by-gender} with nodes coloured by gender. We use the Python package NetworkX \cite{networkx} for its visualisation tools. Indeed, we will discuss layout algorithms later as for now we focus on the simple hypothesis test.
 %
@@ -274,7 +263,7 @@ We use an SBM model with $k=2$ communities (1: gender-77 on and 2: gender-77 off
 		q & p_2
 	\end{bmatrix}
 \end{equation}
-
+%
 Therefore, $p_1$ is the probability that two vertices of gender-77 are connected, $q$ is the crossover probability and $p_2$ is the connection probability within the gender-78 community\footnote{Strictly speaking this is the not gender-77 community as there are a handful of vertices that do not disclose their gender to Facebook or do not fall into this binary}. The results of the hypothesis tests are given in table \ref{tab:egonet-0-hyp-tests} alongside p-values (we choose a 95\% significance level to reject the null). However, in some cases the test statistics were so extreme that the p-value saturated to 0.
 %
 \begin{table}[H]
@@ -329,17 +318,15 @@ We colour each vertex according to this quantity $\tilde{\sigma}_v$ and plot the
 %
 \begin{figure}[H]
 	\centering
-	\begin{subfigure}{\figwidth}
-		\includegraphics[width=\linewidth]{ego-0-abp.png}
-		\caption{Normalised ABP output $\tilde{\sigma}_v$ colouring vertices, spring layout}
-		\label{fig:abp-output-norm}
-	\end{subfigure}
-	\begin{subfigure}{\figwidth}
-		\includegraphics[width=\linewidth]{ego-0-abp-by-gender.png}
-		\caption{Vertices grouped into set $S$ (left cluster) and set $S^C$ (right cluster)}
-		\label{fig:abp-output-by-gender}
-	\end{subfigure}
-	\caption{Egonet-0 weak recovery results}
+	\includegraphics[width=\figwidth]{ego-0-abp.png}
+	\caption{Normalised ABP output $\tilde{\sigma}_v$ colouring vertices, spring layout}
+	\label{fig:abp-output-norm}
+\end{figure}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\figwidth]{ego-0-abp-by-gender.png}
+	\caption{Vertices grouped by ABP partition: set $S$ (left cluster) and set $S^C$ (right cluster)}
+	\label{fig:abp-output-by-gender}
 \end{figure}
 
 We can evaluate formally whether weak recovery has succeeded by inspecting figure \ref{fig:abp-output-by-gender} and treating gender-77 and gender-78 as the two communities of interest. Within set $S$ we have $\{58, 122\}$ 77-ers and 78-ers respectively and for $S^C$ the breakdown is $\{72, 96\}$. Therefore, the fraction of each gender cohort in set S can be calculated:
@@ -359,7 +346,7 @@ Clearly the fractions of each community in the partition $S$ differ substantiall
 We now have an algorithm (ABP) that partitions our graph into two sets that are most readily explained by an SBM with $k=2$ communities. We can now ask the question of which vertex labels most readily explain the separation and therefore determine which features have the largest impact on the graphical structure; this circumvents the binary resolution problem with the hypothesis testing approach.
 
 This part of the project is still in its early stages so these are just preliminary results. For reference we plot the community fractions in the detected set $S$
-\footnote{ABP is non-deterministic so each subplot is the result of a different run of ABP. Subfigures use the same partition $S$ but no exact comparison is possible between figures.}
+\footnote{ABP is non-deterministic so each figure is the result of a different run of ABP. No exact comparison is possible between figures but the results are in some sense typical.}
 on figure \ref{fig:abp-output-community-fractions}. It is interesting to note that if two bars on this plot differ substantially then we have strong evidence that we have solved weak recovery as in definition \ref{defn:weak-recovery}. In a slight abuse of notation, we necessarily remove the constraint on the community sets $\Omega_i$ to be disjoint as one vertex can have multiple features turned on. These should no longer be thought of as community sets but rather feature sets. This can be modelled more precisely through a Mixed Membership Model but for now an SBM with $k=2$ communities suffices.
 
 We perform a linear regression on the $n \times 1$ normalised belief vector $\tilde{\sigma}$ with the $n \times f$ feature matrix $X$ as the explanatory variable. $X_{ij} = 1$ if vertex $i$ has feature $j$ turned on and $0$ if feature $j$ is off. The equation we try to fit is given below:
@@ -372,21 +359,12 @@ We perform a linear regression on the $n \times 1$ normalised belief vector $\ti
 Linear regression finds the constant bias $a$ and $f \times 1$ weight vector $b$ that minimises the mean squared prediction error $\epsilon^T \epsilon / n$. The theory for linear regression is well known so omitted here (see \cite{yale-linear-regression} for a reference). We perform a linear regression using only gender and language features available in the dataset and plot the parameter coefficient in order of decreasing magnitude (figure \ref{fig:abp-output-lin-regression}).
 %
 \begin{figure}[H]
-	\centering
-	\begin{subfigure}{\linewidth}
-		\includegraphics[width=\linewidth]{ego-0-abp-community-fractions.png}
-		\caption{Community fractions $|\Omega_i \cap S| / |\Omega_i|$}
-		\label{fig:abp-output-community-fractions}
-	\end{subfigure}
-	\begin{subfigure}{\linewidth}
-		\includegraphics[width=\linewidth]{ego-0-abp-lin-regression.png}
-		\caption{Linear regression of $\tilde{\sigma}_v$ on select features ($R^2 = 0.113$)}
-		\label{fig:abp-output-lin-regression}
-	\end{subfigure}
-	\caption{Egonet-0 linear classifier results}
+	\includegraphics[width=\linewidth]{ego-0-abp-lin-regression.png}
+	\caption{Egonet-0 linear regression of $\tilde{\sigma}_v$ on select features ($R^2 = 0.113$)}
+	\label{fig:abp-output-lin-regression}
 \end{figure}
 
-The results are rather interesting. Certain languages are a far stronger predictor of community assignment than gender. After all, one would hope that a language barrier poses a more tangible obstacle to friendship than gender. Furthermore, the gender coefficients are of the same sign further decreasing the causal impact that gender has given language. The bias term has rather low magnitude which just implies that the partition $S$ and $S^C$ are of similar size. A keen reader would notice that the bias term is included in figure \ref{fig:abp-output-community-fractions}. This is because we implement the bias by augmenting $X$ with an additional feature flag always set to $1$ such that the constant term $a$ in equation \ref{eqn:lin-regression} is subsumed into the $b$ vector. Since all vertices have the bias feature turned on $\Omega_{bias} = \Vcal$, the fraction of vertices with bias turned on in $S$ is equivalent to the total number of vertices in $S$ as a fraction of the total in $\Vcal$, or put formally: $|S| / |\Vcal|$. Indeed, in figure \ref{fig:abp-output-community-fractions} we see that this quantity is very close to 0.5.
+The results are rather interesting. Certain languages are a far stronger predictor of community assignment than gender. After all, one would hope that a language barrier poses a more tangible obstacle to friendship than gender. Furthermore, the gender coefficients are of the same sign further decreasing the causal impact that gender has given language. The bias term has rather low magnitude which just implies that the partition $S$ and $S^C$ are of similar size.
 
 This analysis is of course rather crude as we have failed to take into account multi-collinearity or even determined if a linear regression model is appropriate; indeed, an $R^2$ value of just 0.113 would suggest that it is not. Nevertheless, this serves as the platform for subsequent more rigorous analysis. Furthermore, we have not proven the conjecture that the regression coefficients are valid measures of causal impact on graphical structure.
 
