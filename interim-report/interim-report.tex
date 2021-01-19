@@ -83,12 +83,7 @@ The most popular graphical model in industry and indeed academia is called the S
 	Let $n \in \Integers^+$ be the number of vertices and $k \in \Integers^+$ be the number of communities in an SBM graph. We define a probability vector $\pi = [\pi_1, \pi_2 \dots \pi_k]^T$ to be the prior on the k-communities. Each vertex $v \in \Vcal = \{1, 2 \dots N\}$ has a community label $X_v \in \{1, 2 \dots n\}$. Let $W$ be a symmetric $k \times k$ matrix with entries in $[0,1]$ called the connectivity matrix. We say that the pair $(X, \Gcal) \sim \textrm{SBM}(n, \pi, W)$ if X is an $N$-dimensional vector with each component independently distributed as the community prior $X_v \sim \pi$ and $\Gcal$ is an $N$-vertex graph where each pair of vertices $(i, j)$ is connected with probability $p(i \leftrightarrow j) = W_{X_i, X_j}$ independently of other pairs of vertices. Lastly, we define the community sets as $\Omega_i = \Omega_i(X) \coloneqq \{v \in \Vcal : X_v = i\}$ which contains all vertices belonging to community $i$.
 \end{definition}
 
-Though the definition of the SBM is simple, it allows for very deep and rich analysis of graphical datasets. For certain problems it helps to define the symmetric SBM.
-
-\begin{definition}
-	\label{defn:sym-sbm}
-	The symmetric SBM is a special case denoted by $\textrm{SSBM}(n, k, q_{in}, q_{out}) \equiv \textrm{SBM}(n, p, W)$ if the community prior $p$ is uniform ($p_i = 1/k$ for $i \in \{1, 2, \dots k\}$) and $W_{ij}$ takes only two values, one on diagonal and another off diagonal such that $W_{ij} = q_{in}$ for $i=j$ and $W_{ij} = q_{out}$ for $i \neq j$.
-\end{definition}
+Though the definition of the SBM is simple, it allows for very deep and rich analysis of graphical datasets.
 
 \section{Verifying Structure}
 \subsection{Theory}
@@ -220,7 +215,7 @@ We can apply these results to equation \ref{eqn:test-stat-compute-form} to obtai
 	= \frac{1}{2} z_n^2
 \end{align}
 
-Through application of the Central Limit Theorem (CLT) and Slutsky's Theorem it can be shown that as $n \rightarrow \infty$ under the null $H_0$ the term in brackets on the final line is distributed like a standard Gaussian $z_n \sim \Gaussian(0,1)$. This is because under the same assumptions, assuming that $W_\alpha = W_\beta = \mu$, by the CLT $\hat{p} \sim (\mu, \mu(1 - \mu)/ M_\alpha)$, $\hat{q} \sim (\mu, \mu(1 - \mu)/ M_\beta)$ and $\hat{r} \sim (\mu, \mu(1 - \mu)/ (M_\alpha + M_\beta))$. The proof is long-winded and therefore omitted from this short report. Therefore, the whole test-statistic is distributed as $t_n \sim \frac{1}{2} \chi^2_1$ by the definition of the $\chi^2_p$ distribution: $\chi^2_p \sim \sum_{i=1}{p} Z_i^2$ for $Z_i \sim \Gaussian(0,1)$. This leads to theorem \ref{theorem:hyp-test-sbm-chi} and corollary \ref{corollary:z-test}.
+Through application of the Central Limit Theorem (CLT) and Slutsky's Theorem it can be shown that as $n \rightarrow \infty$ under the null $H_0$ the term in brackets on the final line is distributed like a standard Gaussian $z_n \sim \Gaussian(0,1)$. This is because under the same assumptions, assuming that $W_\alpha = W_\beta = \mu$, by the CLT $\hat{p} \sim (\mu, \mu(1 - \mu)/ M_\alpha)$, $\hat{q} \sim (\mu, \mu(1 - \mu)/ M_\beta)$ and $\hat{r} \sim (\mu, \mu(1 - \mu)/ (M_\alpha + M_\beta))$. The proof is long-winded and therefore omitted from this short report. The result leads to theorem \ref{theorem:hyp-test-sbm-chi}.
 
 \begin{theorem}[$\chi^2$ test]
 	For $(X, \Gcal) \sim \textrm{SBM}(n, p, W)$, given the realised graph and class labels $(X, \Gcal)$ we can perform a hypothesis test on parameters $W_\alpha$ and $W_\beta$ of the connectivity matrix $W$.
@@ -241,16 +236,7 @@ Through application of the Central Limit Theorem (CLT) and Slutsky's Theorem it 
 	\label{theorem:hyp-test-sbm-chi}
 \end{theorem}
 
-\begin{corollary}[z-test]
-	We can also use a slightly simpler test-statistic $z_n$ albeit with some loss of generality. If we define $z_n$ to be:
-	%
-	\begin{equation*}
-		z_n \coloneqq \frac{\hat{p} - \hat{q}}{\sqrt{\hat{r}(1- \hat{r})(1/M_\alpha + 1/M_\beta)}}
-	\end{equation*}
-	
-	With the symbols retaining their previous meanings. Under the null $H_0$, as $n \rightarrow \infty$ then $z_n \sim \Gaussian(0, 1)$. Meaning that, we can construct a similar test to reject $H_0$ at the $100(\zeta)\%$ confidence level if and only if $|z_n| \geq \phi^{-1}(\zeta)$, where $\phi^{-1}$ is the standard inverse Gaussian cdf on magnitude satisfying $Pr(|Y| \leq \phi^{-1}(\zeta)) = \zeta$ given $Y \sim \Gaussian(0, 1)$
-	\label{corollary:z-test}
-\end{corollary}
+Note that an alternative test is possible by comparing $z_n$ to a Gaussian.
 
 \subsection{Early results}
 
@@ -313,7 +299,7 @@ Therefore, $p_1$ is the probability that two vertices of gender-77 are connected
 	\label{tab:egonet-0-hyp-tests}
 \end{table}
 
-Test 2 rejecting the null gives evidence that gender-78 people (community 2) have on average more same-gender friends than 77-ers have ($\hat{p_2} > \hat{p_1}$ in table \ref{tab:egonet-0-props}). The rejection of the null in test 3 gives evidence that gender-78 treat gender-77 people differently to their own gender. Indeed, a gender-78 person is more likely to be friends with a fellow 78-er than with a 77-er. However, we do not reject the null in test 1 so there is insufficient evidence to claim the reverse (that 77-ers tend to stay away from 78-ers). Nevertheless, these are results on a single egonet so can hardly be generalised to society as a whole. However, the exercise has highlighted some interesting points:
+Test 2 rejecting the null gives evidence that gender-78 people (community 2) have on average more same-gender friends than 77-ers have ($\hat{p}_2 > \hat{p}_1$ in table \ref{tab:egonet-0-props}). The rejection of the null in test 3 gives evidence that gender-78 treat gender-77 people differently to their own gender. Indeed, a gender-78 person is more likely to be friends with a fellow 78-er than with a 77-er. However, we do not reject the null in test 1 so there is insufficient evidence to claim the reverse (that 77-ers tend to stay away from 78-ers). Nevertheless, these are results on a single egonet so can hardly be generalised to society as a whole. However, the exercise has highlighted some interesting points:
 
 \begin{itemize}
 	\item The hypothesis test framework does not quantify the magnitude of the difference just whether or not a difference exists.
@@ -326,32 +312,11 @@ To address these shortcomings we instead approach the problem from a different a
 \section{Detecting Structure}
 \subsection{Weak recovery}
 
-This is the problem of recovering the communities from the graph $\Gcal$. We use the notation $\hat{X}$ to denote the produced estimate of the community labels for the $n$ vertices. Obviously, if the SBM is symmetric then we must allow for an arbitrary relabelling of the communities $r: \{1, 2 \dots k\} \mapsto \{1, 2 \dots k\}$ before we compare the agreement of the two vectors $\hat{X}$ and $X$. The agreement $A$ and normalised agreement $\tilde{A}$ between two vectors $x, y$ are computed as below:
-%
-\begin{align}
-	A(x, y) &= \max_r \frac{1}{n} \sum_{i=1}^{n} \one (x_i, r(y_i)) \\
-	\tilde{A}(x, y) &= \max_r \frac{1}{k} \sum_{i=1}^{k} \frac{1}{n_i} \sum_{v \in \Omega_i(x)} \one(x_v, r(y_v))
-\end{align}
-
-The normalised agreement is important for asymmetric SBMs as it takes the agreement averaged over communities rather than vertices. We define 4 recovery regimes (plus the trivial no recovery), such that the following holds (adapted from Abbe \cite{Abbe}):
-
-\begin{definition}[Recovery regimes]
-	for $(X, \Gcal) \sim \textrm{SBM}(m, p, W)$ the following recovery requirements are solved if there exists an algorithm which takes $\Gcal$ and input and outputs a vector of classifications $\hat{X} = \hat{X}(\Gcal)$ such that as $n \rightarrow \infty$:
-	\begin{itemize}
-		\item \textbf{Exact recovery:} $Pr\{A(X, \hat{X}) = 1\} = 1 - o(1)$ correct classification recovered almost surely
-		\item \textbf{Almost exact recovery:} $Pr\{A(X, \hat{X}) = 1 - o(1)\} = 1 - o(1)$ vanishing fraction misclassified almost surely
-		\item \textbf{Partial recovery:} $Pr\{\tilde{A}(X, \hat{X}) \geq \alpha\} = 1 - o(1), 1 > \alpha > 1/k$ better than choosing from uniform prior
-		\item \textbf{Weak recovery:} $Pr\{\tilde{A}(X, \hat{X}) \geq 1/k + \epsilon \} = 1 - o(1), \epsilon > 0$ marginally better than choosing from uniform prior
-		\item \textbf{No recovery:} graph provides no information as to class labels
-	\end{itemize}
-	Where $o(1)$ denotes a family of functions that tend to 0 as $n \rightarrow \infty$. The regime $\Gcal$ occupies depends on the parameters of the SBM. Each recovery regime is weaker than the one above it so Exact recovery implies weak recovery is possible..
-\end{definition}
-
-We choose to focus on weak recovery as it is the least strict of all regimes. An alternative statement of weak recovery that implies the one above is given below \cite{Abbe}:
+Community detection is the problem of recovering the communities from the graph $\Gcal$. We use the notation $\hat{X}$ to denote the estimate of the community labels for the $n$ vertices. Obviously, if the SBM is symmetric then we must allow for an arbitrary relabelling of the communities $r: \{1, 2 \dots k\} \mapsto \{1, 2 \dots k\}$ before we compare the agreement of the two vectors $\hat{X}$ and $X$. There are 4 recovery regimes (plus the trivial no recovery), as defined by Abbe \cite{Abbe}. We choose to focus on weak recovery as it is the least strict of all. Therefore, there are very few constraints on the SBM parameters and the theory can be applied to a wide range of graphs. A statement of weak recovery is given in definition \ref{defn:weak-recovery} \cite{Abbe}.
 
 \begin{definition}[Weak recovery]
 	\label{defn:weak-recovery}
-	for  $(X, \Gcal) \sim \textrm{SBM}(n, p, W)$ weak recovery is solved if there exists $\epsilon > 0$ and a certain choice of indices $i, j \in \{1, 2 \dots k\}$ and an algorithm that takes as input $\Gcal$ and outputs a partition of the vertex set $\Vcal$ into two distinct sets $S$ and $S^C$ (detected communities 1 and 2 respectively) such that:
+	weak recovery is solved for a graph  $(X, \Gcal) \sim \textrm{SBM}(n, p, W)$ if there exists $\epsilon > 0$ and a certain choice of indices $i, j \in \{1, 2 \dots k\}$ and an algorithm that takes as input $\Gcal$ and outputs a partition of the vertex set $\Vcal$ into two distinct sets $S$ and $S^C$ (detected communities 1 and 2 respectively) such that:
 	\begin{equation*}
 		Pr\left\{ \frac{|\Omega_i \cap S|}{|\Omega_i|} - \frac{|\Omega_j \cap S|}{|\Omega_j|} \geq \epsilon \right\} = 1 - o(1)
 	\end{equation*}
@@ -471,7 +436,6 @@ Lastly, the analysis must of course be expanded to more datasets to benchmark ef
 
 This concludes the Technical Milestone Report for the project thus far. We start by fully fleshing out the theoretical foundation of the Stochastic Block Model and hypothesis tests on connectivity parameters. Nevertheless, this approach is too narrow in scope to be a useful tool on its own. We therefore set about the problem from the opposite direction; rather than verify structure we are already given, we detect structure in the graph without labels and seek to identify which labels best recreate the detected partition. Early results are promising but this approach needs to be given the same rigorous treatment as the hypothesis testing framework. That will be the emphasis of future work.
 
-%\nocite{*}
 \printbibliography
 
 \end{multicols*}
