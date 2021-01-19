@@ -90,7 +90,7 @@ Though the definition of the SBM is simple, it allows for very deep and rich ana
 \section{Verifying Structure}
 \subsection{Theory}
 
-Armed with this definition we tackle the simplest problem in structure verification. Given an undirected graph $\Gcal$ and vertex-labels $X$, we wish to determine whether the two communities $a$ and $b$ connect differently. Put formally, this is a hypothesis test on the parameters of $W$. There are three parameters we would wish to test: $W_{aa}, W_{ab}$ and $W_{bb}$ (note that for an undirected graph $W = W^T$ necessarily so $W_{ab} = W_{ba}$). To do this we can perform three-pairwise hypothesis tests. Here we test $W_{\alpha}$ against $W_{\beta}$ where $\alpha$ and $\beta$ are unique indices in $\{(a,a), (a, b), (b,b)\}$:
+Armed with definition \ref{defn:sbm} we tackle the simplest problem in structure verification. Given an undirected graph $\Gcal$ and vertex-labels $X$ such that $(X, \Gcal) \sim \textrm{SBM}(n, p, W)$, we wish to determine whether the two communities $a$ and $b$ connect differently. Put formally, this is a hypothesis test on the parameters of $W$. There are three parameters we would wish to test: $W_{aa}, W_{ab}$ and $W_{bb}$ (note that for an undirected graph $W = W^T$ necessarily so $W_{ab} = W_{ba}$). To do this we can perform three-pairwise hypothesis tests. Here we test $W_{\alpha}$ against $W_{\beta}$ where $\alpha$ and $\beta$ are unique indices in $\{(a,a), (a, b), (b,b)\}$. Therefore, each hypothesis test can be formulated as below:
 %
 \begin{equation}
 \begin{aligned}
@@ -99,14 +99,14 @@ Armed with this definition we tackle the simplest problem in structure verificat
 \end{aligned}
 \end{equation}
 
-We formulate this as a likelihood ratio test. Letting $\lik(\Dcal | H)$ denote the likelihood of observing the data $\Dcal = (X, G)$ under hypothesis $H$. Therefore, the test statistic is given by:
+We formulate this as a likelihood ratio test. Letting $\lik(D | H)$ denote the likelihood of observing the data $D = (X, \Gcal)$ under hypothesis $H$. Therefore, the test statistic is given by:
 %
 \begin{equation}
-	t_n \coloneqq \log \frac{\lik(\Dcal | H_1)}{\lik(\Dcal | H_0)}
+	t_n \coloneqq \log \frac{\lik(D | H_1)}{\lik(D | H_0)}
 	\label{eqn:test-statistic-start}
 \end{equation}
 
-At this point it helps to introduce some more notation. We define the number of vertices in community $i$ by $n_i \coloneqq |\Omega_i(X)|$ leading to the result $n = \sum_i n_i$. Furthermore, we use $E_{ij} = E_{ij}(X, \Gcal)$ to denote the number of realised edges between communities $i$ and $j$ (in generality $i$ may be equal to $j$) and similarly define $M_{ij} = M_{ij}(X)$ as the maximum number of possible edges between the communities. For an undirected graph this can be computed simply as follows:
+At this point it helps to introduce some more notation. We define the number of vertices in community $i$ by $n_i \coloneqq |\Omega_i(X)|$. Furthermore, we use $E_{ij} = E_{ij}(X, \Gcal)$ to denote the number of realised edges between communities $i$ and $j$ (in generality $i$ may be equal to $j$) and similarly define $M_{ij} = M_{ij}(X)$ as the maximum number of possible edges between communities $i$ and $j$. This is computed simply as follows:
 %
 \begin{equation}
 	M_{ij} = M_{ij} (X) = \begin{cases}
@@ -118,16 +118,16 @@ At this point it helps to introduce some more notation. We define the number of 
 With this new notation, the likelihood function can be written explicitly:
 %
 \begin{align}
-\lik(\Dcal | H) &= p(X| \pi) \cdot p(\Gcal | W, X) \nonumber \\
-&= p(X | \pi) \cdot \prod_{i=1}^{k} \prod_{j=i}^{k} p(E_{ij} | W, X) \nonumber \\
-&= p(X | \pi) \cdot \prod_{i=1}^{k} \prod_{j=i}^{k} W_{ij} ^ {E_{ij}} \cdot \left( 1 - W_{ij} \right) ^ {(M_{ij} - E_{ij})}
+\lik(D | H) &= Pr(X| p) \cdot Pr(\Gcal | W, X) \nonumber \\
+&= Pr(X | p) \cdot \prod_{i=1}^{k} \prod_{j=i}^{k} p(E_{ij} | W, X) \nonumber \\
+&= Pr(X | p) \cdot \prod_{i=1}^{k} \prod_{j=i}^{k} W_{ij} ^ {E_{ij}} \cdot \left( 1 - W_{ij} \right) ^ {(M_{ij} - E_{ij})}
 \label{eqn:likelihood-verbose}
 \end{align}
 
-The form of $p(\Gcal | W, X)$ is simply a sequence of Bernoulli trials for each distinct community pair $(i, j)$ (edge present with probability $W_{ij}$ or edge absent with probability $1 - W_{ij}$ for every pair of vertices across those communities). A sequence of Bernoullis is the same as a Binomial distribution without the combinatoric term. By inspecting equation \ref{eqn:likelihood-verbose} we see that only terms involving $W_{\alpha}$ and $W_{\beta}$ are going to differ under the two hypotheses; the rest of the terms will cancel in our calculation of the test-statistic $t_n$. Therefore, we can rewrite the likelihood as follows:
+The form of $Pr(\Gcal | W, X)$ is simply a sequence of Bernoulli trials for each distinct community pair $(i, j)$; there are $E_{ij}$ edges present each with probability $W_{ij}$ and $(M_{ij} - E_{ij})$ absent with probability $(1 - W_{ij})$. A sequence of Bernoullis is the same as a Binomial distribution without the combinatoric term. By inspecting equation \ref{eqn:likelihood-verbose} we see that only terms involving $W_{\alpha}$ and $W_{\beta}$ are going to differ under the two hypotheses $H_0$ and $H_1$; the rest of the terms will cancel in our calculation of the test-statistic $t_n$. Therefore, we can rewrite the likelihood as follows:
 %
 \begin{equation}
-	\lik (\Dcal | H) \propto f (W_\alpha, E_\alpha, M_\alpha) \cdot f (W_\beta, E_\beta, M_\beta)
+	\lik (D | H) \propto f (W_\alpha, E_\alpha, M_\alpha) \cdot f (W_\beta, E_\beta, M_\beta)
 \end{equation} 
 \begin{equation}
 	\textrm{where } f (w, e, m) \coloneqq w^e \cdot (1-w)^{(m - e)}
@@ -159,7 +159,7 @@ Furthermore, we spot the following property $f(w, e_1, m_1) \cdot f(w, e_2, m_2)
 	&= \log \frac{f(\hat{p}, E_\alpha, M_\alpha)}{f(\hat{r}, E_\alpha, M_\alpha)} + \log \frac{f(\hat{q}, E_\beta, M_\beta)}{f(\hat{r}, E_\beta, M_\beta)}
 \end{align}
 
-Where $\hat{p} \coloneqq E_\alpha / M_\alpha$, $\hat{q} \coloneqq E_\beta / M_\beta$ and $\hat{r} \coloneqq (E_\alpha + E_\beta) / (M_\alpha + M_\beta)$. These symbols are introduced to make the notation more succinct.
+Where $\hat{p} \coloneqq E_\alpha / M_\alpha$, $\hat{q} \coloneqq E_\beta / M_\beta$ and $\hat{r} \coloneqq (E_\alpha + E_\beta) / (M_\alpha + M_\beta)$. These are essentially maximum-likelihood estimates of parameters of $W$ and the symbols are introduced to make the notation more succinct. Note that the max-likelihood estimate of $W_alpha$ under $H_1$ is denoted by the symbol $\hat{p}$ and should not be confused with the community prior $p$ though context will make the distinction apparent. We now state lemma \ref{lem:kl-div}.
 
 \begin{lemma}[KL divergence]
 	With $f$ defined as in equation \ref{eqn:f-defn}, $0 \leq e \leq m$ and $r \in [0, 1]$ it holds that:
@@ -180,7 +180,7 @@ Proving lemma \ref{lem:kl-div} is simply a case of algebraic manipulation:
 	&= m \kl \left( \textrm{Bern}(e/m) || \textrm{Bern}(r) \right) \quad \therefore \textrm{QED}
 \end{align}
 
-Thereby proving lemma \ref{lem:kl-div}. This allows us to simplify the test-statistic into a form that is more numerically stable:
+Thereby proving lemma \ref{lem:kl-div}. This allows us to simplify the test-statistic into a form that is more numerically stable (equation \ref{eqn:test-stat-compute-form}). However, we must simplify further still using lemma \ref{lem:kl-approx-chi}.
 %
 \begin{equation}
 	t_n = M_\alpha \cdot \kl\left( \textrm{Bern}(\hat{p}) || \textrm{Bern}(\hat{r})\right) + 
@@ -188,7 +188,6 @@ Thereby proving lemma \ref{lem:kl-div}. This allows us to simplify the test-stat
 	\label{eqn:test-stat-compute-form}
 \end{equation}
 
-However, we must simplify further still.
 %
 \begin{lemma}[$\chi^2$ approximation]
 	\label{lem:kl-approx-chi}
@@ -211,7 +210,7 @@ Where the summation over $\delta$ evaluates to 0 because $\delta$ is the differe
 \chi^2(\textrm{Bern}(p) || \textrm{Bern}(q)) = \left( \frac{p-q}{\sqrt{q(1-q)}} \right)^2
 \end{equation}
 
-We can apply these results to equation \ref{eqn:test-stat-compute-form} to obtain an approximate expression for $t_n$ under the null for large $n$ such that $\hat{p}$, $\hat{q}$ and $\hat{r}$ are all close meaning Lemma \ref{lem:kl-approx-chi} is valid, giving:
+We can apply these results to equation \ref{eqn:test-stat-compute-form} to obtain an approximate expression for $t_n$ under the null. Under $H_0$ and for large $n$, the estimates $\hat{p}$, $\hat{q}$ and $\hat{r}$ are all close meaning Lemma \ref{lem:kl-approx-chi} is applicable. This gives:
 %
 \begin{align}
 	t_n &\approx \frac{1}{2 \hat{r}(1 - \hat{r})} \left( 
@@ -226,7 +225,7 @@ We can apply these results to equation \ref{eqn:test-stat-compute-form} to obtai
 	= \frac{1}{2} z_n^2
 \end{align}
 
-Through application of the Central Limit Theorem (CLT) and Slutsky's Theorem it can be shown that as $n \rightarrow \infty$ under the null $H_0$ the term in brackets on the final line is distributed like a standard Gaussian $z_n \sim \Gaussian(0,1)$. This is because under the same assumptions, assuming that $W_\alpha = W_\beta = \mu$, by the CLT $\hat{p} \sim (\mu, \mu(1 - \mu)/ M_\alpha)$, $\hat{q} \sim (\mu, \mu(1 - \mu)/ M_\beta)$ and $\hat{p} \sim (\mu, \mu(1 - \mu)/ (M_\alpha + M_\beta))$. Therefore, the whole test-statistic is distributed as $t_n \sim \frac{1}{2} \chi^2_1$ by the definition of the $\chi^2_p$ distribution: $\chi^2_p \sim \sum_{i=1}{p} Z_i^2$ for $Z_i \sim \Gaussian(0,1)$. This leads to the following theorem:
+Through application of the Central Limit Theorem (CLT) and Slutsky's Theorem it can be shown that as $n \rightarrow \infty$ under the null $H_0$ the term in brackets on the final line is distributed like a standard Gaussian $z_n \sim \Gaussian(0,1)$. This is because under the same assumptions, assuming that $W_\alpha = W_\beta = \mu$, by the CLT $\hat{p} \sim (\mu, \mu(1 - \mu)/ M_\alpha)$, $\hat{q} \sim (\mu, \mu(1 - \mu)/ M_\beta)$ and $\hat{r} \sim (\mu, \mu(1 - \mu)/ (M_\alpha + M_\beta))$. The proof is long-winded and therefore omitted from this short report. Therefore, the whole test-statistic is distributed as $t_n \sim \frac{1}{2} \chi^2_1$ by the definition of the $\chi^2_p$ distribution: $\chi^2_p \sim \sum_{i=1}{p} Z_i^2$ for $Z_i \sim \Gaussian(0,1)$. This leads to theorem \ref{theorem:hyp-test-sbm-chi} and corollary \ref{corollary:z-test}.
 
 \begin{theorem}[$\chi^2$ test]
 	For $(X, \Gcal) \sim \textrm{SBM}(n, p, W)$, given the realised graph and class labels $(X, \Gcal)$ we can perform a hypothesis test on parameters $W_\alpha$ and $W_\beta$ of the connectivity matrix $W$.
@@ -255,11 +254,12 @@ Through application of the Central Limit Theorem (CLT) and Slutsky's Theorem it 
 	\end{equation*}
 	
 	With the symbols retaining their previous meanings. Under the null $H_0$, as $n \rightarrow \infty$ then $z_n \sim \Gaussian(0, 1)$. Meaning that, we can construct a similar test to reject $H_0$ at the $100(\zeta)\%$ confidence level if and only if $|z_n| \geq \phi^{-1}(\zeta)$, where $\phi^{-1}$ is the standard inverse Gaussian cdf on magnitude satisfying $Pr(|Y| \leq \phi^{-1}(\zeta)) = \zeta$ given $Y \sim \Gaussian(0, 1)$
+	\label{corollary:z-test}
 \end{corollary}
 
 \subsection{Early results}
 
-We seek to apply theorem \ref{theorem:hyp-test-sbm-chi} to various real-world graphical datasets. We start by analysing social network graphs. The Stanford Network Analysis Project (SNAP for short) \cite{snapnets} offers a wealth of Facebook egonets. An egonet is simply a graph where all vertices (in this case each representing a Facebook user) are guaranteed to be connected to one central node (the ego-node). The data consists of the undirected set of edges $\Gcal$ indicating whether any two vertices (Facebook users) are connected (friends on Facebook). We also have a set of binary labels for each vertex $X$. However, for the sake of privacy these features are anonymised. This is best explained through the example below: \\
+We seek to apply theorem \ref{theorem:hyp-test-sbm-chi} to real-world graphical datasets. We start by analysing social network graphs. The Stanford Network Analysis Project (SNAP for short) \cite{snapnets} offers a wealth of Facebook egonets. An egonet is simply a graph where all vertices (in this case each representing a Facebook user) are guaranteed to be connected to one central node (the ego-node). The data consists of the undirected set of edges $\Gcal$ indicating whether any two vertices (Facebook users) are connected (friends on Facebook). We also have a set of binary feature flags for each vertex $X$. However, for the sake of privacy these features are anonymised. This is best explained through the example below: \\
 
 \begin{center}
 \begin{minipage}{8cm}
@@ -274,9 +274,9 @@ We seek to apply theorem \ref{theorem:hyp-test-sbm-chi} to various real-world gr
 \end{center}
 
 
-Each feature is anonymised to avoid disclosing personally identifiable information. I cannot tell whether vertex $v$ is male or female but I can tell whether they are the same gender as another vertex $w$ which suffices for our analysis. If we have a total of $f$ features and $n$ vertices, then the feature matrix $X$ would be an $n \times f$ where each row is the feature vector for the corresponding vertex. The features are binary such that $X_{ij} \in \{0, 1\}$ indicating the feature of and on respectively.
+Each feature is given an anonymised signature to avoid disclosing personally identifiable information. We cannot tell whether vertex $v$ is male or female but we can tell whether they are the same gender as another vertex $w$ which suffices for our analysis. If we have a total of $f$ features and $n$ vertices, then the feature matrix $X$ would be an $n \times f$ where each row is the feature vector for the corresponding vertex. The features are binary such that $X_{ij} \in \{0, 1\}$ indicating the feature being turned off and on respectively.
 
-We perform a hypothesis test in the manner described by theorem \ref{theorem:hyp-test-sbm-chi} to determine whether gender influences how friends connect on Facebook. We choose to analyse SNAP egonet with id 0 (the id of the egonet is the id of the single egonode) though any choice is possible. The egonet is plotted on figure \ref{fig:ego-0-by-gender}. We use the Python package NetworkX \cite{networkx} for its visualisation tools. Indeed, we will discuss layout algorithms later as for now we focus on the simple hypothesis test.
+We perform a hypothesis test in the manner described by theorem \ref{theorem:hyp-test-sbm-chi} to determine whether gender influences how friends connect on Facebook. We choose to analyse SNAP egonet with id 0 (the id of the egonet is the id of the single egonode) though any choice is possible. The egonet is plotted on figure \ref{fig:ego-0-by-gender} with nodes coloured by gender. We use the Python package NetworkX \cite{networkx} for its visualisation tools. Indeed, we will discuss layout algorithms later as for now we focus on the simple hypothesis test.
 %
 \begin{figure}[!h]
 	\centering
@@ -294,7 +294,7 @@ We use an SBM model with $k=2$ communities (1: gender-77 on and 2: gender-77 off
 	\end{bmatrix}
 \end{equation}
 
-Therefore, $p_1$ is the probability that two vertices of gender-77 are connected, $q$ is the crossover probability and $p_2$ is the connection probability within the gender-78 community. The results of the hypothesis tests are given in table \ref{tab:egonet-0-hyp-tests} alongside p-values (we choose a 95\% significance level to reject the null). However, in some cases the test statistics were so extreme that the p-value saturated to 0.
+Therefore, $p_1$ is the probability that two vertices of gender-77 are connected, $q$ is the crossover probability and $p_2$ is the connection probability within the gender-78 community\footnote{Strictly speaking this is the not gender-77 community as there are a handful of vertices that do not disclose their gender to Facebook or do not fall into this binary}. The results of the hypothesis tests are given in table \ref{tab:egonet-0-hyp-tests} alongside p-values (we choose a 95\% significance level to reject the null). However, in some cases the test statistics were so extreme that the p-value saturated to 0.
 %
 \begin{table}[!h]
 	\centering
@@ -318,15 +318,15 @@ Therefore, $p_1$ is the probability that two vertices of gender-77 are connected
 	\label{tab:egonet-0-hyp-tests}
 \end{table}
 
-Test 2 being rejected gives evidence that one gender has on average more friends from their own gender. We see that gender-78 people (community 2) have on average more friends ($\hat{p_2} > \hat{p_1}$ in table \ref{tab:egonet-0-props}). The rejection of the null in test 3 gives evidence that gender-78 treat gender-77 people differently to their own gender. Indeed, a gender-78 person is more likely to be friends with a fellow 78-er than with a 77-er. However, we do not reject the null in test 1 so there is insufficient evidence to claim the reverse (that 77-ers tend to stay away from 78-ers). Nevertheless, these are results on a single egonet so can hardly be generalised to society as a whole. However, the exercise has highlighted some interesting points:
+Test 2 rejecting the null gives evidence that gender-78 people (community 2) have on average more same-gender friends than 77-ers have ($\hat{p_2} > \hat{p_1}$ in table \ref{tab:egonet-0-props}). The rejection of the null in test 3 gives evidence that gender-78 treat gender-77 people differently to their own gender. Indeed, a gender-78 person is more likely to be friends with a fellow 78-er than with a 77-er. However, we do not reject the null in test 1 so there is insufficient evidence to claim the reverse (that 77-ers tend to stay away from 78-ers). Nevertheless, these are results on a single egonet so can hardly be generalised to society as a whole. However, the exercise has highlighted some interesting points:
 
-\begin{enumerate}
+\begin{itemize}
 	\item The hypothesis test framework does not quantify the magnitude of the difference just whether or not a difference exists.
 	\item As the degree $n$ increases, the p-values will necessarily become more extreme.
 	\item The method relies on the analyst to specify the features of interest so results may be misleading if third variables are missing from the analysis.
-\end{enumerate} 
+\end{itemize} 
 
-To address these shortcomings we instead approach the problem from a different angle. For now we have been given a graph with fully labelled vertices and ask if a given feature affect the structure. Instead, we could take a graph and partition into communities first (without using feature information) and then ask which features most reliably explain the partition. For that we need a way of detecting structure.
+To address these shortcomings we instead approach the problem from a different angle. For now we have been given a graph with fully labelled vertices and ask if a given feature affects the structure. Instead, we could take a graph and partition first (without using feature information) and then ask which features explain the partition. For that we need a way of detecting structure.
 
 \section{Detecting Structure}
 \subsection{Weak recovery}
@@ -352,7 +352,7 @@ The normalised agreement is important for asymmetric SBMs as it takes the agreem
 	Where $o(1)$ denotes a family of functions that tend to 0 as $n \rightarrow \infty$. The regime $\Gcal$ occupies depends on the parameters of the SBM. Each recovery regime is weaker than the one above it so Exact recovery implies weak recovery is possible..
 \end{definition}
 
-We choose to focus on weak recovery as it is the least strict of all regimes. An alternative statement of weak recovery is given below:
+We choose to focus on weak recovery as it is the least strict of all regimes. An alternative statement of weak recovery that implies the one above is given below \cite{Abbe}:
 
 \begin{definition}[Weak recovery]
 	\label{defn:weak-recovery}
@@ -365,7 +365,7 @@ We choose to focus on weak recovery as it is the least strict of all regimes. An
 \end{definition}
 
 
-One of the most promising weak recovery algorithms is called Acyclic Belief Propagataion (ABP). This is a message-passing algorithm that solves weak recovery in the sense of definition \ref{defn:weak-recovery}. Algorithm \ref{alg:lin-abp} is heavily adapated from Abbe and Sandon \cite{Linear-ABP}. The original paper goes into much more detail but it works on the premise that one can infer the community of a particular vertex by taking a majority vote among the  of all its neighbours. The algorithm is non-determinsitic and requires the vertex set $\Vcal = \Vcal(\Gcal)$ and edge set $\Ecal = \Ecal(\Gcal)$ as well as two hyper-parameters $r$ (the maximum cyclic length to correct for) and $T$ (the number of iterations):
+One of the most promising weak recovery algorithms is called Acyclic Belief Propagataion (ABP). This is a message-passing algorithm that solves weak recovery in the sense of definition \ref{defn:weak-recovery}. Algorithm \ref{alg:lin-abp} is heavily adapated from Abbe and Sandon \cite{Linear-ABP}. The original paper goes into much more detail but it works on the premise that one can infer the community of a particular vertex simply from the labels of all its neighbours. The algorithm is non-deterministic and requires the vertex set $\Vcal = \Vcal(\Gcal)$ and edge set $\Ecal = \Ecal(\Gcal)$ as well as two hyper-parameters $r$ (the maximum cyclic length to correct for) and $T$ (the number of iterations).
 
 %
 \begin{algorithm}
@@ -392,7 +392,7 @@ One of the most promising weak recovery algorithms is called Acyclic Belief Prop
 	\end{algorithmic}
 \end{algorithm}
 
-We implement this algorithm in Python and apply it to the Facebook Egonets described earlier. We found that the hyperparameter settings $r=3$ and $T=5$ yielded good results. We define the normalised ABP output below:
+We implement this algorithm in Python and apply it to the Facebook egonets described earlier. We found that the hyperparameter settings $r=3$ and $T=5$ yielded good results. As well as the hard partition of $\Vcal$ into $S$ and $S^C$ we can use the normalised ABP output $\tilde{\sigma}_v$ defined below:
 %
 \begin{equation}
 	\tilde{\sigma}_v \coloneqq \begin{cases}
@@ -401,7 +401,7 @@ We implement this algorithm in Python and apply it to the Facebook Egonets descr
 	\end{cases}
 \end{equation}
 
-Where $\sigma_{max}$ is the largest positive value of $\sigma_v$ and $\sigma_{min}$ is the most negative. The normalised quantity $\tilde{\sigma}_v \in [-1, +1]$ with $0$ still being the midpoint that determines which detected community vertex $v$ is assigned to. We colour each vertex according to this quantity $\tilde{\sigma}_v$ and plot the graph on figure \ref{fig:abp-output-norm}. We see intuitively that ABP has worked. The blue cluster in the lower right is clearly part of one community and a great many vertices do not seem to belong to any cluster at all so their classification is uncertain (the colour is close to green).
+Where $\sigma_{max}$ is the largest positive value of $\sigma_v$ and $\sigma_{min}$ is the most negative. The normalised quantity has restricted range $\tilde{\sigma}_v \in [-1, +1]$ with $0$ still being the decision boundary for partitioning. We colour each vertex according to this quantity $\tilde{\sigma}_v$ and plot the graph on figure \ref{fig:abp-output-norm}. We see intuitively that ABP has worked. The blue cluster in the lower right is clearly part of the same community. Furthermore, many vertices that do not seem to belong to any cluster have uncertain classifications (the colour is close to green).
 %
 \begin{figure}[!h]
 	\centering
@@ -431,13 +431,13 @@ Clearly the fraction of each community in the partition $S$ differ substantially
 \subsection{From detection to inference}
 \label{sect:detection-to-inference}
 
-We now have an algorithm (ABP) that partitions our graph into two sets that are most readily explained by an SBM with $k=2$ communities. We can now ask the question of which vertex labels most readily explain the separation. Therefore, we can determine which features have the largest impact on the graphical structure; this circumvents the binary resolution problem with the hypothesis testing approach.
+We now have an algorithm (ABP) that partitions our graph into two sets that are most readily explained by an SBM with $k=2$ communities. We can now ask the question of which vertex labels most readily explain the separation and therefore determine which features have the largest impact on the graphical structure; this circumvents the binary resolution problem with the hypothesis testing approach.
 
 This part of the project is still in its early stages so these are just preliminary results. For reference we plot the community fractions in the detected set $S$
 \footnote{ABP is non-deterministic so each subplot is the result of a different run of ABP. Subfigures use the same partition $S$ but no exact comparison is possible between figures.}
-on figure \ref{fig:abp-output-community-fractions}. It is interesting to note that if two bars on this plot differ substantially then we have satisfied the requirment for weak recovery as defined in \ref{defn:weak-recovery}. We necessarily remove the constraint on the community sets $\Omega_i$ to be disjoint as one vertex can have multiple features turned on. This can be modelled more precisely through a Mixed Membership Model but for now an SBM with $k=2$ communities suffices.
+on figure \ref{fig:abp-output-community-fractions}. It is interesting to note that if two bars on this plot differ substantially then we have strong evidence that we have solved weak recovery as in definition \ref{defn:weak-recovery}. In a slight abuse of notation, we necessarily remove the constraint on the community sets $\Omega_i$ to be disjoint as one vertex can have multiple features turned on. These should no longer be thought of as community sets but rather feature sets. This can be modelled more precisely through a Mixed Membership Model but for now an SBM with $k=2$ communities suffices.
 
-We perform a linear regression on the normalised ABP output vector $\tilde{\sigma}$ with the feature matrix $n \times f$ feature matrix $X$ as the explanatory variables. $X_{ij} = 1$ if vertex $i$ has feature $j$ turned on and $0$ if feature $j$ is off. The equation we try to fit is given below:
+We perform a linear regression on the $n \times 1$ normalised ABP output vector $\tilde{\sigma}$ with the $n \times f$ feature matrix $X$ as the explanatory variable. $X_{ij} = 1$ if vertex $i$ has feature $j$ turned on and $0$ if feature $j$ is off. The equation we try to fit is given below:
 %
 \begin{equation}
 	\tilde{\sigma} = a + X b + \epsilon
@@ -461,17 +461,17 @@ Linear regression finds the constant bias $a$ and $f \times 1$ weight vector $b$
 	\caption{Egonet-0 linear classifier results}
 \end{figure}
 
-The results are rather interesting. Certain languages are a far stronger predictor of community assignment than language. After all, one would hope that a language barrier poses a more tangible obstacle to friendship than gender. The bias term has rather low magnitude which just implies that the partition $S$ and $S^C$ are of similar size. A keen reader would notice that the bias term is included in figure \ref{fig:abp-output-community-fractions}; this is because we implement the bias by augmenting $X$ with an additional feature flag always to $1$ such that the constant term $a$ in equation \ref{eqn:lin-regression} is subsumed into the $b$ vector. Indeed, in figure \ref{fig:abp-output-community-fractions} the fraction of vertices with bias turned on in partition $S$ is very close to 0.5. Since all vertices have the bias feature turned on $\Omega_{bias} = \Vcal$, this is equivalent to the number of vertices in $S$ as a fraction of the total: $|S| / |\Vcal|$.
+The results are rather interesting. Certain languages are a far stronger predictor of community assignment than gender. After all, one would hope that a language barrier poses a more tangible obstacle to friendship than gender. Furthermore, the gender coefficients are of the same sign further decreasing the causal impact that gender has given language. The bias term has rather low magnitude which just implies that the partition $S$ and $S^C$ are of similar size. A keen reader would notice that the bias term is included in figure \ref{fig:abp-output-community-fractions}. This is because we implement the bias by augmenting $X$ with an additional feature flag always set to $1$ such that the constant term $a$ in equation \ref{eqn:lin-regression} is subsumed into the $b$ vector. Since all vertices have the bias feature turned on $\Omega_{bias} = \Vcal$, the fraction of vertices with bias turned on in $S$ is equivalent to the total number of vertices in $S$ as a fraction of the total in $\Vcal$, or put formally: $|S| / |\Vcal|$. Indeed, in figure \ref{fig:abp-output-community-fractions} we see that this quantity is very close to 0.5.
 
-This analysis is of course rather crude as we have failed to take into account multi-collinearity or even determined if a linear regression model is appropriate; indeed, an $R^2$ value of just 0.113 would suggest that it is not. Nevertheless, this serves as the platform for subsequent more rigorous analysis.
+This analysis is of course rather crude as we have failed to take into account multi-collinearity or even determined if a linear regression model is appropriate; indeed, an $R^2$ value of just 0.113 would suggest that it is not. Nevertheless, this serves as the platform for subsequent more rigorous analysis. Furthermore, we have not proven the conjecture that the regression coefficients are valid measures of causal impact on graphical structure.
 
 \section{Future Direction}
 
 The immediate next steps for the project are to refine the classification approach outlined in section \ref{sect:detection-to-inference}. Firstly, it should be tied back to the hypothesis testing framework to make sure that the results are proven to be meaningful. Secondly, the exact form of the classifier can be explored; a linear regression model is a good starting point but we can expand to a softmax neural network as that would allow us to generalise to more than just two partitions.
 
-Indeed, ABP is severely limited by the fact that it only outputs 2 partitions $S$ and $S^C$. Therefore, though weak recovery is solved the results from applying the classification approach may not be natural or easy to interpret. We instead would prefer to investigate various different algorithms. Force-directed approaches are the standard in industry. One of the most common is the Fruchterman-Reingold algorithm which treats vertices as repelling objects and edges as attractive forces (springs) and then performs iterative updates on vertex positions for a finite number of iterations. This algorithm is what is used by the NetworkX package \cite{networkx} to determine graph layouts as seen in figures \ref{fig:ego-0-by-gender} and \ref{fig:abp-output-norm}. Song and Bressan \cite{force-directed} have had great success using the Fruchterman-Reingold algorithm followed by k-means clustering for community detection. Nevertheless, though they show the method produces accurate results there is no rigorous proof that it solves weak recovery.
+Indeed, ABP is severely limited by the fact that it only outputs 2 partitions $S$ and $S^C$. Therefore, though weak recovery is solved the results from applying the classification approach may not be natural or easy to interpret. We instead would prefer to investigate various different algorithms. Force-directed approaches are the standard in industry for their speed of execution. One of the most common is the Fruchterman-Reingold algorithm which treats vertices as repelling objects and edges as attractive forces (springs). It can then caluclate forces and perform iterative updates on vertex positions for a finite number of iterations. This algorithm is what is used by the NetworkX package \cite{networkx} to determine graph layouts as seen in figures \ref{fig:ego-0-by-gender} and \ref{fig:abp-output-norm}. Song and Bressan \cite{force-directed} have had great success using the Fruchterman-Reingold algorithm followed by k-means clustering for community detection. Nevertheless, though they show the method produces accurate results there is no rigorous proof yet that it solves weak recovery.
 
-Lastly, the analysis must of course be expanded to more datasets to benchmark efficacy against other methods. Work has already begun analysing the influence of gender academic collaboration graphs from Aminer \cite{aminer}. Nevertheless, this dataset does not contain gender explicitly, only first-name. However, this is cross-referenced with a list of popular baby-names to get a good replacement (as suggested by West et al. \cite{gender-scholarship}). Furthermore, the seminal dataset of political blogs from the 2004 US election \cite{polblogs} which started much of the analysis of the SBM will of course be analysed.
+Lastly, the analysis must of course be expanded to more datasets to benchmark efficacy against other methods and ensure the methods developed are generally applicable. Work has already begun analysing the influence of gender academic collaboration graphs from Aminer \cite{aminer}. Nevertheless, this dataset does not contain gender explicitly, only first-name. However, this is cross-referenced with a list of popular baby-names to get a good replacement (as suggested by West et al. \cite{gender-scholarship}). Furthermore, the seminal dataset of political blogs from the 2004 US election \cite{polblogs} which started much of the analysis of the SBM will of course be analysed.
 
 \section{Conclusion}
 
