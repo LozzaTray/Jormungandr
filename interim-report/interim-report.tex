@@ -120,7 +120,7 @@ At this point it helps to introduce some more notation. We define the number of 
 With this new notation, the likelihood function can be written explicitly:
 %
 \begin{align}
-\lik(D | H) &= \prob(X| p) \cdot \prob(\Gcal | W, X) \nonumber \\
+\lik(D | &H) = \prob(X| p) \cdot \prob(\Gcal | W, X) \nonumber \\
 &= \prob(X | p) \prod_{i=1}^{k} \prod_{j=i}^{k} \prob(E_{ij} | W, X) \nonumber \\
 &= \prob(X | p) \prod_{i=1}^{k} \prod_{j=i}^{k} W_{ij} ^ {E_{ij}} \left( 1 - W_{ij} \right) ^ {(M_{ij} - E_{ij})}
 \label{eqn:likelihood-verbose}
@@ -210,6 +210,7 @@ We can apply these results to equation \ref{eqn:test-stat-compute-form} to obtai
 %
 Through application of the Central Limit Theorem (CLT) and Slutsky's Theorem it can be shown that as $n \rightarrow \infty$ under the null $H_0$, the term in brackets on the final line is distributed like a standard Gaussian $z_n \sim \Gaussian(0,1)$. The proof is long-winded and therefore omitted from this short report. The result leads to theorem \ref{theorem:hyp-test-sbm-chi}.
 
+\pagebreak
 \begin{theorem}[$\chi^2$ test]
 	For $(X, \Gcal) \sim \textrm{SBM}(n, p, W)$, given the realised graph and class labels $(X, \Gcal)$ we can perform a hypothesis test on entries $W_\alpha$ and $W_\beta$ of the connectivity matrix $W$:
 	%
