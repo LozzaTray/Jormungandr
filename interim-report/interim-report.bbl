@@ -139,28 +139,6 @@
     \field{year}{2005}
   \endentry
 
-  \entry{gender-scholarship}{article}{}
-    \name{author}{1}{}{%
-      {{hash=eaJW}{%
-         prefix={et},
-         prefixi={e\bibinitperiod},
-         family={al.},
-         familyi={a\bibinitperiod},
-         given={Jevin\bibnamedelima West},
-         giveni={J\bibinitperiod\bibinitdelim W\bibinitperiod},
-      }}%
-    }
-    \strng{namehash}{aJWe1}
-    \strng{fullhash}{aJWe1}
-    \field{labelnamesource}{author}
-    \field{labeltitlesource}{title}
-    \field{sortinit}{A}
-    \field{sortinithash}{A}
-    \field{title}{The role of gender in scholarly authorship}
-    \field{journaltitle}{PLoS One}
-    \field{year}{2013}
-  \endentry
-
   \entry{networkx}{inproceedings}{}
     \name{author}{3}{}{%
       {{hash=HAA}{%
