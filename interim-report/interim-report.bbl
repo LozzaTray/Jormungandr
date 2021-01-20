@@ -243,6 +243,7 @@
     \verb{url}
     \verb http://snap.stanford.edu/data
     \endverb
+    \field{month}{06}
     \field{year}{2014}
   \endentry
 
