@@ -113,6 +113,47 @@ class Graph_MCMC:
 
             return classifier
 
+
+    def sample_classifier_tf(self, num_iter, verbose=False):
+        if self.state is None:
+            print("No state partition detected >> ABORT")
+        else:
+            properties = self.G.vertex_properties
+            D = len(properties)
+
+            B = self.state.get_nonempty_B()
+            vertices = self.G.get_vertices()
+            N = len(vertices)
+
+            X = np.empty((N, D))
+
+            for prop_index, value_map in enumerate(properties.values()):
+                for vertex_index, vertex_id in enumerate(vertices):
+                    X[vertex_index, prop_index] = value_map[vertex_id]
+
+            classifier = SoftmaxNeuralNet(layers_size=[B])
+
+            def sgld_iterate(state):
+                blocks = state.get_blocks()
+                Y = np.empty(N)
+
+                for vertex_index, vertex_id in enumerate(vertices):
+                    Y[vertex_index] = blocks[vertex_id]
+
+                Y = from_values_to_one_hot(Y)
+                cost = classifier.sgld_iterate(step_size=0.01, X=X, Y=Y)
+                return cost
+
+            classifier.tf_initialise(D)
+
+            # for i in range(0, num_iter):
+            #     dS, nattempts, nmoves = self.state.multiflip_mcmc_sweep(niter=1, psplit=0)
+            #     cost = sgld_iterate(self.state)
+            #     if verbose and i % 10 == 0:
+            #         print("i: {}, dS: {}, nattempts: {}, nmoves: {}, cost: {}".format(i, dS, nattempts, nmoves, cost))
+
+            return classifier
+
         
 
     def draw(self, output=None):

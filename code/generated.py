@@ -10,8 +10,10 @@ def run():
     #ml_classifier = graph.train_feature_classifier()
     #ml_classifier.plot_final_weights(["a", "b", "c"])
 
-    classifier = graph.sample_classifier_mcmc(100, True)
-    classifier.plot_sampled_weights(["a", "b", "c"])
+    classifier = graph.sample_classifier_tf(1000, True)
+    # classifier.plot_sampled_weights(["a", "b", "c"])
+    # classifier.plot_sample_history()
+    # classifier.plot_sample_histogram()
 
 
 

@@ -3,8 +3,11 @@
 import numpy as np
 import matplotlib.pylab as plt
 from sklearn.preprocessing import OneHotEncoder
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+
 import pysgmcmc as pg
+from pysgmcmc.samplers.sghmc import SGHMCSampler
 
 
 class SoftmaxNeuralNet:
@@ -112,6 +115,32 @@ class SoftmaxNeuralNet:
             self.weight_history["W" + str(l)] = []
             self.bias_history["b" + str(l)] = []
 
+
+    def tf_initialise(self, input_dimension):
+        self.layers_size.insert(0, input_dimension)
+
+        tf_weights = []
+        tf_biases = []
+
+        for l in range(1, len(self.layers_size)):
+            weight_shape = (self.layers_size[l], self.layers_size[l - 1])
+            intial_weight = np.random.randn(*weight_shape)
+            tf_weight = tf.Variable(initial_value=intial_weight, shape=weight_shape, name="W"+str(l))
+
+            bias_weight = (self.layers_size[l], 1)
+            initial_bias = np.zeros(bias_weight)
+            tf_bias = tf.Variable(initial_value=initial_bias, shape=bias_weight, name="b"+str(l))
+
+            tf_weights.append(tf_weight)
+            tf_biases.append(tf_bias)
+
+        tf_weights.extend(tf_biases)
+        params = tf_weights
+
+        self.sampler = SGHMCSampler(
+            params=params, 
+            cost_fun={}
+        )
     
     def cross_entropy_loss(self, X, Y):
         A, _store = self._forward(X)
@@ -261,6 +290,38 @@ class SoftmaxNeuralNet:
         plt.title("Sampled softmax weightings")
         plt.xlabel("Class label")
         plt.ylabel("Weight mean $\pm \sigma$")
+        plt.grid()
+        plt.legend()
+        plt.show()
+
+    
+    def plot_sample_histogram(self):
+        W_history = self.weight_history["W" + str(self.L)]
+        n = len(W_history)
+        values = [w[0, 0] for w in W_history]     
+        plt.hist(values)
+        
+        plt.title("Weight samples (n={})".format(n))
+        plt.xlabel("Value")
+        plt.ylabel("Frequency")
+        plt.grid()
+        plt.show()
+
+    
+    def plot_sample_history(self):
+        W_history = self.weight_history["W" + str(self.L)]
+        
+        B = W_history[0].shape[0]
+        D = W_history[0].shape[1]
+        n = len(W_history)       
+
+        for b in range(0, B):
+            mean = [np.mean(w[b, :]) for w in W_history]
+            plt.plot(mean, label="block-{}".format(b))
+        
+        plt.title("Sampled softmax weightings")
+        plt.xlabel("Sample index")
+        plt.ylabel("Weight")
         plt.grid()
         plt.legend()
         plt.show()
