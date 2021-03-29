@@ -377,6 +377,16 @@ Indeed, ABP is severely limited by the fact that it only outputs 2 sets. Though 
 
 Lastly, the analysis must of course be expanded to more datasets to benchmark efficacy against existing methods and ensure the approach is generally applicable. Work has already begun analysing the influence of gender on academic collaboration graphs provided by Aminer \cite{aminer}. Furthermore, the seminal dataset of political blogs from the 2004 US election \cite{polblogs} which started much of the analysis of the SBM is in the works.
 
+\section{Bayesian Exploration}
+
+For our inference goals we wish to sample block memberships $b$ according to the posterior $p(b | \Gcal)$. Peixoto \cite{Peixoto-MCMC} proposes a Monte-Carlo method for generating these samples. We simply
+
+We can generate these samples and then use them to approximate the true posterior:
+%
+\begin{equation}
+	p(b_v = j | \Gcal) \approx \frac{1}{N} \sum_{n=1}^{N} \one \left\{ b_v^{(n)} = j \right\}
+\end{equation}
+
 \section{Conclusion}
 
 We began by fully fleshing out the theoretical foundation of the Stochastic Block Model and hypothesis tests on connectivity parameters. Nevertheless, this approach is too narrow in scope to be a useful tool on its own. We therefore set about the problem from the opposite direction; rather than verify structure we are already given, we detect structure in the graph without using labels and seek to identify which labels best recreate the detected partition. Early results are promising but this approach needs to be given the same rigorous treatment as the hypothesis testing framework. That will be the emphasis of future work.
