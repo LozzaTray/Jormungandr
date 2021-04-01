@@ -381,6 +381,18 @@ Lastly, the analysis must of course be expanded to more datasets to benchmark ef
 
 For our inference goals we wish to sample block memberships $b$ according to the posterior $p(b | \Gcal)$. Peixoto \cite{Peixoto-MCMC} proposes a Monte-Carlo method for generating these samples. We simply
 
+At each iteration of the Markov chain we can use the most recent block assignments to train the classifier, mapping from vertex features to detected membership. The classifier has parameters $\theta$. We wish to apply Bayesian techniques such that we retain a measurement of the uncertainty in the classification. We propose to use Stochastic Gradient Langevin Dynamics (SGLD) as described by Nemeth and Fearnhead \cite{Nemeth-SGMCMC}. This allows us to draw samples from an arbitrary distribution $\pi$ on $\theta$. We can write $\pi$ in the following form.
+%
+\begin{equation}
+	\pi(\theta) \propto \exp \left( - U(\theta) \right)
+\end{equation}
+
+We wish to draw samples from, the posterior.
+%
+\begin{equation}
+	p(\theta | b) = \frac{p(\theta) p(b | \theta)}{p(b)}
+\end{equation}
+
 We can generate these samples and then use them to approximate the true posterior:
 %
 \begin{equation}
