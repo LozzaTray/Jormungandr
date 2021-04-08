@@ -1,11 +1,11 @@
-\documentclass[]{article}
+\documentclass[twocolumn]{article}
 
 %opening
-\title{TMR: Detecting Structure in Graphical Data}
-\author{Lawrence Tray \and Ioannis Kontoyiannis}
+\title{Automatic feature classification for the stochastic block model}
+\author{Lawrence Tray \and I. Kontoyiannis}
 
 %packages
-\usepackage[margin=0.6in]{geometry}
+\usepackage[margin=0.5in]{geometry}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -75,7 +75,6 @@ We produce vast quantities of graphical data every day and yet the techniques us
 We instead approach the problem from the opposite direction: given a graph we detect the partitions that are in some sense typical and then develop a classifier to map from vertex features to partition. The classifier then implicitly rank orders the input features by importance. Nevertheless, work must still be done to refine this classifier and tie it back to the rigorous hypothesis testing framework already developed.
 \end{abstract}
 
-\begin{multicols*}{2}
 
 \section{Introduction}
 
@@ -211,7 +210,6 @@ We can apply these results to equation \ref{eqn:test-stat-compute-form} to obtai
 %
 Through application of the Central Limit Theorem (CLT) and Slutsky's Theorem it can be shown that as $n \rightarrow \infty$ under the null $H_0$, the term in brackets on the final line is distributed like a standard Gaussian $z_n \sim \Gaussian(0,1)$. The proof is long-winded and therefore omitted from this short report. The result leads to theorem \ref{theorem:hyp-test-sbm-chi}.
 
-\pagebreak
 \begin{theorem}[$\chi^2$ test]
 	For $(X, \Gcal) \sim \textrm{SBM}(n, p, W)$, given the realised graph and class labels $(X, \Gcal)$ we can perform a hypothesis test on entries $W_\alpha$ and $W_\beta$ of the connectivity matrix $W$:
 	%
@@ -369,7 +367,7 @@ The results are rather interesting. Certain languages are a far stronger predict
 
 This analysis is of course rather crude as we have failed to take into account multi-collinearity or even determined if a linear regression model is appropriate; indeed, an $R^2$ value of just 0.113 would suggest that it is not. Nevertheless, this serves as the starting point for subsequent more rigorous analysis. Furthermore, we have not yet proven the conjecture that the regression coefficients are valid measures of causal impact on graphical structure.
 
-\pagebreak
+
 \section{Future Direction}
 
 The immediate next steps for the project are to refine the classification approach outlined in section \ref{sect:detection-to-inference}. Firstly, it should be tied back to the hypothesis testing framework to prove the results are be meaningful. Secondly, the exact form of the classifier can be explored; a linear regression model is a good starting point but we can expand to a simple softmax neural network as that would allow us to generalise to more than just two partitions.
@@ -401,12 +399,19 @@ For our inference goals we wish to sample block memberships $b$ according to the
 \end{definition}
 
 \begin{figure}[!h]
-	\begin{tikzpicture}
-		\draw (0, 0) circle (2);
-		\draw (2, 0) -> (4, 0);
-		\draw (6, 0) circle (2);
-		\draw (8, 0) -> (10, 0);
-		\draw (12, 0) circle (2);
+	\centering
+	\begin{tikzpicture}[
+		roundnode/.style={circle, draw=black, minimum size=7mm},
+		squarednode/.style={rectangle, draw=black, minimum size=7mm}
+	]
+	% nodes
+	\node[roundnode] (X) at (0, 0) {X};
+	\node[squarednode] (b) at (3, 0) {b};
+	\node[roundnode] (A) at (6, 0) {A};
+	
+	% arrows
+	\draw[->] (X.east) -- node[above] {$\theta = \{w_j\}_j$} (b.west);
+	\draw[->] (b.east) -- node[above] {$\psi = \{e, k\}$}(A.west);
 	\end{tikzpicture}
 \end{figure}
 
@@ -433,7 +438,5 @@ We can generate these samples and then use them to approximate the true posterio
 We began by fully fleshing out the theoretical foundation of the Stochastic Block Model and hypothesis tests on connectivity parameters. Nevertheless, this approach is too narrow in scope to be a useful tool on its own. We therefore set about the problem from the opposite direction; rather than verify structure we are already given, we detect structure in the graph without using labels and seek to identify which labels best recreate the detected partition. Early results are promising but this approach needs to be given the same rigorous treatment as the hypothesis testing framework. That will be the emphasis of future work.
 
 \printbibliography
-
-\end{multicols*}
 
 \end{document}
