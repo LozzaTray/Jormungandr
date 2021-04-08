@@ -1,4 +1,4 @@
-\documentclass[11pt]{article}
+\documentclass[]{article}
 
 %opening
 \title{TMR: Detecting Structure in Graphical Data}
@@ -20,6 +20,7 @@
 \usepackage{algpseudocode}% http://ctan.org/pkg/algorithmicx
 \usepackage{multicol}
 \usepackage{titling}
+\usepackage{tikz}
 
 
 %bibliography
@@ -84,7 +85,7 @@ There is a wealth of graphical data in the world with more produced every second
 
 The most popular graphical model in academia is called the Stochastic Block Model (SBM). We use a definition adapted from Abbe \cite{Abbe}.
 
-\begin{definition}
+\begin{definition}[Canonical SBM]
 	\label{defn:sbm}
 	Let $n \in \Integers^+$ be the number of vertices and $k \in \Integers^+$ be the number of communities. We define the vector $p = [p_1, p_2 \dots p_k]^T$ to be the prior on the k-communities. Each vertex $v \in \Vcal = \{1, 2 \dots n\}$ has a community label $X_v \in \{1, 2 \dots n\}$. Let $W$ be a symmetric $k \times k$ matrix with entries in $[0,1]$ called the connectivity matrix. The pair $(X, \Gcal) \sim \textrm{SBM}(n, p, W)$ if X is an $n \times 1$ vector with each component independently drawn from the community prior $X_v \sim p$ and $\Gcal$ is an $n$-vertex graph where each vertex-pair $(i, j)$ is connected with probability $\prob(i \leftrightarrow j) = W_{X_i, X_j}$ independently of other edges. Lastly, we define the community sets as $\Omega_i = \Omega_i(X) \coloneqq \{v \in \Vcal : X_v = i\}$ which contains all vertices belonging to community $i$.
 \end{definition}
@@ -379,7 +380,35 @@ Lastly, the analysis must of course be expanded to more datasets to benchmark ef
 
 \section{Bayesian Exploration}
 
-For our inference goals we wish to sample block memberships $b$ according to the posterior $p(b | \Gcal)$. Peixoto \cite{Peixoto-MCMC} proposes a Monte-Carlo method for generating these samples. We simply
+For our inference goals we wish to sample block memberships $b$ according to the posterior $p(b | \Gcal)$. Peixoto \cite{Peixoto-MCMC} proposes a Monte-Carlo method for generating these samples. However, he proposes a slight modification of the Stochastic Block Model. The so called microcanonical formulation. In contrast to the canonical version where edge parameters are obeyed only on expectation, the microcanonical model has these constraints obeyed with certainty. The definition follows from \cite{Peixoto-Bayesian-Microcanonical}.
+
+\begin{definition}[Microcanonical SBM]
+	\label{defn:microcan-sbm}
+	Let $N \in \Integers^{+}$ denote the number of vertices in our graph. The block memberships are denoted by a vector $b$ of length $N$ where each entry $b_i \in \{1, 2 \dots B\}$ where $B$ is the number of nonempty blocks. Let $e$ be a $B \times B$ matrix of edge counts between blocks ($e_{rs}$ is number of edges from block $r$ onto block $s$ - or twice that number if $r=s$). We restrict our analysis to undirected graphs so $e$ is symmetric. For a non-degree-corrected stochastic block model (NDC-SBM), we say that the graph $A$ is generated as follows:
+	%
+	\begin{equation}
+		A \sim \textrm{NDC-SBM}_{\textrm{MC}} (b, e)
+	\end{equation}
+	%
+	Where edges are placed at random but respecting the constraints imposed by $e$ and $b$. The additional parameters $N$ and $B$ are omitted as they are inferred from the shape ofs of $b$ and $e$. If we interpret $A$ as an adjacency matrix, then this constraint can be written formally as: $e_{rs} = \sum_{i=1}^{N} \sum_{j=1}^{N} A_{ij} \one \{b_i = r\} \one \{b_j = s\}$. However, this formulation does not tolerate high degree variation within blocks as is typical of real-world data. We therefore introduce the degree-corrected SBM (DC-SBM) which has an additional parameter $k$ which is a vector of length $N$ encoding the degree sequence ($k_i$ is the degree of vertex $i$). Therefore, we write:
+	%
+	\begin{equation}
+		A \sim \textrm{DC-SBM}_{\textrm{MC}} (b, e, k)
+	\end{equation}
+	%
+	This imposes the additional constraint that $k_i = \sum_{j=1}^{N} A_{ij}$. In what follows, we will always assume the degree-corrected model unless otherwise specified.
+	
+\end{definition}
+
+\begin{figure}[!h]
+	\begin{tikzpicture}
+		\draw (0, 0) circle (2);
+		\draw (2, 0) -> (4, 0);
+		\draw (6, 0) circle (2);
+		\draw (8, 0) -> (10, 0);
+		\draw (12, 0) circle (2);
+	\end{tikzpicture}
+\end{figure}
 
 At each iteration of the Markov chain we can use the most recent block assignments to train the classifier, mapping from vertex features to detected membership. The classifier has parameters $\theta$. We wish to apply Bayesian techniques such that we retain a measurement of the uncertainty in the classification. We propose to use Stochastic Gradient Langevin Dynamics (SGLD) as described by Nemeth and Fearnhead \cite{Nemeth-SGMCMC}. This allows us to draw samples from an arbitrary distribution $\pi$ on $\theta$. We can write $\pi$ in the following form.
 %
