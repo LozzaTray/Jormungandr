@@ -33,7 +33,7 @@
 
 
 %bibliography
-\bibliographystyle{ieeetr}
+\bibliographystyle{plainnat}
 
 
 \title{Automatic feature classification in stochastic block models}
@@ -164,20 +164,20 @@ In our model $b$ is now an intermediate variable and so we cannot choose a prior
 	p(b | X) = \int p(b | X, \theta) p(\theta) d\theta = B^{-N}
 \end{equation}
 %
-In his paper, \cite{Peixoto-Bayesian-Microcanonical} proposes careful choices for the SBM parameters. The proposal is to write the joint prior on $(b, e, k)$ as a product of conditionals $p(b, e, k) = p(b) p(e | b) p(k | e, b)= p(b) p(\psi | b)$. For our purposes we must insert a conditioning on $X$, to form our pseudo-prior for $b$ and $\psi$.
+In his paper, Peixoto \cite{Peixoto-Bayesian-Microcanonical} proposes careful choices for the SBM parameters. The proposal is to write the joint prior on $(b, e, k)$ as a product of conditionals $p(b, e, k) = p(b) p(e | b) p(k | e, b)= p(b) p(\psi | b)$. For our purposes we must insert a conditioning on $X$, to form our pseudo-prior for $b$ and $\psi$.
 %
 \begin{equation}
 	p(b, \psi | X) = p(b | X) p(\psi | b, X) = p(b | X) p(\psi | b)
 \end{equation}
 %
-Where it is apparent by regarding figure \ref{fig:lbgm} as a Markov model that $(\psi \indep X) | b$. We then borrow the priors proposed by \cite{Peixoto-Bayesian-Microcanonical} for $p(\psi | b)$, repeated here for reference.
+Where it is apparent by regarding figure \ref{fig:lbgm} as a Markov model that $(\psi \indep X) | b$. We then borrow the priors proposed by Peixoto \cite{Peixoto-Bayesian-Microcanonical} for $p(\psi | b)$, repeated here for reference.
 %
 \begin{equation}
 	p(\psi | b) = p(e | b) p(k | e, b) = \left[ \specialchoose{ \specialchoose{B}{2} }{ E} \right]^{-1} 
 	\cdot \left[ \prod_r \frac{\prod_j \eta_j^r !}{n_r! q(e_r, n_r)} \right]
 \end{equation}
 %
-Where $\specialchoose{n}{m}$ is shorthand for ${{n+m-1} \choose {m}} = \frac{(n+m-1)!}{(n-1)!(m)!}$ which can be thought of as the total number of histograms (non-negative bin values) with $n$ bins that are constrained to sum to $m$. $E = \frac{1}{2} \sum_{r,s} e_{rs}$ is the total number of edges. Importantly, $E$ is not allowed to vary and so $p(e|b)$ is uniform with respect to $e$. The variable $\eta_j^r$ is introduced to denote the number of vertices in block $r$ that have degree $j$. Formally, $\eta_j^r \coloneqq \sum_{i} \one\left\{b_i = r \right\} \one \left\{k_i = j \right\}$. Furthermore, $q(m, n)$ is the number of different histograms with at most $n$ non-zero bins that sum to $m$. Lastly, $e_r \coloneqq \sum_{s} e_{rs}$ is the total number of half edges in block r and $n_r \coloneqq \sum_{i} \one{b_i = r}$ is the number of vertices assigned to block $r$.
+Where $\specialchoose{n}{m}$ is shorthand for $\binom{n+m-1}{m} = \frac{(n+m-1)!}{(n-1)!(m)!}$ which can be thought of as the total number of histograms (non-negative bin values) with $n$ bins that are constrained to sum to $m$. $E = \frac{1}{2} \sum_{r,s} e_{rs}$ is the total number of edges. Importantly, $E$ is not allowed to vary and so $p(e|b)$ is uniform with respect to $e$. The variable $\eta_j^r$ is introduced to denote the number of vertices in block $r$ that have degree $j$. Formally, $\eta_j^r \coloneqq \sum_{i} \one\left\{b_i = r \right\} \one \left\{k_i = j \right\}$. Furthermore, $q(m, n)$ is the number of different histograms with at most $n$ non-zero bins that sum to $m$. Lastly, $e_r \coloneqq \sum_{s} e_{rs}$ is the total number of half edges in block r and $n_r \coloneqq \sum_{i} \one{b_i = r}$ is the number of vertices assigned to block $r$.
 
 Importantly, we have computable forms for $p(\theta)$ and $p(b, \psi | X)$ which will be useful for performing inference.
 
@@ -190,13 +190,27 @@ We are presented with a vertex-labelled graph $(A, X)$. The goal is to draw samp
 	\theta^{(i)} \sim p(\theta | A, X)
 \end{equation}
 %
-We instead propose an iterative approach:
+We instead propose an iterative approach. First drawing samples from the block membership posterior $p(b | A, X)$ and then using these samples to draw samples from $\theta$ conditioned on the block membership sample $b^{(i)}$ and feature matrix. 
 %
 \begin{align}
-	b^{(i)} &\sim p(b | A, X) \\
-	\theta^{(i)} &\sim p(\theta | X, b^{(i)})
+	b^{(i)} &\sim p \Big( b | A, X \Big) \\
+	\theta^{(i)} &\sim p\Big(\theta | X, b^{(i)} \Big)
 \end{align}
 %
+Both of these can be implemented using a variation of the Metropolis-Hastings algorithm \cite{hastings-alg}. We just need to define a proposal distribution $q(\cdot, \cdot)$ for proposing moves and be able to evaluate the target distribution point-wise.
+
+\subsection{Inferring block memeberships from graph $p (b | A, X)$}
+
+Peixoto \cite{Peixoto-MCMC} proposes a Monte Carlo method which we will base our approach on. It relies on writing the posterior in the following form.
+
+\begin{equation}
+	p(b | A, X) \propto p(A | b, X) \cdot p(b | X) \coloneqq \pi_b(b)
+\end{equation}
+
+
+\section{Experiments}
+
+\section{Conclusion}
 
 \begin{ack}
 Use unnumbered first level headings for the acknowledgments. All acknowledgments
@@ -221,7 +235,7 @@ questions.  For each question, change the default \answerTODO{} to \answerYes{},
 justification to your answer}, either by referencing the appropriate section of
 your paper or providing a brief inline description.  For example:
 \begin{itemize}
-  \item Did you include the license to the code and datasets? \answerYes{See Section~\ref{gen_inst}.}
+  \item Did you include the license to the code and datasets? \answerYes{See Section gen-inst.}
   \item Did you include the license to the code and datasets? \answerNo{The code and the data are proprietary.}
   \item Did you include the license to the code and datasets? \answerNA{}
 \end{itemize}
