@@ -61,11 +61,13 @@
 
 %custom commands
 \newcommand{\Xcal}{\mathcal{X}}
+\newcommand{\Bcal}{\mathcal{B}}
 \newcommand{\Integers}{\mathbb{Z}}
 \newcommand{\one}{\mathbbm{1}}
 \newcommand{\Gaussian}{\mathcal{N}}
 \newcommand{\indep}{\perp \!\!\! \perp}
 \newcommand{\specialchoose}{\genfrac{\{}{\}}{0pt}{}}
+\newcommand{\Expect}{\mathbb{E}}
 
 
 %envs
@@ -185,28 +187,61 @@ Importantly, we have computable forms for $p(\theta)$ and $p(b, \psi | X)$ which
 \section{Inference}
 
 We are presented with a vertex-labelled graph $(A, X)$. The goal is to draw samples from equation \ref{eqn:theta-target}. However, this is not easily done in practice.
-
+%
 \begin{equation}
 	\label{eqn:theta-target}
 	\theta^{(i)} \sim p(\theta | A, X)
 \end{equation}
 %
-We instead propose an iterative approach. First drawing samples from the block membership posterior $p(b | A, X)$ and then using these samples to draw samples from $\theta$ conditioned on the block membership sample $b^{(i)}$ and feature matrix. 
+We instead propose an iterative approach. First drawing samples $b^{(i)}$ from the block membership posterior (equation \ref{eqn:b-samples}). We then use each $b^{(i)}$ to draw samples for $\theta$ as in equation \ref{eqn:theta-samples}. 
 %
 \begin{align}
-	b^{(i)} &\sim p \Big( b | A, X \Big) \\
-	\theta^{(i)} &\sim p\Big(\theta | X, b^{(i)} \Big)
+	b^{(i)} &\sim p \Big( b | A, X \Big)  \label{eqn:b-samples}\\
+	\theta^{(i)} &\sim p\Big(\theta | X, b^{(i)} \Big) \label{eqn:theta-samples}
 \end{align}
 %
-Both of these can be implemented using a variation of the Metropolis-Hastings algorithm \cite{hastings-alg}. We just need to define a proposal distribution $q(\cdot, \cdot)$ for proposing moves and be able to evaluate the target distribution point-wise.
+Both of these can be implemented with a Markov Chain through the Metropolis-Hastings algorithm \cite{hastings-alg}. We just need to define a proposal distribution $q(x, y)$ for proposing a move $x \rightarrow y$ and be able to evaluate an un-normalised form of the target distribution, denoted $\pi(\cdot)$, point-wise. The proposed move is then accepted with acceptance probability $\alpha$ else it is rejected and we stay at $x$.
+%
+\begin{equation}
+	\alpha = \min \left( \frac{\pi(y) q(y, x)}{\pi(x) q(x, y)} , 1 \right)
+\end{equation}
+%
+This accept-reject step ensures the resulting Markov Chain is in detailed balance with the target distribution $\pi(\cdot)$. What we propose in equations \ref{eqn:b-samples} and \ref{eqn:theta-samples} is therefore implemented through a 2-level Markov chain. The resulting samples for $\theta^{(i)}$ are unbiased in the sense that the expectation of their distribution is the posterior we are targeting in equation \ref{eqn:theta-target}.
+%
+\begin{align*}
+	\Expect_{b^{(i)}} \left[p \left( \theta | X, b^{(i)} \right) \right] &= \sum_{b \in \mathcal{B}^N} p(\theta | X, b) p(b | A, X) \\
+	&= \sum_{b \in \mathcal{B}^N} p(\theta, b | A, X) \\
+	&= p(\theta | A, X) \\
+\end{align*}
+%
+Which is indeed the distribution we are targeting from equation \ref{eqn:theta-target}. The reason we split the Markov chain into two stages is because the summation over all latent states $b \in \mathcal{B}^N$ required to compute the likelihood $p(A| X, \theta) = \sum_{b \in \Bcal^N}$ is computationally intensive
 
-\subsection{Inferring block memeberships from graph $p (b | A, X)$}
+
+\subsection{Inferring block memberships}
 
 \citet{Peixoto-MCMC} proposes a Monte Carlo method which we will base our approach on. It relies on writing the posterior in the following form.
-
+%
 \begin{equation}
-	p(b | A, X) \propto p(A | b, X) \cdot p(b | X) \coloneqq \pi_b(b)
+	p(b | A, X) \propto p(A | b, X) \cdot p(b | X) = \pi_b(b)
 \end{equation}
+%
+Now $\pi_b(\cdot)$ is the un-normalised density we wish to sample from. We can break $\pi_b$ down as follows:
+%
+\begin{align*}
+	\pi_b(b) &= p(b|X) \sum_{\psi} \nolimits p(A , \psi | b, X) \\
+	&= p(b|X) p(A, \psi^* | b, X) \\
+	&= p(A | b, \psi^*) \cdot p(\psi^* | b) \cdot p(b | X)
+\end{align*}
+%
+Since we are using a microcanonical formulation, there is only one value of $\psi$ which we denote $\psi^*$ that is compatible with the given $A$ and $b$. Namely, $k^*_i = \sum_j A_{ij} $ and $e^*_{rs} = \sum_{i, j} A_ij \one \{b_i=r\} \one\{b_j=s\}$. Therefore, the summation over all $\psi$ reduces to just one term that has the value $\psi^*$ compatible with $b$ and $\theta$. We also define the description length or entropy of the configuration as.
+%
+\begin{equation}
+	S(b) = - \log \pi_b(b) = - \left[ \log p(A | b, \psi^*) + \log p(\psi^*, b | X) \right]
+\end{equation}
+%
+Now this entropy can be thought of as the description length of the graph $A$ because it is the sum of the information required to represent the graph given the parameters and the amount of information required to store the parameters given $X$.
+
+\subsection{Inferring feature to block generator}
 
 
 \section{Experiments}
