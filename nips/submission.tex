@@ -5,6 +5,7 @@
 % before loading neurips_2021
 
 % ready for submission
+\PassOptionsToPackage{numbers, compress}{natbib}
 \usepackage[final]{neurips_2021}
 
 % to compile a preprint version, e.g., for submission to arXiv, add add the
@@ -164,13 +165,13 @@ In our model $b$ is now an intermediate variable and so we cannot choose a prior
 	p(b | X) = \int p(b | X, \theta) p(\theta) d\theta = B^{-N}
 \end{equation}
 %
-In his paper, Peixoto \cite{Peixoto-Bayesian-Microcanonical} proposes careful choices for the SBM parameters. The proposal is to write the joint prior on $(b, e, k)$ as a product of conditionals $p(b, e, k) = p(b) p(e | b) p(k | e, b)= p(b) p(\psi | b)$. For our purposes we must insert a conditioning on $X$, to form our pseudo-prior for $b$ and $\psi$.
+In his paper, \citet{Peixoto-Bayesian-Microcanonical} proposes careful choices for the SBM parameters. The proposal is to write the joint prior on $(b, e, k)$ as a product of conditionals $p(b, e, k) = p(b) p(e | b) p(k | e, b)= p(b) p(\psi | b)$. For our purposes we must insert a conditioning on $X$, to form our pseudo-prior for $b$ and $\psi$.
 %
 \begin{equation}
 	p(b, \psi | X) = p(b | X) p(\psi | b, X) = p(b | X) p(\psi | b)
 \end{equation}
 %
-Where it is apparent by regarding figure \ref{fig:lbgm} as a Markov model that $(\psi \indep X) | b$. We then borrow the priors proposed by Peixoto \cite{Peixoto-Bayesian-Microcanonical} for $p(\psi | b)$, repeated here for reference.
+Where it is apparent by regarding figure \ref{fig:lbgm} as a Markov model that $(\psi \indep X) | b$. We then borrow the priors proposed by \citet{Peixoto-Bayesian-Microcanonical} for $p(\psi | b)$, repeated here for reference.
 %
 \begin{equation}
 	p(\psi | b) = p(e | b) p(k | e, b) = \left[ \specialchoose{ \specialchoose{B}{2} }{ E} \right]^{-1} 
@@ -201,7 +202,7 @@ Both of these can be implemented using a variation of the Metropolis-Hastings al
 
 \subsection{Inferring block memeberships from graph $p (b | A, X)$}
 
-Peixoto \cite{Peixoto-MCMC} proposes a Monte Carlo method which we will base our approach on. It relies on writing the posterior in the following form.
+\citet{Peixoto-MCMC} proposes a Monte Carlo method which we will base our approach on. It relies on writing the posterior in the following form.
 
 \begin{equation}
 	p(b | A, X) \propto p(A | b, X) \cdot p(b | X) \coloneqq \pi_b(b)
