@@ -28,6 +28,7 @@
 \usepackage{microtype}      % microtypography
 \usepackage{xcolor}         % colors
 \usepackage{tikz}
+\usetikzlibrary{arrows}
 \usepackage{amsmath}
 \usepackage{mathtools}
 \usepackage{bbm}
@@ -83,12 +84,15 @@
 \maketitle
 
 \begin{abstract}
-  Paper abstract.
+We present a novel generative model for describing vertex-labelled undirected graphs. This is a two-layered model. First a probabilistic mapping from vertex labels to latent block memberships and from these block memberships we generate a graph according to the micro-canonical stochastic block model.
+
+With this framework we are able to efficiently sample the parameters of the vertex label to block membership mapping. This allows us to automatically determine which features have the largest impact on graphical structure.
 \end{abstract}
 
 
 \section{Introduction}
 
+There is a wealth of graphical data in the world with more produced every second; social networks, website hyperlinks and academic collaboration are just some examples. Many algorithms are used to analyse this data. Nevertheless, many of the approaches have been developed in industry to yield empirically good results. There is space to develop a principled framework for Bayesian inference on graphical data.
 
 \section{Preliminaries}
 
@@ -133,9 +137,9 @@ Where $\tilde{x} \coloneqq \left[x_1, x_2, \dots x_D, 1\right]^T$ is an augmente
 		squarednode/.style={rectangle, draw=black, minimum size=7mm}
 		]
 		% nodes
-		\node[roundnode] (X) at (0, 0) {X};
-		\node[squarednode] (b) at (3, 0) {b};
-		\node[roundnode] (A) at (6, 0) {A};
+		\node[roundnode] (X) at (0, 0) {$X$};
+		\node[squarednode] (b) at (3, 0) {$b$};
+		\node[roundnode] (A) at (6, 0) {$A$};
 		
 		% arrows
 		\draw[->] (X.east) -- node[above] {$\theta$} (b.west);
@@ -181,9 +185,7 @@ Where it is apparent by regarding figure \ref{fig:lbgm} as a Markov model that $
 	\cdot \left[ \prod_r \frac{\prod_j \eta_j^r !}{n_r! q(e_r, n_r)} \right]
 \end{equation}
 %
-Where $\specialchoose{n}{m}$ is shorthand for $\binom{n+m-1}{m} = \frac{(n+m-1)!}{(n-1)!(m)!}$ which can be thought of as the total number of histograms (non-negative bin values) with $n$ bins that are constrained to sum to $m$. $E = \frac{1}{2} \sum_{r,s} e_{rs}$ is the total number of edges. Importantly, $E$ is not allowed to vary and so $p(e|b)$ is uniform with respect to $e$. The variable $\eta_j^r$ is introduced to denote the number of vertices in block $r$ that have degree $j$. Formally, $\eta_j^r \coloneqq \sum_{i} \one\left\{b_i = r \right\} \one \left\{k_i = j \right\}$. Furthermore, $q(m, n)$ is the number of different histograms with at most $n$ non-zero bins that sum to $m$. Lastly, $e_r \coloneqq \sum_{s} e_{rs}$ is the total number of half edges in block r and $n_r \coloneqq \sum_{i} \one{b_i = r}$ is the number of vertices assigned to block $r$.
-
-Importantly, we have computable forms for $p(\theta)$ and $p(b, \psi | X)$ which will be useful for performing inference.
+Where $\specialchoose{n}{m}$ is shorthand for $\binom{n+m-1}{m} = \frac{(n+m-1)!}{(n-1)!(m)!}$ which can be thought of as the total number of histograms (non-negative bin values) with $n$ bins that are constrained to sum to $m$. $E = \frac{1}{2} \sum_{r,s} e_{rs}$ is the total number of edges. Importantly, $E$ is not allowed to vary and so $p(e|b)$ is uniform with respect to $e$. The variable $\eta_j^r$ is introduced to denote the number of vertices in block $r$ that have degree $j$. Formally, $\eta_j^r \coloneqq \sum_{i} \one\left\{b_i = r \right\} \one \left\{k_i = j \right\}$. Furthermore, $q(m, n)$ is the number of different histograms with at most $n$ non-zero bins that sum to $m$. Lastly, $e_r \coloneqq \sum_{s} e_{rs}$ is the total number of half edges in block r and $n_r \coloneqq \sum_{i} \one{b_i = r}$ is the number of vertices assigned to block $r$. Importantly, we have computable forms for $p(\theta)$ and $p(b, \psi | X)$ which will be useful for performing inference.
 
 \section{Inference}
 
@@ -201,10 +203,11 @@ We instead propose an iterative approach. First drawing samples $b^{(i)}$ from t
 	\theta^{(i)} &\sim p\Big(\theta | X, b^{(i)} \Big) \label{eqn:theta-samples}
 \end{align}
 %
-Both of these can be implemented with a Markov Chain through the Metropolis-Hastings algorithm \cite{hastings-alg}. We just need to define a proposal distribution $q(x, y)$ for proposing a move $x \rightarrow y$ and be able to evaluate an un-normalised form of the target distribution, denoted $\pi(\cdot)$, point-wise. The proposed move is then accepted with acceptance probability $\alpha$ else it is rejected and we stay at $x$.
+Both of these can be implemented with a Markov Chain through the Metropolis-Hastings algorithm \cite{hastings-alg}. We just need to define a proposal distribution $q(x, x')$ for proposing a move $x \rightarrow x'$ and be able to evaluate an un-normalised form of the target distribution, denoted $\pi(\cdot)$, point-wise. The proposed move is then accepted with probability $\alpha$ (equation \ref{eqn:mh-accept}) else it is rejected and we stay at $x$.
 %
 \begin{equation}
-	\alpha = \min \left( \frac{\pi(y) q(y, x)}{\pi(x) q(x, y)} , 1 \right)
+	\alpha = \min \left( \frac{\pi(x') q(x', x)}{\pi(x) q(x, x')} , 1 \right)
+	\label{eqn:mh-accept}
 \end{equation}
 %
 This accept-reject step ensures the resulting Markov Chain is in detailed balance with the target distribution $\pi(\cdot)$. What we propose in equations \ref{eqn:b-samples} and \ref{eqn:theta-samples} is therefore implemented through a 2-level Markov chain. The resulting samples for $\theta^{(i)}$ are unbiased in the sense that the expectation of their distribution is the posterior we are targeting in equation \ref{eqn:theta-target}.
@@ -215,7 +218,40 @@ This accept-reject step ensures the resulting Markov Chain is in detailed balanc
 	&= p(\theta | A, X) \\
 \end{align*}
 %
-Which is indeed the distribution we are targeting from equation \ref{eqn:theta-target}. The reason we split the Markov chain into two stages is because the summation over all latent states $b \in \mathcal{B}^N$ required to directly compute the likelihood $p(A| X, \theta) = \sum_{b \in \Bcal^N} p(A | b) P(b | X, \theta)$ is computationally intensive.
+The reason we split the Markov chain into two stages is because the summation over all latent states $b \in \mathcal{B}^N$ required to directly compute the likelihood $p(A| X, \theta) = \sum_{b \in \Bcal^N} p(A | b) P(b | X, \theta)$ is computationally intensive.
+%
+\begin{figure}[!h]
+	\centering
+	\begin{tikzpicture}[
+		roundnode/.style={circle, draw=black, minimum size=12mm},
+		squarednode/.style={rectangle, draw=black, minimum size=12mm}
+		]
+		% nodes
+		\node[roundnode] (b0) at (0, 2) {$b^{(t)}$};
+		\node[roundnode] (b1) at (4, 2) {$b'$};
+		\node[roundnode] (b2) at (8, 2) {$b^{(t+1)}$};
+		\node[roundnode] (t0) at (0, 0) {$\theta^{(t)}$};
+		\node[roundnode] (t1) at (4, 0) {$\theta'$};
+		\node[roundnode] (t2) at (8, 0) {$\theta^{(t+1)}$};
+		
+		% arrows
+		\draw[->] (b0) to node[above] {$\sim q_b(b^{(t)}, b' | A)$} (b1);
+		\draw[->] (b1) to node[above] {$\alpha_b (b, b' | A)$} (b2);
+		\draw[->] (b0) [out=30, in=150] to node[above] {$1-\alpha_b$} (b2);
+		
+		\draw[->] (t0) to node[above] {$\sim q_\theta(\theta, \theta' | X, b^{(t)})$} (t1);
+		\draw[->] (t1) to node[above] {$\alpha_\theta (\theta, \theta' | X, b^{(t)})$} (t2);
+		\draw[->] (t0) [out=-30, in=-150] to node[below] {$1-\alpha_\theta$} (t2);
+		
+		\draw[dashed, ->] (b0) to (2, 0.8);
+		\draw[dashed, ->] (b0) to (5.5, 0.8);
+
+	\end{tikzpicture}
+	\caption{Sampling sequence}
+	\label{fig:samp-sequence}
+\end{figure}
+%
+Figure \ref{fig:samp-sequence} shows an overview of the proposed method. We have introduced subscripts and conditionings to make explicit what parameters each step utilises. In an important simplification, $p(b| X) = B^{-N}$ which is unchanged no matter the value of X. Therefore, we do not need to know the value of $X$ to perform the sampling on $b$.
 
 \subsection{Sampling block memberships}
 
@@ -236,12 +272,12 @@ Now $\pi_b(\cdot)$ is the un-normalised density we wish to sample from. In other
 Since we are using a microcanonical formulation, there is only one value of $\psi$ which we denote $\psi^*$ that is compatible with the given $(A, b)$ pair. Specifically, $k^*_i = \sum_j A_{ij} $ and $e^*_{rs} = \sum_{i, j} A_ij \one \{b_i=r\} \one\{b_j=s\}$. Therefore, the summation over all $\psi$ reduces to just the single $\psi^*$ term. We also define the microcanonical entropy of the configuration as.
 %
 \begin{equation}
-	S(b) = - \log \pi_b(b) = - \left[ \log p(A | b, \psi^*) + \log p(\psi^*, b | X) \right]
+	S(b) = - \log \pi_b(b) = - \Big( \log p(A | b, \psi^*) + \log p(\psi^*, b | X) \Big)
 \end{equation}
 %
-This entropy can be thought of as the description length of the graph because it is the sum of the information required to represent the graph given the parameters and the amount of information required to store the parameters (given the feature matrix $X$).
+This entropy can be thought of as the description length of the graph because it is the sum of the information required to represent the graph given the parameters and the amount of information required to store the parameters (given the feature matrix $X$). The exact, from of the proposal distribution and accept-reject step is explored throughly by \citet{Peixoto-MCMC}. There is a widely available library \verb*|graph-tool| \cite{peixoto_graph-tool_2014} implementing this algorithm, which we use. The only modification is in the block membership prior $p(b)$ which we replace with $p(b|X)=B^{-N}$ which is a uniform distribution and so does not impact the MH accept-reject step.
 
-\subsection{Inferring feature to block generator}
+\subsection{Sampling feature classifier parameters}
 
 Now the invariant distribution we wish to target for the $\theta$ samples is the posterior of $\theta$ given the values of the pair $(X, b)$. We write this as follows:
 %
@@ -250,39 +286,64 @@ Now the invariant distribution we wish to target for the $\theta$ samples is the
 	\therefore U(\theta) &= - \left( \log p(b | X, \theta) + \log (\theta) \right)
 \end{align}
 %
-Where we have introduced $U(\theta)$ equal to the negative log posterior, because it simplifies analysis. Each of these terms is easily computed, by first defining $t_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and $y_{ij} = \phi_j(x_i; \theta)$.
+Where we have introduced $U(\theta)$ equal to the negative log posterior, because it simplifies analysis. Each of the constituent terms of$U(\theta)$ is easily computed. To simplify notation, we define $y_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and $a_{ij} = \phi_j(x_i; \theta)$.
 %
 \begin{equation}
-	\log p(b | X, \theta) = \sum_{i=1}^{N} \sum_{j=1}^{B} t_{ij} \log y_{ij}  \quad \textrm{and} \quad
-	\log p(\theta) = -\frac{d}{2} \log 2\pi - \frac{1}{2} || \theta || ^2
+	\log p(b | X, \theta) = \sum_{i=1}^{N} \sum_{j=1}^{B} y_{ij} \log a_{ij}  \quad \textrm{and} \quad
+	\log p(\theta) = -\frac{(D+1)(B)}{2} \log 2\pi - \frac{1}{2 \sigma_\theta^2} || \theta || ^2
 \end{equation}
 %
-The proposal can then be written as:
+This means that $U(\theta) = H_c(t, y) + \nicefrac{1}{2\sigma_\theta^2} || \theta ||^2$ plus a constant, where $H_c(\cdot || \star)$ is the cross entropy between two distributions and the prior introduces a regularisation term. This is a typical objective function used in neural network training. In typical applications we only seek the value of $\theta$ that minimises the objective function, which in our case would yield the maximum a posteriori (MAP) estimate. This is often done through some kind of gradient descent. However, our goal is not to find the MAP estimate but to draw samples from the posterior. We therefore adopt the Metropolis Adjusted Langevin Algorithm (first proposed by \citet{mala-tweedie}). Given the current sample $\theta$, we propose a new sample $\theta'$ according to equation \ref{eqn:theta-update}
 %
 \begin{equation}
-	\theta' = \theta - h_t \nabla U(\theta) + \sqrt{2h_t} \cdot \xi_t
+	\theta' = \theta - h \nabla U(\theta) + \sqrt{2h} \cdot \xi
+	\label{eqn:theta-update}
 \end{equation}
 %
-Where $\xi_t \sim \Gaussian(0, I)$. As such the proposal distribution, is easy to compute
+Where $\xi \sim \Gaussian(0, I)$. Indeed without the injected noise term, this is equivalent to gradient descent. We require the noise term to fully explore the parameter space. As such the proposal distribution, is a simple multivariate Gaussian which can be evaluated easily.
 %
 \begin{equation}
-	q(\theta, \theta') = \Gaussian \left( \theta' ; \theta - h_t \nabla U(\theta), 2h_t I \right)
+	q_\theta(\theta, \theta') = \Gaussian \left( \theta' ; \theta - h \nabla U(\theta), 2h I \right)
 \end{equation}
 %
 The term $\nabla U$ has an easy to compute analytic form. By noting that $\theta = \{w_k\}_{k=1}^{B}$
 %
 \begin{equation}
-	\frac{\partial U}{\partial w_k} = - \left( \sum_{i=1}^{N} \Big\{ \tilde{x}_i (t_{ik} - y_{ik}) \Big\} - w_k \right)
+	\frac{\partial U}{\partial w_k} = - \left( \sum_{i=1}^{N} \Big\{ \tilde{x}_i (y_{ik} - a_{ik}) \Big\} - w_k \right)
 \end{equation}
 %
-. We would then accept these samples with probability
+After a proposed move is generated, in typical Metropolis-Hastings fashion we accept the move with probability $\alpha$.
 %
 \begin{equation}
-	\alpha = \min \left( \exp \left(-\Delta U \right) \frac{ q(\theta', \theta)}{q(\theta, \theta')} , 1 \right)
+	\alpha(\theta, \theta') = \min \left( \exp \left(-\Delta U \right) \frac{ q(\theta', \theta)}{q(\theta, \theta')} , 1 \right)
 \end{equation}
+
+\subsection{Sampling sequence}
+
+So far each $\theta^{(t)}$ update uses its corresponding $b^{(t)}$ sample. This means that the evaluation of $U(\theta)$ and $\nabla U(\theta)$ has high variance. $U(\theta)$ is fed in the information $y_{ij}^{(t)} = \one\{b_i^{t} = j\}$. We would rather deal with the expectation of this value.
+%
+\begin{equation}
+	\Expect \left[ y_{ij}^{(t)} \right] = \Expect \left[ \one(b_{i}^{(t)} = j) \right]
+	= p(b_i = j)
+\end{equation}
+%
+We obtain an unbiased estimate for this quantity as simply the empirical distribution of the block membership samples $\left\{ b^{(t)} \right\}_{t=1}^T$.
+%
+\begin{equation}
+	\hat{y}_{ij} \coloneqq \frac{1}{T} \sum_{t=1}^{T} y_{ij}^T
+\end{equation}
+%
+This means we no longer need to run the $b$ and $\theta$ Markov chains concurrently. Instead, we run the $b$-chain to completion and use it to generate $\hat{y}_{ij}$ for $i \in \{1 \dots N\}$ and $j \in \{1 \dots B\}$. This is an estimate of $p(b | A, X)$ that we use for every iteration of the $\theta$ Markov chain. This affords us the flexibility to vary the number of samples we draw for $b$ and $\theta$ as well as reducing the burn-in time for the $\theta$-chain.
 
 \section{Experiments}
 
+We apply the developed methods to a variety of datasets.
+
+\begin{itemize}
+	\item \textbf{Maier Facebook Egonet} \cite{FB-Maier} - This is a network of the author's Facebook friends list. Each vertex has been manually labelled with a variety of features describing their relationship to the author.
+	\item \textbf{College football teams} \cite{Evans_2010_football} - network of American college football teams and their interactions. Vertex labels are the division a team belongs to.
+	\item \textbf{Law firm} \cite{LawFirm} - a network of relationships between members of a law firm. Each relationship is categorised according to type: coworkers, friends or advice.
+\end{itemize}
 \section{Conclusion}
 
 \begin{ack}
@@ -408,5 +469,6 @@ As this is a constant with respect to $b$ we conclude that $p(b | X)$ must be a 
 \end{equation}
 
 \subsection{Derivation of gradient with respect to feature parameters}
+\label{appdx:gradu}
 
 \end{document}
