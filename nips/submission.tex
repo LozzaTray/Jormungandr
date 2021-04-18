@@ -31,6 +31,7 @@
 \usepackage{amsmath}
 \usepackage{mathtools}
 \usepackage{bbm}
+\usepackage{amssymb}
 
 
 %bibliography
@@ -214,10 +215,9 @@ This accept-reject step ensures the resulting Markov Chain is in detailed balanc
 	&= p(\theta | A, X) \\
 \end{align*}
 %
-Which is indeed the distribution we are targeting from equation \ref{eqn:theta-target}. The reason we split the Markov chain into two stages is because the summation over all latent states $b \in \mathcal{B}^N$ required to compute the likelihood $p(A| X, \theta) = \sum_{b \in \Bcal^N}$ is computationally intensive
+Which is indeed the distribution we are targeting from equation \ref{eqn:theta-target}. The reason we split the Markov chain into two stages is because the summation over all latent states $b \in \mathcal{B}^N$ required to directly compute the likelihood $p(A| X, \theta) = \sum_{b \in \Bcal^N} p(A | b) P(b | X, \theta)$ is computationally intensive.
 
-
-\subsection{Inferring block memberships}
+\subsection{Sampling block memberships}
 
 \citet{Peixoto-MCMC} proposes a Monte Carlo method which we will base our approach on. It relies on writing the posterior in the following form.
 %
@@ -225,7 +225,7 @@ Which is indeed the distribution we are targeting from equation \ref{eqn:theta-t
 	p(b | A, X) \propto p(A | b, X) \cdot p(b | X) = \pi_b(b)
 \end{equation}
 %
-Now $\pi_b(\cdot)$ is the un-normalised density we wish to sample from. We can break $\pi_b$ down as follows:
+Now $\pi_b(\cdot)$ is the un-normalised density we wish to sample from. In other words, we wish to construct a Markov chain that has $\pi_b(\cdot)$ as its invariant distribution. We can break $\pi_b$ down as follows:
 %
 \begin{align*}
 	\pi_b(b) &= p(b|X) \sum_{\psi} \nolimits p(A , \psi | b, X) \\
@@ -233,16 +233,53 @@ Now $\pi_b(\cdot)$ is the un-normalised density we wish to sample from. We can b
 	&= p(A | b, \psi^*) \cdot p(\psi^* | b) \cdot p(b | X)
 \end{align*}
 %
-Since we are using a microcanonical formulation, there is only one value of $\psi$ which we denote $\psi^*$ that is compatible with the given $A$ and $b$. Namely, $k^*_i = \sum_j A_{ij} $ and $e^*_{rs} = \sum_{i, j} A_ij \one \{b_i=r\} \one\{b_j=s\}$. Therefore, the summation over all $\psi$ reduces to just one term that has the value $\psi^*$ compatible with $b$ and $\theta$. We also define the description length or entropy of the configuration as.
+Since we are using a microcanonical formulation, there is only one value of $\psi$ which we denote $\psi^*$ that is compatible with the given $(A, b)$ pair. Specifically, $k^*_i = \sum_j A_{ij} $ and $e^*_{rs} = \sum_{i, j} A_ij \one \{b_i=r\} \one\{b_j=s\}$. Therefore, the summation over all $\psi$ reduces to just the single $\psi^*$ term. We also define the microcanonical entropy of the configuration as.
 %
 \begin{equation}
 	S(b) = - \log \pi_b(b) = - \left[ \log p(A | b, \psi^*) + \log p(\psi^*, b | X) \right]
 \end{equation}
 %
-Now this entropy can be thought of as the description length of the graph $A$ because it is the sum of the information required to represent the graph given the parameters and the amount of information required to store the parameters given $X$.
+This entropy can be thought of as the description length of the graph because it is the sum of the information required to represent the graph given the parameters and the amount of information required to store the parameters (given the feature matrix $X$).
 
 \subsection{Inferring feature to block generator}
 
+Now the invariant distribution we wish to target for the $\theta$ samples is the posterior of $\theta$ given the values of the pair $(X, b)$. We write this as follows:
+%
+\begin{align}
+	p(\theta | X, b) &\propto p(b | X, \theta) p(\theta) = \pi_\theta (\theta) =  \exp \left( - U(\theta) \right) \\
+	\therefore U(\theta) &= - \left( \log p(b | X, \theta) + \log (\theta) \right)
+\end{align}
+%
+Where we have introduced $U(\theta)$ equal to the negative log posterior, because it simplifies analysis. Each of these terms is easily computed, by first defining $t_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and $y_{ij} = \phi_j(x_i; \theta)$.
+%
+\begin{equation}
+	\log p(b | X, \theta) = \sum_{i=1}^{N} \sum_{j=1}^{B} t_{ij} \log y_{ij}  \quad \textrm{and} \quad
+	\log p(\theta) = -\frac{d}{2} \log 2\pi - \frac{1}{2} || \theta || ^2
+\end{equation}
+%
+The proposal can then be written as:
+%
+\begin{equation}
+	\theta' = \theta - h_t \nabla U(\theta) + \sqrt{2h_t} \cdot \xi_t
+\end{equation}
+%
+Where $\xi_t \sim \Gaussian(0, I)$. As such the proposal distribution, is easy to compute
+%
+\begin{equation}
+	q(\theta, \theta') = \Gaussian \left( \theta' ; \theta - h_t \nabla U(\theta), 2h_t I \right)
+\end{equation}
+%
+The term $\nabla U$ has an easy to compute analytic form. By noting that $\theta = \{w_k\}_{k=1}^{B}$
+%
+\begin{equation}
+	\frac{\partial U}{\partial w_k} = - \left( \sum_{i=1}^{N} \Big\{ \tilde{x}_i (t_{ik} - y_{ik}) \Big\} - w_k \right)
+\end{equation}
+%
+. We would then accept these samples with probability
+%
+\begin{equation}
+	\alpha = \min \left( \exp \left(-\Delta U \right) \frac{ q(\theta', \theta)}{q(\theta, \theta')} , 1 \right)
+\end{equation}
 
 \section{Experiments}
 
@@ -369,5 +406,7 @@ As this is a constant with respect to $b$ we conclude that $p(b | X)$ must be a 
 \begin{equation}
 	p(b | X) = B^{-N}
 \end{equation}
+
+\subsection{Derivation of gradient with respect to feature parameters}
 
 \end{document}
