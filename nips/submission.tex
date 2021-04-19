@@ -100,19 +100,19 @@ We will be using the microcanonical stochastic block model, proposed by \cite{Pe
 
 \begin{definition}[Microcanonical SBM]
 	\label{defn:microcan-sbm}
-	Let $N \in \Integers^{+}$ denote the number of vertices in our graph. The block memberships are denoted by a vector $b$ of length $N$ where each entry $b_i \in \{1, 2 \dots B\}$ where $B$ is the number of nonempty blocks. Let $e$ be a $B \times B$ matrix of edge counts between blocks ($e_{rs}$ is number of edges from block $r$ onto block $s$ - or twice that number if $r=s$). We restrict our analysis to undirected graphs so $e$ is symmetric. For a non-degree-corrected stochastic block model (NDC-SBM), we say that the graph $A$ is generated as follows:
+	Let $N \in \Integers^{+}$ denote the number of vertices in a graph. The block memberships are encoded by a vector $b$ of length $N$ where each entry $b_i \in \{1, 2 \dots B\}$. $B$ is the number of non-empty blocks. Let $e$ be a $B \times B$ matrix of edge counts between blocks ($e_{rs}$ is number of edges from block $r$ onto block $s$ - or twice that number if $r=s$). For undirected graphs $e$ is symmetric. For a non-degree-corrected stochastic block model (NDC-SBM), we say that the graph $A$ is generated as follows:
 	%
 	\begin{equation}
 		A \sim \textrm{NDC-SBM}_{\textrm{MC}} (b, e)
 	\end{equation}
 	%
-	Where edges are placed at random but respecting the constraints imposed by $e$ and $b$. The additional parameters $N$ and $B$ are omitted as they are inferred from the shape ofs of $b$ and $e$. If we interpret $A$ as an adjacency matrix, then this constraint can be written formally as: $e_{rs} = \sum_{i=1}^{N} \sum_{j=1}^{N} A_{ij} \one \{b_i = r\} \one \{b_j = s\}$. However, this formulation does not tolerate high degree variation within blocks as is typical of real-world data. We therefore introduce the degree-corrected SBM (DC-SBM) which has an additional parameter $k$ which is a vector of length $N$ encoding the degree sequence ($k_i$ is the degree of vertex $i$). Therefore, we write:
+	Where edges are placed uniformly at random but respecting the constraints imposed by $e$ and $b$. The additional parameters $N$ and $B$ are omitted as they are inferred from the shapes of $b$ and $e$. If we interpret $A$ as an adjacency matrix, then this constraint can be written formally as: $e_{rs} = \sum_{i,j} A_{ij} \one \{b_i = r\} \one \{b_j = s\}$. Nevertheless, this formulation does not accept high degree variability within blocks as is typical of real-world data. We therefore introduce the degree-corrected SBM (DC-SBM). This has an additional parameter $k$ which is an $N$-length vector encoding the degree sequence ($k_i$ is the degree of vertex $i$). Therefore, we write:
 	%
 	\begin{equation}
 		A \sim \textrm{DC-SBM}_{\textrm{MC}} (b, e, k)
 	\end{equation}
 	%
-	This imposes the additional constraint that $k_i = \sum_{j=1}^{N} A_{ij}$. In what follows, we will always assume the degree-corrected model unless otherwise specified.
+	Once again, edges are placed uniformly at random but respecting the constraints imposed by the parameters. The DC-SBM has the additional constraint that $k_i = \sum_{j} A_{ij}$. In what follows, we will always assume the degree-corrected model unless otherwise specified.
 	
 \end{definition}
 
@@ -121,14 +121,14 @@ We will be using the microcanonical stochastic block model, proposed by \cite{Pe
 
 We restrict our analysis to labelled, undirected graphs with $N$ nodes. We define the vector $x_i \in \Xcal^D$ as the feature vector for the $i$'th vertex. Each vertex has $D$ total features and we assume all entries take values from the same set $\Xcal$. For the majority of datasets we analyse, we deal with binary feature flags so $\Xcal = \{0, 1\}$. The feature vectors $\{x_i\}_{i=1}^{N}$ are subsumed into the $N \times D$ matrix $X$.
 
-The proposed generative model is given in figure \ref{fig:lbgm}. We start, with the feature matrix X and generate a vector of block memberships $b$. The parameters of this generator are encapsulated by $\theta$. Each feature vector $x_i$ is treated independently and used to generate the block membership $b_i$. We choose a single softmax layer to model $p(b_i | x_i, \theta)$. More complex models are possible but then deriving meaning from inferred parameter distributions is complicated. Summarising, we can write $p(b | X, \theta)$ as follows:
+The proposed generative model (which we call the latent block generative model - LBGM) is given in figure \ref{fig:lbgm}. We start, with the feature matrix X and generate a vector of block memberships $b$. The parameters of this generator are encapsulated by $\theta$. Each feature vector $x_i$ is treated independently and used to generate the block membership $b_i$. We choose a single softmax layer to model $p(b_i | x_i, \theta)$. More complex models are possible but then deriving meaning from inferred parameter distributions is more difficult. Summarising, we write $p(b | X, \theta)$ as follows:
 %
 \begin{equation}
 	p(b| X, \theta) = \prod_{i=1}^{N} p(b_i | x_i, \theta) = \prod_{i=1}^{N} \phi_{b_i} (x_i; \theta)
 	= \prod_{i=1}^{N} \frac{\exp\left(w_{b_i}^T \tilde{x}_i\right)}{\sum_{k=1}^{B} \exp \left( w_k^T \tilde{x}_i\right)}
 \end{equation}
 %
-Where $\tilde{x} \coloneqq \left[x_1, x_2, \dots x_D, 1\right]^T$ is an augmented version of $x$ that allows for a bias term. The parameters $\theta$ just contain the $B \times (D+1)$ matrix of weight values or alternatively, $\theta = \{w_k\}_{k=1}^{B}$.
+Where $\tilde{x} \coloneqq \left[x_1, x_2, \dots x_D, 1\right]^T$ is an augmented version of $x$ that allows for a bias term. The parameters for this stage are denoted $\theta$ and consist of the all weight $B$ weight vectors $\theta = \{w_k\}_{k=1}^{B}$. Each $w_k$ has dimension $D+1$.
 
 \begin{figure}[!h]
 	\centering
@@ -149,7 +149,7 @@ Where $\tilde{x} \coloneqq \left[x_1, x_2, \dots x_D, 1\right]^T$ is an augmente
 	\label{fig:lbgm}
 \end{figure}
 
-Once we have generated the block memberships $b$, we proceed to draw the graph $A$ from the microcanical SBM (\ref{defn:microcan-sbm}) with additional parameters $\psi = \{e, k\}$. In a slight abuse of notation we denote the inter-block edge count matrix with $e = \psi_e$ and the degree sequence $k = \psi_k$ to make explicit that these are contained in $\psi$.
+Once we have generated the block memberships $b$, we proceed to draw the graph $A$ from the microcanical DC-SBM (\ref{defn:microcan-sbm}) with additional parameters $\psi = \{e, k\}$. In a slight abuse of notation we denote the inter-block edge count matrix with $e = \psi_e$ and the degree sequence $k = \psi_k$ to make explicit that these parameters are contained in $\psi$.
 %
 \begin{equation}
 	A \sim \textrm{DC-SBM}_{\textrm{MC}} (b, \psi_e, \psi_k)
@@ -162,34 +162,35 @@ Before performing any inference, we must specify priors on $\theta$ and $\psi$. 
 %
 \begin{equation}
 	p(\theta) = \Gaussian \left( \theta ; 0, \sigma_\theta^2 I \right)
+	\label{eqn:theta-prior}
 \end{equation}
 %
-We will see that this form of prior is equivalent to a regularisation term in neural network training that penalises extreme weight magnitudes. As $\sigma_\theta^2 \rightarrow \infty$ this becomes an uninformative uniform prior.
+We will see that this form of prior is equivalent to a regularisation term in neural network training that penalises extreme weight magnitudes. For $\sigma_\theta^2 \rightarrow \infty$ this becomes an uninformative uniform prior.
 
-In our model $b$ is now an intermediate variable and so we cannot choose a prior. The closest thing we can get to a prior is $p(b | X)$. As far as inference on the right-hand-side of figure \ref{fig:lbgm}, we regard $p(b | X)$ as a pseudo-prior on $b$. We can show that our choice of prior for $p(\theta)$ leads to the following form for $p(b | X)$.
+In our model, the block memberships vector $b$ is an intermediate latent variable and so we are not free to choose a prior for it. The closest thing we can get to a prior is $p(b | X)$. As far as inference on the right-hand-side of figure \ref{fig:lbgm}, we regard $p(b | X)$ as a pseudo-prior on $b$. We can show (appendix \ref{appdx:b|x}) that our choice of prior for $p(\theta)$ (equation \ref{eqn:theta-prior}) leads to the following form for $p(b | X)$.
 %
 \begin{equation}
 	p(b | X) = \int p(b | X, \theta) p(\theta) d\theta = B^{-N}
 \end{equation}
 %
-In his paper, \citet{Peixoto-Bayesian-Microcanonical} proposes careful choices for the SBM parameters. The proposal is to write the joint prior on $(b, e, k)$ as a product of conditionals $p(b, e, k) = p(b) p(e | b) p(k | e, b)= p(b) p(\psi | b)$. For our purposes we must insert a conditioning on $X$, to form our pseudo-prior for $b$ and $\psi$.
+This is a uniform distribution that only depends on the number of blocks $B$. In a nice simplification we find that evaluating $p(b | X)$ does not require knowing the exact value $X$ takes. In his paper, \citet{Peixoto-Bayesian-Microcanonical} proposes careful choices for the microcanonical SBM parameters $\psi$. In the absence of the feature matrix layer $X$, the idea is to write the joint prior on $(b, e, k)$ as a product of conditionals $p(b, e, k) = p(b) p(e | b) p(k | e, b)= p(b) p(\psi | b)$. For our purposes we must insert a conditioning on $X$, to form our pseudo-prior for $b$ and $\psi$.
 %
 \begin{equation}
 	p(b, \psi | X) = p(b | X) p(\psi | b, X) = p(b | X) p(\psi | b)
 \end{equation}
 %
-Where it is apparent by regarding figure \ref{fig:lbgm} as a Markov model that $(\psi \indep X) | b$. We then borrow the priors proposed by \citet{Peixoto-Bayesian-Microcanonical} for $p(\psi | b)$, repeated here for reference.
+Where it is apparent by regarding figure \ref{fig:lbgm} as a Bayesian model that $(\psi \indep X) | b$. We then borrow the priors proposed by \citet{Peixoto-Bayesian-Microcanonical} for $p(\psi | b)$, repeated here for reference.
 %
 \begin{equation}
 	p(\psi | b) = p(e | b) p(k | e, b) = \left[ \specialchoose{ \specialchoose{B}{2} }{ E} \right]^{-1} 
 	\cdot \left[ \prod_r \frac{\prod_j \eta_j^r !}{n_r! q(e_r, n_r)} \right]
 \end{equation}
 %
-Where $\specialchoose{n}{m}$ is shorthand for $\binom{n+m-1}{m} = \frac{(n+m-1)!}{(n-1)!(m)!}$ which can be thought of as the total number of histograms (non-negative bin values) with $n$ bins that are constrained to sum to $m$. $E = \frac{1}{2} \sum_{r,s} e_{rs}$ is the total number of edges. Importantly, $E$ is not allowed to vary and so $p(e|b)$ is uniform with respect to $e$. The variable $\eta_j^r$ is introduced to denote the number of vertices in block $r$ that have degree $j$. Formally, $\eta_j^r \coloneqq \sum_{i} \one\left\{b_i = r \right\} \one \left\{k_i = j \right\}$. Furthermore, $q(m, n)$ is the number of different histograms with at most $n$ non-zero bins that sum to $m$. Lastly, $e_r \coloneqq \sum_{s} e_{rs}$ is the total number of half edges in block r and $n_r \coloneqq \sum_{i} \one{b_i = r}$ is the number of vertices assigned to block $r$. Importantly, we have computable forms for $p(\theta)$ and $p(b, \psi | X)$ which will be useful for performing inference.
+Where $\specialchoose{n}{m}$ is shorthand for $\binom{n+m-1}{m} = \frac{(n+m-1)!}{(n-1)!(m)!}$ which can be thought of as the total number of distinct histograms that have $n$ with constrained sum $m$. $E = \frac{1}{2} \sum_{r,s} e_{rs}$ is the total number of edges in the graph. Importantly, $E$ is not allowed to vary and so $p(e|b)$ is uniform with respect to $e$. The variable $\eta_j^r$ is introduced to denote the number of vertices in block $r$ that have degree $j$. Formally, $\eta_j^r \coloneqq \sum_{i} \one\left\{b_i = r \right\} \one \left\{k_i = j \right\}$. Furthermore, $q(m, n)$ is the number of different histograms with at most $n$ non-zero bins that sum to $m$. Lastly, $e_r \coloneqq \sum_{s} e_{rs}$ is the total number of half edges in block r and $n_r \coloneqq \sum_{i} \one\{b_i = r\}$ is the number of vertices assigned to block $r$. Importantly, we have computable forms for $p(\theta)$ and $p(b, \psi | X)$ which will be useful for performing inference.
 
 \section{Inference}
 
-We are presented with a vertex-labelled graph $(A, X)$. The goal is to draw samples from equation \ref{eqn:theta-target}. However, this is not easily done in practice.
+Suppose we are presented with a vertex-labelled graph $(A, X)$. The goal is to draw samples for $\theta$ according to equation \ref{eqn:theta-target}. However, this is not easily done in practice.
 %
 \begin{equation}
 	\label{eqn:theta-target}
@@ -203,7 +204,7 @@ We instead propose an iterative approach. First drawing samples $b^{(i)}$ from t
 	\theta^{(i)} &\sim p\Big(\theta | X, b^{(i)} \Big) \label{eqn:theta-samples}
 \end{align}
 %
-Both of these can be implemented with a Markov Chain through the Metropolis-Hastings algorithm \cite{hastings-alg}. We just need to define a proposal distribution $q(x, x')$ for proposing a move $x \rightarrow x'$ and be able to evaluate an un-normalised form of the target distribution, denoted $\pi(\cdot)$, point-wise. The proposed move is then accepted with probability $\alpha$ (equation \ref{eqn:mh-accept}) else it is rejected and we stay at $x$.
+Both of these sampling steps implemented with a Markov Chain through the Metropolis-Hastings algorithm \cite{hastings-alg}. We just need to define a proposal distribution $q(x, x')$ for proposing a move $x \rightarrow x'$ and be able to evaluate an un-normalised form of the target distribution, denoted $\pi(\cdot)$, point-wise. The proposed move is then accepted with probability $\alpha$ (equation \ref{eqn:mh-accept}) else it is rejected and we stay at $x$.
 %
 \begin{equation}
 	\alpha = \min \left( \frac{\pi(x') q(x', x)}{\pi(x) q(x, x')} , 1 \right)
@@ -251,11 +252,11 @@ The reason we split the Markov chain into two stages is because the summation ov
 	\label{fig:samp-sequence}
 \end{figure}
 %
-Figure \ref{fig:samp-sequence} shows an overview of the proposed method. We have introduced subscripts and conditionings to make explicit what parameters each step utilises. In an important simplification, $p(b| X) = B^{-N}$ which is unchanged no matter the value of X. Therefore, we do not need to know the value of $X$ to perform the sampling on $b$.
+Figure \ref{fig:samp-sequence} shows an overview of the proposed method. We have introduced subscripts and conditionings to make explicit what parameters each step utilises. In an important simplification, we note that $p(b| X) = B^{-N}$ which does not depend on the exact value of X. Therefore, we do not need to know the value of $X$ to perform the sampling on $b$. Conversely, for the $\theta^{(t)}$ samples, we use $b^{(t)}$ but not $A$ as $(\theta \indep A) | b$
 
 \subsection{Sampling block memberships}
 
-\citet{Peixoto-MCMC} proposes a Monte Carlo method which we will base our approach on. It relies on writing the posterior in the following form.
+\citet{Peixoto-MCMC} proposes a Monte Carlo method which we will base our approach on. It relies on writing the posterior in the following form:
 %
 \begin{equation}
 	p(b | A, X) \propto p(A | b, X) \cdot p(b | X) = \pi_b(b)
@@ -269,44 +270,45 @@ Now $\pi_b(\cdot)$ is the un-normalised density we wish to sample from. In other
 	&= p(A | b, \psi^*) \cdot p(\psi^* | b) \cdot p(b | X)
 \end{align*}
 %
-Since we are using a microcanonical formulation, there is only one value of $\psi$ which we denote $\psi^*$ that is compatible with the given $(A, b)$ pair. Specifically, $k^*_i = \sum_j A_{ij} $ and $e^*_{rs} = \sum_{i, j} A_ij \one \{b_i=r\} \one\{b_j=s\}$. Therefore, the summation over all $\psi$ reduces to just the single $\psi^*$ term. We also define the microcanonical entropy of the configuration as.
+Since we are using the microcanonical SBM formulation, there is only one value of $\psi$ that is compatible with the given $(A, b)$ pair. We denote this value $\psi^*$. Specifically, $k^*_i = \sum_j A_{ij} $ and $e^*_{rs} = \sum_{i, j} A_ij \one \{b_i=r\} \one\{b_j=s\}$. Therefore, the summation over all $\psi$ reduces to just the single $\psi^*$ term. We also define the microcanonical entropy of the configuration as.
 %
 \begin{equation}
 	S(b) = - \log \pi_b(b) = - \Big( \log p(A | b, \psi^*) + \log p(\psi^*, b | X) \Big)
 \end{equation}
 %
-This entropy can be thought of as the description length of the graph because it is the sum of the information required to represent the graph given the parameters and the amount of information required to store the parameters (given the feature matrix $X$). The exact, from of the proposal distribution and accept-reject step is explored throughly by \citet{Peixoto-MCMC}. There is a widely available library \verb*|graph-tool| \cite{peixoto_graph-tool_2014} implementing this algorithm, which we use. The only modification is in the block membership prior $p(b)$ which we replace with $p(b|X)=B^{-N}$ which is a uniform distribution and so does not impact the MH accept-reject step.
+This entropy can be thought of as the description length of the graph because it is the sum of the information required to represent the graph given the parameters and the amount of information required to store the parameters (given the feature matrix $X$). The exact, from of the proposal distribution and accept-reject step is explored throughly by \citet{Peixoto-MCMC}. There is a widely available library, \verb*|graph-tool| \cite{peixoto_graph-tool_2014}, implementing this algorithm. The only modification we make is in the block membership prior $p(b)$ which we replace with $p(b|X)=B^{-N}$ which is a uniform distribution and so cancels out in the MH accept-reject step.
 
 \subsection{Sampling feature classifier parameters}
 
-Now the invariant distribution we wish to target for the $\theta$ samples is the posterior of $\theta$ given the values of the pair $(X, b)$. We write this as follows:
+The invariant distribution we wish to target for the $\theta$ samples is the posterior of $\theta$ given the values of the pair $(X, b)$. We write this as follows:
 %
 \begin{align}
 	p(\theta | X, b) &\propto p(b | X, \theta) p(\theta) = \pi_\theta (\theta) =  \exp \left( - U(\theta) \right) \\
 	\therefore U(\theta) &= - \left( \log p(b | X, \theta) + \log (\theta) \right)
 \end{align}
 %
-Where we have introduced $U(\theta)$ equal to the negative log posterior, because it simplifies analysis. Each of the constituent terms of$U(\theta)$ is easily computed. To simplify notation, we define $y_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and $a_{ij} = \phi_j(x_i; \theta)$.
+Where we have introduced $U(\theta)$ equal to the negative log posterior, because it simplifies analysis. Each of the constituent terms of $U(\theta)$ is easily computed (equation \ref{eqn:u-form}). To simplify notation, we define $y_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and $a_{ij} = \phi_j(x_i; \theta)$.
 %
 \begin{equation}
 	\log p(b | X, \theta) = \sum_{i=1}^{N} \sum_{j=1}^{B} y_{ij} \log a_{ij}  \quad \textrm{and} \quad
 	\log p(\theta) = -\frac{(D+1)(B)}{2} \log 2\pi - \frac{1}{2 \sigma_\theta^2} || \theta || ^2
+	\label{eqn:u-form}
 \end{equation}
 %
-This means that $U(\theta) = H_c(t, y) + \nicefrac{1}{2\sigma_\theta^2} || \theta ||^2$ plus a constant, where $H_c(\cdot || \star)$ is the cross entropy between two distributions and the prior introduces a regularisation term. This is a typical objective function used in neural network training. In typical applications we only seek the value of $\theta$ that minimises the objective function, which in our case would yield the maximum a posteriori (MAP) estimate. This is often done through some kind of gradient descent. However, our goal is not to find the MAP estimate but to draw samples from the posterior. We therefore adopt the Metropolis Adjusted Langevin Algorithm (first proposed by \citet{mala-tweedie}). Given the current sample $\theta$, we propose a new sample $\theta'$ according to equation \ref{eqn:theta-update}
+This means that $U(\theta) = H_c(t, y) + \nicefrac{1}{2\sigma_\theta^2} || \theta ||^2$ plus a constant, where $H_c(\cdot || \star)$ is the cross entropy between two distributions. We see that the prior is equivalent to a regularisation term. This is a typical objective function used in neural network training. In traditional applications we only seek the value of $\theta$ that minimises the objective function, which in our case would yield the maximum a posteriori (MAP) estimate. This is often done through some kind of gradient descent. However, our goal is not to find the MAP estimate but to draw samples from the posterior. We therefore adopt the Metropolis Adjusted Langevin Algorithm (first proposed by \citet{mala-tweedie}). Given the current sample $\theta$, we propose a new sample $\theta'$ according to equation \ref{eqn:theta-update}
 %
 \begin{equation}
 	\theta' = \theta - h \nabla U(\theta) + \sqrt{2h} \cdot \xi
 	\label{eqn:theta-update}
 \end{equation}
 %
-Where $\xi \sim \Gaussian(0, I)$. Indeed without the injected noise term, this is equivalent to gradient descent. We require the noise term to fully explore the parameter space. As such the proposal distribution, is a simple multivariate Gaussian which can be evaluated easily.
+Where $\xi \sim \Gaussian(0, I)$ and $h$ is a step-size parameter - which may vary with the sample index. Indeed without the injected noise term, this is equivalent to gradient descent. We require the noise term to fully explore the parameter space. As such the proposal distribution, is a simple multivariate Gaussian which can be evaluated easily.
 %
 \begin{equation}
 	q_\theta(\theta, \theta') = \Gaussian \left( \theta' ; \theta - h \nabla U(\theta), 2h I \right)
 \end{equation}
 %
-The term $\nabla U$ has an easy to compute analytic form. By noting that $\theta = \{w_k\}_{k=1}^{B}$
+The term $\nabla U$ has an easy to compute analytic form. By noting that $\theta = \{w_k\}_{k=1}^{B}$, we write the derivative with respect to each $w_k$ as:
 %
 \begin{equation}
 	\frac{\partial U}{\partial w_k} = - \left( \sum_{i=1}^{N} \Big\{ \tilde{x}_i (y_{ik} - a_{ik}) \Big\} - w_k \right)
@@ -330,10 +332,10 @@ So far each $\theta^{(t)}$ update uses its corresponding $b^{(t)}$ sample. This 
 We obtain an unbiased estimate for this quantity as simply the empirical distribution of the block membership samples $\left\{ b^{(t)} \right\}_{t=1}^T$.
 %
 \begin{equation}
-	\hat{y}_{ij} \coloneqq \frac{1}{T} \sum_{t=1}^{T} y_{ij}^T
+	\hat{y}_{ij} \coloneqq \frac{1}{T} \sum_{t=1}^{T} y_{ij}^{(t)}
 \end{equation}
 %
-This means we no longer need to run the $b$ and $\theta$ Markov chains concurrently. Instead, we run the $b$-chain to completion and use it to generate $\hat{y}_{ij}$ for $i \in \{1 \dots N\}$ and $j \in \{1 \dots B\}$. This is an estimate of $p(b | A, X)$ that we use for every iteration of the $\theta$ Markov chain. This affords us the flexibility to vary the number of samples we draw for $b$ and $\theta$ as well as reducing the burn-in time for the $\theta$-chain.
+This means we no longer need to run the $b$ and $\theta$ Markov chains concurrently. Instead, we run the $b$-chain to completion and use it to generate $\hat{y}_{ij}$ for $i \in \{1 \dots N\}$ and $j \in \{1 \dots B\}$. This is an estimate of $p(b | A, X)$ that we use for every iteration of the $\theta$ Markov chain. This affords us the flexibility to vary the number of samples we draw for $b$ and $\theta$ as well as reducing the burn-in time for the $\theta$-chain by reducing the variance in our evaluation of $U$ and $\nabla U$.
 
 \section{Experiments}
 
