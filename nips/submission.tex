@@ -314,13 +314,13 @@ Where we have introduced $U(\theta)$ equal to the negative log posterior. This $
 \begin{equation}
 	\log p(b | X, \theta) = \sum_{i=1}^{N} \sum_{j=1}^{B} y_{ij} \log a_{ij}  \quad \textrm{and} \quad
 	\log p(\theta) = -\frac{(D+1)(B)}{2} \log 2\pi - \frac{1}{2 \sigma_\theta^2} || \theta ||^2
-	\label{eqn:u-form}
+	\label{eqn:U-constituent-terms}
 \end{equation}
 %
 This means that if we ignore constant terms we can write $U(\theta)$ as in equation \ref{eqn:U-form}. We see that the prior effectively introduces a regularisation term. Note that $||\theta||^2 = \sum_{i} \theta_{i}^2 = \sum_{j=1}^{B} ||w_j||^2$ is the Euclidean norm of the vector of parameters $\theta$.
 %
 \begin{equation}
-	U(\theta) = \left( \sum_{i=N}^{T} \sum_{j=1}^{B} y_{ij} \log \frac{1}{a_{ij}} \right)
+	U(\theta) = \left( \sum_{i=1}^{N} \sum_{j=1}^{B} y_{ij} \log \frac{1}{a_{ij}} \right)
 	+ \frac{1}{2\sigma_\theta^2} ||\theta||^2
 	\label{eqn:U-form}
 \end{equation}
@@ -340,7 +340,7 @@ Where $\xi \sim \Gaussian(0, I)$ and $h$ is a step-size parameter - which may va
 	q_\theta(\theta, \theta') = \Gaussian \left( \theta' ; \theta - h \nabla U(\theta), 2h I \right)
 \end{equation}
 %
-The term $\nabla U$ has an easy to compute analytic form. By noting that $\theta = \{w_k\}_{k=1}^{B}$, we write the derivative with respect to each $w_k$ as:
+The term $\nabla U$ has an easy to compute analytic form (derived in Appendix \ref{appdx:gradu}). By noting that $\theta = \{w_k\}_{k=1}^{B}$, we write the derivative with respect to each $w_k$ as:
 %
 \begin{equation}
 	\frac{\partial U}{\partial w_k} = - \left( \sum_{i=1}^{N} \Big\{ \tilde{x}_i (y_{ik} - a_{ik}) \Big\} - \frac{w_k}{\sigma_\theta^2} \right)
@@ -360,24 +360,24 @@ After a proposed move is generated, in typical Metropolis-Hastings fashion we ac
 	, 1 \right)
 \end{equation}
 %
-This fully specifies, the sampling procedure to generate $\theta^{(t)} \sim p(\theta | X, b^{(t)})$. This is a pseudo-marginal approach, meaning that $\theta^{(t)} \sim p(\theta | X, A)$ as $b^{(t)} \sim p(b | A, X)$.
+This fully specifies, the sampling procedure to generate $\{\theta^{(t)}\}_{t=1}^T$. Bear in mind that each $\theta^{(t)}$ update step uses its corresponding $b^{(t)}$ block membership sample.
 
 \subsection{Sampling sequence}
 
-So far each $\theta^{(t)}$ update uses its corresponding $b^{(t)}$ sample. This means that the evaluation of $U(\theta)$ and $\nabla U(\theta)$ has high variance. $U(\theta)$ is fed in the information $y_{ij}^{(t)} = \one\{b_i^{t} = j\}$. We would rather deal with the expectation of this value.
+So far, each $\theta^{(t)}$ update uses its corresponding $b^{(t)}$ sample. This means that the evaluation of $U(\theta)$ and $\nabla U(\theta)$ has high variance. This may lead to longer burn-in and autocorrelation times of the resulting Markov Chain. The only link between $b^{(t)}$ and $\theta^{(t)}$ is in the evaluation of $U(\theta)$ and $\nabla U(\theta)$ which depends on $y_{ij}^{(t)} \coloneqq \one\{b_i^{(t)} = j\}$. We would rather deal with the expectation of each $y_{ij}^{(t)}$:
 %
 \begin{equation}
-	\Expect \left[ y_{ij}^{(t)} \right] = \Expect \left[ \one(b_{i}^{(t)} = j) \right]
-	= p(b_i = j)
+	\Expect \left[ y_{ij}^{(t)} \right] = \Expect_{b^{(t)}} \left[ \one(b_{i}^{(t)} = j) \right]
+	= p(b_i = j | A, X)
 \end{equation}
 %
 We obtain an unbiased estimate for this quantity as simply the empirical distribution of the block membership samples $\left\{ b^{(t)} \right\}_{t=1}^T$.
 %
 \begin{equation}
-	\hat{y}_{ij} \coloneqq \frac{1}{T} \sum_{t=1}^{T} y_{ij}^{(t)}
+	\hat{y}_{ij} \coloneqq \frac{1}{T} \sum_{t=1}^{T} y_{ij}^{(t)} = \frac{1}{T} \sum_{t=1}^{T} \one\{b_i^{(t)} = j\}
 \end{equation}
 %
-This means we no longer need to run the $b$ and $\theta$ Markov chains concurrently. Instead, we run the $b$-chain to completion and use it to generate $\hat{y}_{ij}$ for $i \in \{1 \dots N\}$ and $j \in \{1 \dots B\}$. This is an estimate of $p(b | A, X)$ that we use for every iteration of the $\theta$ Markov chain. This affords us the flexibility to vary the number of samples we draw for $b$ and $\theta$ as well as reducing the burn-in time for the $\theta$-chain by reducing the variance in our evaluation of $U$ and $\nabla U$.
+We therefore, choose to feed each $\theta^{(t)}$ update step the same $\hat{y}_{ij}$ for all $t$ rather than the corresponding $y^{(t)}_{ij}$. This means we no longer need to run the $b$ and $\theta$ Markov chains concurrently. Instead, we run the $b$-chain to completion and use it to generate $\hat{y}_{ij}$ for $i \in \{1 \dots N\}$ and $j \in \{1 \dots B\}$. This is an estimate of $p(b | A, X)$ that we use for every iteration of the $\theta$ Markov chain. This affords us the flexibility to vary the number of samples we draw for $b$ and $\theta$; wed refer to these as $T_b$ and $T_\theta$ henceforth. Furthermore, this changeover reduces the burn-in time for the $\theta$-chain by reducing the variance in our evaluation of $U$ and $\nabla U$.
 
 \section{Experiments}
 
@@ -515,7 +515,53 @@ As this is a constant with respect to $b$ we conclude that $p(b | X)$ must be a 
 	p(b | X) = B^{-N}
 \end{equation}
 
-\subsection{Derivation of gradient with respect to feature parameters}
+\subsection{Derivation of U gradient with respect to feature parameters}
 \label{appdx:gradu}
+The goal is to determine $\nabla U(\theta)$, the gradient of the negative log posterior with respect to the parameters. We repeat the form of $U(\theta)$ in equation \ref{eqn:U-form-appdx}.
+%
+\begin{equation}
+	U(\theta) = \left( \sum_{i=1}^{N} \sum_{j=1}^{B} y_{ij} \log \frac{1}{a_{ij}} \right)
+	+ \frac{1}{2\sigma_\theta^2} ||\theta||^2
+	\label{eqn:U-form-appdx}
+\end{equation}
+%
+Where $y_{ij}$ is independent of $\theta$ and $a_{ij}$ is the output from the softmax layer, with form as given in equation \ref{eqn:a-ij}.
+%
+\begin{equation}
+	a_{ij} \coloneqq \phi_{j} (x_i; \theta) = \frac{\exp(w_j^T \tilde{x}_i)}{\sum_{b=1}^{B} \exp(w_b^T \tilde{x}_i)}
+	\label{eqn:a-ij} 
+\end{equation}
+%
+We note that $\theta = \{w_k\}_{k=1}^B$, and as such we can write this in vector form $\theta = \left[w_1^T, w_2^T \dots w_B^T  \right]^T$. Therefore, $\nabla U(\theta) = \left[\nicefrac{\partial U}{\partial w_1}^T,\nicefrac{\partial U}{\partial w_2}^T \dots \nicefrac{\partial U}{\partial w_B}^T  \right]^T$; to compute $\nabla U(\theta)$ it suffices to find the form of $\nicefrac{\partial U}{\partial w_k}$ with respect to a general $k$.
+
+To this end, we must first find partial derivatives of $a_{ij}$ and $||\theta||$ with respect to $w_k$. Starting with $a_{ij}$:
+%
+\begin{align}
+	\frac{\partial a_{ij}}{\partial w_k} &= \frac
+	{\tilde{x}_i \exp(w_j^T \tilde{x}_i) \delta_{jk} \cdot \sum_{b=1}^{B} \exp(w_b^T \tilde{x}_i) 
+		- 
+	\exp(w_j^T \tilde{x}_i) \cdot \tilde{x}_i \exp(w_k^T \tilde{x}_i)}
+	{\left( \sum_{b=1}^{B} \exp(w_b^T \tilde{x}_i) \right)^2} \nonumber \\
+	&= \tilde{x}_i \left( a_{ij} \delta_{jk} - a_{ij}a_{ik} \right) 
+\end{align}
+%
+Where $\delta_{jk} \coloneqq \one \left\{ j = k \right\}$. Now moving onto the derivative of $||\theta||^2$:
+%
+\begin{equation}
+	\frac{ \partial}{\partial w_k} ||\theta||^2 = \frac{\partial}{\partial w_k} \left( \sum_{b=1}^B ||w_b||^2 \right) = 2w_k
+\end{equation}
+%
+We are ready to put this all together, to find the partial derivative of $U(\theta)$ with respect to each $w_k$:
+\begin{align}
+	\frac{\partial U}{\partial w_k} &= 
+	\sum_{i=1}^{N} \sum_{j=1}^{B} y_{ij} 
+	\left( \frac{-\tilde{x}_i}{a_{ij}} \left( a_{ij} \delta_{jk} - a_{ij} a_{ik} \right) \right)
+	+ \frac{w_k}{\sigma_\theta^2} \nonumber \\
+	&=  - \left( \sum_{i=1}^{N} \tilde{x}_i \left( y_{ik} - a_{ik} \sum_{j=1}^{B} y_{ij} \right)
+	- \frac{w_k}{\sigma_\theta^2} \right) \nonumber \\
+	&= - \left( \sum_{i=1}^{N} \Big\{ \tilde{x}_i (y_{ik} - a_{ik}) \Big\} - \frac{w_k}{\sigma_\theta^2} \right)
+\end{align}
+%
+This is the required result. This form can be computed efficiently through matrix operations. The only property of $y_{ij}$ we have used in the derivation is the sum-to-one constraint $\sum_{j=1}^{B} y_{ij} = 1$ for all $i$.
 
 \end{document}
