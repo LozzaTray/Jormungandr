@@ -311,7 +311,7 @@ Where $\xi \sim \Gaussian(0, I)$ and $h$ is a step-size parameter - which may va
 The term $\nabla U$ has an easy to compute analytic form. By noting that $\theta = \{w_k\}_{k=1}^{B}$, we write the derivative with respect to each $w_k$ as:
 %
 \begin{equation}
-	\frac{\partial U}{\partial w_k} = - \left( \sum_{i=1}^{N} \Big\{ \tilde{x}_i (y_{ik} - a_{ik}) \Big\} - w_k \right)
+	\frac{\partial U}{\partial w_k} = - \left( \sum_{i=1}^{N} \Big\{ \tilde{x}_i (y_{ik} - a_{ik}) \Big\} - \frac{w_k}{\sigma_\theta^2} \right)
 \end{equation}
 %
 After a proposed move is generated, in typical Metropolis-Hastings fashion we accept the move with probability $\alpha$.
