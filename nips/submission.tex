@@ -33,6 +33,8 @@
 \usepackage{mathtools}
 \usepackage{bbm}
 \usepackage{amssymb}
+\usepackage{algorithmic}
+\usepackage{algorithm}
 
 
 %bibliography
@@ -378,6 +380,53 @@ We obtain an unbiased estimate for this quantity as simply the empirical distrib
 \end{equation}
 %
 We therefore, choose to feed each $\theta^{(t)}$ update step the same $\hat{y}_{ij}$ for all $t$ rather than the corresponding $y^{(t)}_{ij}$. This means we no longer need to run the $b$ and $\theta$ Markov chains concurrently. Instead, we run the $b$-chain to completion and use it to generate $\hat{y}_{ij}$ for $i \in \{1 \dots N\}$ and $j \in \{1 \dots B\}$. This is an estimate of $p(b | A, X)$ that we use for every iteration of the $\theta$ Markov chain. This affords us the flexibility to vary the number of samples we draw for $b$ and $\theta$; wed refer to these as $T_b$ and $T_\theta$ henceforth. Furthermore, this changeover reduces the burn-in time for the $\theta$-chain by reducing the variance in our evaluation of $U$ and $\nabla U$.
+
+\begin{algorithm} % enter the algorithm environment
+	\caption{Block membership sample generation} % give the algorithm a caption
+	\label{alg:b-samples} % and a label for \ref{} commands later in the document
+	\begin{algorithmic} % enter the algorithmic environment
+
+		\FOR{$t \in \{0, 1 \dots T_b - 1\}$}
+			\STATE $b' \gets \sim q_b(b^{(t)}, b' | A)$
+			\STATE $\log \alpha_b \gets \log \alpha_b(b^{(t)}, b' | A)$
+			\STATE $u \gets \sim \textrm{Unif}(0,1)$
+			\IF{$\log u < \log \alpha_b$}
+				\STATE $b^{(t+1)} \gets b'$
+			\ELSE
+				\STATE $b^{(t+1)} \gets b^{(t)}$
+			\ENDIF
+		\ENDFOR
+		
+		\STATE \textbf{return} $\{b^{(t)}\}_{t=1}^{T_b}$
+		
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm} % enter the algorithm environment
+	\caption{LBGM parameter pseudo-marginal inference} % give the algorithm a caption
+	\label{alg:theta-samples} % and a label for \ref{} commands later in the document
+	\begin{algorithmic} % enter the algorithmic environment
+		
+		\STATE $\mathcal{S} \gets \textrm{range}(\textrm{burn-in}, T_b, \textrm{thinning})$
+		\STATE $\hat{Y}_{ij} \gets \frac{1}{\mathcal{|S|}} \sum_{t \in \mathcal{S}} \one \{ b^{(t)}_i = j\} \quad \forall i,j$
+		
+		\item[]
+		
+		\FOR{$t \in \{0, 1 \dots T_\theta - 1\}$}
+		\STATE $\theta' \gets \sim q_\theta(\theta^{(t)}, \theta' | X, \hat{Y})$
+		\STATE $\log \alpha_\theta \gets \log \alpha_\theta(\theta^{(t)}, \theta' | A, \hat{Y})$
+		\STATE $u \gets \sim \textrm{Unif}(0,1)$
+		\IF{$\log u < \log \alpha_\theta$}
+		\STATE $\theta^{(t+1)} \gets \theta'$
+		\ELSE
+		\STATE $\theta^{(t+1)} \gets \theta^{(t)}$
+		\ENDIF
+		\ENDFOR
+		
+		\STATE \textbf{return} $\{\theta^{(t)}\}_{t=1}^{T_\theta}$
+		
+	\end{algorithmic}
+\end{algorithm}
 
 \section{Experiments}
 
