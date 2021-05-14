@@ -428,14 +428,17 @@ We therefore, choose to feed each $\theta^{(t)}$ update step the same $\hat{y}_{
 	\end{algorithmic}
 \end{algorithm}
 
+\subsection{Complexity Analysis}
+
 \section{Experiments}
 
 We apply the developed methods to a variety of datasets.
 
 \begin{itemize}
-	\item \textbf{Maier Facebook Egonet} \cite{FB-Maier} - This is a network of the author's Facebook friends list. Each vertex has been manually labelled with a variety of features describing their relationship to the author.
 	\item \textbf{College football teams} \cite{Evans_2010_football} - network of American college football teams and their interactions. Vertex labels are the division a team belongs to.
 	\item \textbf{Law firm} \cite{LawFirm} - a network of relationships between members of a law firm. Each relationship is categorised according to type: coworkers, friends or advice.
+	\item \textbf{Maier Facebook Egonet} \cite{FB-Maier} - network of the author's Facebook friends list. Each vertex has been manually labelled with a variety of features describing their relationship to the author.
+	\item \textbf{Twitch users} \cite{twitch} - a network of user-user friendships on the streaming service Twitch. Vertex labels are extracted according to video-games played, location and streaming habits. This dataset is also broken down into disjoint networks according to language. We only consider the English users with is a subnet with $N=7126$ vertices and $E=35324$ edges).
 \end{itemize}
 
 \section{Extensions}
