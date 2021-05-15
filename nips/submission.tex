@@ -317,7 +317,7 @@ The invariant distribution we wish to target for the $\theta$ samples is the pos
 	\therefore U(\theta) &= - \left( \log p(b | X, \theta) + \log p(\theta) \right) + \textrm{const}
 \end{align}
 %
-Where we have introduced $U(\theta)$ equal to the negative log posterior. This $U(\theta)$ term makes subsequent analysis more concise. Each of the constituent terms of $U(\theta)$ is easily computed (equation \ref{eqn:u-form}). To simplify notation, we define $y_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and $a_{ij} \coloneqq \phi_j(x_i; \theta)$.
+Where we have introduced $U(\theta)$ equal to the negative log posterior. This $U(\theta)$ term makes subsequent analysis more concise. Each of the constituent terms of $U(\theta)$ is easily computed (equation \ref{eqn:U-constituent-terms}). To simplify notation, we define $y_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and $a_{ij} \coloneqq \phi_j(x_i; \theta)$.
 %
 \begin{equation}
 	\log p(b | X, \theta) = \sum_{i=1}^{N} \sum_{j=1}^{B} y_{ij} \log a_{ij}  \quad \textrm{and} \quad
@@ -437,6 +437,12 @@ We therefore, choose to feed each $\theta^{(t)}$ update step the same $\hat{y}_{
 
 \subsection{Complexity Analysis}
 
+\subsection{Choosing the number of blocks}
+
+For the purposes of our model (the LBGM), the number of blocks $B$ is a constant which must be specified by the data scientist. We could however, allow our choice of $B$ to be influenced by the observed data. This places us in the domain of empirical Bayes, which must be negotiated carefully. Prior beliefs must be determined a priori else they are not prior. However, as the number of blocks only specifies the coarseness of the analysis, it is fine to allow it to vary. Indeed, \citet{peixoto-determine-B} shows that for a fixed average degree the maximum number of detectable blocks scales as $O(\sqrt{N})$ where $N$ is the number of vertices.
+
+If we allow $B$ to vary in the $b$-chain (i.e. new blocks can be created and we permit empty blocks) then it can be run  until a minimum description length (MDL) solution is reached. We take the number of non-empty blocks at the MDL to be our fixed block number $B$ for subsequent analysis. Indeed, it is prudent to start our $b$-chain at this MDL solution as then the burn-in time is greatly reduced.
+
 \section{Experiments}
 
 We apply the developed methods to a variety of datasets, to show the power of the method across different scenarios. We choose a range of node counts $N$, edge counts $E$ and feature space dimension $D$.
@@ -449,6 +455,18 @@ We apply the developed methods to a variety of datasets, to show the power of th
 	\item \textbf{Twitch users} \cite{twitch} - a network of user-user friendships on the streaming service Twitch. Vertex labels are extracted according to video-games played, location and streaming habits. This dataset is also broken down into disjoint networks according to language. We only consider the English users with is a subnet with $N=7126$ vertices and $E=35324$ edges).
 \end{itemize}
 
+A table summarising the results is given in table \ref{tab:results}.
+
+\begin{table}[]
+	\centering
+	\begin{tabular}{c|ccc|c|cc}
+		Dataset & $N$ & $E$ & $D$ & $B$ & $\bar{S}_b /N$ & $\bar{U}_\theta /N$ \\ \hline
+		Primary school & 238 & 5539 & 13 &  18 & 43.0  & 2.75 \\
+		Maier FB egonet &     &     &     &   &           &             \\
+		&     &     &     &              &     &       
+	\end{tabular}
+\end{table}
+
 \subsection{Primary school dynamic contacts}
 
 These data were originally collected by \citet{schools} to quantify the transmission opportunities for respiratory infections within a primary school context (ages 6-11 in France). However, we seek to ask a simpler question. What features best describe how people interact with one another in a primary school context. The only vertex features we have available are school-class (one of 10 values - 2 per year group), gender and a distinction between teachers and pupils.
@@ -457,11 +475,20 @@ We must first choose the number of blocks to consider $B$ to define the coarsene
 
 \begin{figure}[!h]
 	\centering
-	\begin{subfigure}{0.4\textwidth}
+	\begin{subfigure}{0.45\linewidth}
 		\centering
-		\includegraphics{width=\textwidth}{school-graph.png}
-		\caption{Graph with nodes coloured to show soft inferred block memberships $\hat{Y}_ij \approx p(b_i=j|A, X)$}
+		\includegraphics[width=\linewidth]{school-graph.png}
+		\caption{Softmax weighting samples for each block index}
+		\label{fig:school-graph}
 	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.45\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{school-null.png}
+		\caption{}
+		\label{fig:school-null}
+	\end{subfigure}
+	\caption{Primary school dynamic contacts network \cite{schools}}
 \end{figure}
 
 \section{Extensions}
