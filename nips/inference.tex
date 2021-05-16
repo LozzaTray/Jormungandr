@@ -1,6 +1,6 @@
 \section{Inference}
 
-Now that we have defined the LBGM, we wish to leverage it to perform inference. Suppose we are presented with a vertex-labelled graph $(A, X)$; the goal is to draw samples for $\theta$ according to the posterior given the observed graph (equation \ref{eqn:theta-target}). 
+Now that we have defined the FFBM, we wish to leverage it to perform inference. Suppose we are presented with a vertex-labelled graph $(A, X)$; the goal is to draw samples for $\theta$ according to the posterior given the observed graph (equation \ref{eqn:theta-target}). 
 %
 \begin{equation}
 	\label{eqn:theta-target}
@@ -196,7 +196,7 @@ We therefore, choose to feed each $\theta^{(t)}$ update step the same $\hat{y}_{
 \end{algorithm}
 
 \begin{algorithm} % enter the algorithm environment
-	\caption{LBGM parameter pseudo-marginal inference} % give the algorithm a caption
+	\caption{FFBM parameter pseudo-marginal inference} % give the algorithm a caption
 	\label{alg:theta-samples} % and a label for \ref{} commands later in the document
 	\begin{algorithmic} % enter the algorithmic environment
 		
@@ -226,6 +226,6 @@ We therefore, choose to feed each $\theta^{(t)}$ update step the same $\hat{y}_{
 
 \subsection{Choosing the number of blocks}
 
-For the purposes of our model (the LBGM), the number of blocks $B$ is a constant which must be specified by the data scientist. We could however, allow our choice of $B$ to be influenced by the observed data. This places us in the domain of empirical Bayes, which must be negotiated carefully. Prior beliefs must be determined a priori else they are not prior. However, as the number of blocks only specifies the coarseness of the analysis, it is fine to allow it to vary. Indeed, \citet{peixoto-determine-B} shows that for a fixed average degree the maximum number of detectable blocks scales as $O(\sqrt{N})$ where $N$ is the number of vertices.
+For the purposes of our model (the FFBM), the number of blocks $B$ is a constant which must be specified by the data scientist. We could however, allow our choice of $B$ to be influenced by the observed data. This places us in the domain of empirical Bayes, which must be negotiated carefully. Prior beliefs must be determined a priori else they are not prior. However, as the number of blocks only specifies the coarseness of the analysis, it is fine to allow it to vary. Indeed, \citet{peixoto-determine-B} shows that for a fixed average degree the maximum number of detectable blocks scales as $O(\sqrt{N})$ where $N$ is the number of vertices.
 
 If we allow $B$ to vary in the $b$-chain (i.e. new blocks can be created and we permit empty blocks) then it can be run  until a minimum description length (MDL) solution is reached. We take the number of non-empty blocks at the MDL to be our fixed block number $B$ for subsequent analysis. Indeed, it is prudent to start our $b$-chain at this MDL solution as then the burn-in time is greatly reduced.
