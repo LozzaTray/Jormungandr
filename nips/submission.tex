@@ -91,12 +91,7 @@
 
 \maketitle
 
-\begin{abstract}
-We present a novel generative model for describing vertex-labelled undirected graphs. This is a two-layered model. First a probabilistic mapping from vertex labels to latent block memberships and from these block memberships we generate a graph according to the micro-canonical stochastic block model.
-
-With this framework we are able to efficiently sample the parameters of the vertex label to block membership mapping. This allows us to automatically determine which features have the largest impact on graphical structure.
-\end{abstract}
-
+\input{abstract}
 
 \input{introduction}
 
@@ -117,10 +112,10 @@ With this framework we are able to efficiently sample the parameters of the vert
 %references
 \bibliography{sources.bib}
 
-\include{checklist}
+\input{checklist}
 
 \appendix
 
-\include{appendices}
+\input{appendices}
 
 \end{document}

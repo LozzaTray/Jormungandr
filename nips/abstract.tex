@@ -1,0 +1,11 @@
+\begin{abstract}
+	Labelled networks are an extremely common and important form of data. Often, we wish to determine how the vertex labels (referred to as features) affect graphical structure. The standard approach has been to partition the network into blocks grouped by distinct values of the feature of interest. We then use a block-based random graph model to test for evidence these extracted feature-based communities interact differently with one another.
+	
+	Nevertheless, these feature-based communities are often not a natural partition of the graph and thus the model is not a good fit. With this in mind, we present a novel generative model for better describing vertex-labelled undirected graphs. This is a two-stage model. First, we start with vertex features and probabilistically generate a block membership. Secondly, given these latent block memberships, we draw a graph according to the micro-canonical stochastic block model. We call this model the latent block generative model (LBGM).
+	
+	Armed with the newly defined LBGM, we present a method to efficiently sample the parameters of the feature to block generator. This allows us to automatically determine which features best explain the block-based graphical structure. Importantly, this analysis can be performed using the whole feature-set rather than considering each independently. 
+	
+	We apply the developed methods to a variety of network data to show the derived results are meaningful and match our expectations. However, the vertex features available often do not readily explain the community structure in the resulting network. The approach is able to detect this and thus is protected against over-confidence. This is usually a failure of the data collection to capture all vertex features relevant to the resulting structure.
+	
+	Future work may benefit from extending the LBGM to multiple hierarchical levels. Currently, the single-level model only provides explanations for the widest separation between communities. Nevertheless, in real-world data each community may be composed of many sub-communities and so on. A hierarchical approach would be able to find explanations for network structure at each level of the hierarchy. 
+\end{abstract}
