@@ -3,12 +3,18 @@
 We apply the developed methods to a variety of datasets, to show the power of the method across different scenarios. We choose a range of node counts $N$, edge counts $E$ and feature space dimension $D$.
 
 \begin{itemize}
-	\item \textbf{Primary school dynamic contacts} \cite{schools} ($N=238, E=5539, D=13$) - network of face-to-face contacts amongst students and teachers at a primary school in Lyon, France. Two nodes are connected if the two parties shared a face-to-face interaction over the course of the day. Vertex features include class membership, gender and whether or not the student is a teacher or pupil. These data were collected on consecutive days in October 2009. We choose to analyse just the second day. 
-	\item \textbf{College football teams} \cite{Evans_2010_football} - network of American college football teams and their interactions. Vertex labels are the division a team belongs to.
-	\item \textbf{Law firm} \cite{LawFirm} - a network of relationships between members of a law firm. Each relationship is categorised according to type: coworkers, friends or advice.
+	\item \textbf{Political books} \cite{polbooks} ($N=105, E=441, D=1$) - network of Amazon book sales about U.S. politics, published close to the presidential election in 2004. Two books are connected if they were frequently co-purchased by the same customer. Vertex features encode the broad political affiliation of the author (liberal, conservative, neutral).
+		
+	\item \textbf{Primary school dynamic contacts} \cite{schools} ($N=238, E=5539, D=13$) - network of face-to-face contacts amongst students and teachers at a primary school in Lyon, France. Two nodes are connected if the two parties shared a face-to-face interaction over the course of the day. Vertex features include class membership, gender and whether or not the student is a teacher or pupil. These data were collected on consecutive days in October 2009. We choose to analyse just the second day.
+	
+	\item \textbf{Facebook egonet} \cite{fb-snap} ($N=747, E=30025, D=480$) - an assortment of Facebook egonets. These are networks of a particular user's friends list and all the connections within that. Vertex features are extracted from each user's profile and is fully anonymized. We focus on the egonet with id 1912.
+	
 	\item \textbf{Maier Facebook Egonet} \cite{FB-Maier}  ($N=349, E=2336, D=32$) - egonet of the author's Facebook friends list. Each vertex has been manually labelled with a variety of features describing their relationship to the author. For our purposes we remove all nodes of degree 1 (those that are only connected to the egonode) as these cannot be said to be part of any community present in the graph.
+		
+	\item \textbf{Law firm} \cite{LawFirm} - a network of relationships between members of a law firm. Each relationship is categorised according to type: coworkers, friends or advice.
+	
 	\item \textbf{Twitch users} \cite{twitch} - a network of user-user friendships on the streaming service Twitch. Vertex labels are extracted according to video-games played, location and streaming habits. This dataset is also broken down into disjoint networks according to language. We only consider the English users with is a subnet with $N=7126$ vertices and $E=35324$ edges).
-	\item \textbf{Political books} \cite{polbooks} ($N=105, E=441, D=1$) - network of Amazon book sales about U.S. politics, published close to the presidential election in 2004. Two books are connected if they were frequently co-purchased on Amazon. Vertex features encode the broad political affiliation of the author (liberal, conservative, neutral).
+
 \end{itemize}
 
 We require metrics to assess the relative model evidence for the FFBM. . A table summarising the results is given in table \ref{tab:results}.
@@ -25,6 +31,30 @@ We require metrics to assess the relative model evidence for the FFBM. . A table
 		       
 	\end{tabular}
 \end{table}
+
+
+\subsection{Political books}
+
+This dataset was collected by \citet{polbooks}. We wish to determine whether political affiliation is a good predictor of the overall network structure. We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral). The inferred block memberships are given in figure \ref{fig:books-graph}.
+
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}{0.3\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{polbooks-graph.png}
+		\fbox{\includegraphics[width=0.4\linewidth]{3-legend.png}}
+		\caption{Graph coloured by inferred block memberships of each node}
+		\label{fig:books-graph}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.5\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{polbooks-null.png}
+		\caption{Feature-to-block generator sampled weight parameters for each block index}
+		\label{fig:book-null}
+	\end{subfigure}
+	\caption{Political books network}
+\end{figure}
 
 \subsection{Primary school dynamic contacts}
 
@@ -48,5 +78,29 @@ We must first choose the number of blocks to consider $B$ to define the coarsene
 		\caption{Feature-to-block generator sampled weight parameters for each block index}
 		\label{fig:school-null}
 	\end{subfigure}
-	\caption{Primary school dynamic contacts network \cite{schools}}
+	\caption{Primary school dynamic contacts network}
 \end{figure}
+
+
+\subsection{Facebook egonet}
+
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}{0.45\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{fb-graph.png}
+		\fbox{\includegraphics[width=0.3\linewidth]{10-legend.png}}
+		\caption{Graph coloured by inferred block memberships of each node}
+		\label{fig:fb-graph}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}{0.45\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{fb-null.png}
+		\caption{Feature-to-block generator sampled weight parameters for each block index}
+		\label{fig:fb-null}
+	\end{subfigure}
+	\caption{Primary school dynamic contacts network}
+\end{figure}
+
+

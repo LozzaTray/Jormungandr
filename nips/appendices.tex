@@ -96,3 +96,52 @@ The first constraint ensures that we have cover sufficient distance to arrive at
 \end{equation}
 %
 Where $a, b, \gamma$ are hyper-parameters to be chosen. We require $a,b > 0$ and $\gamma \in (0.5, 1]$ to satisfy equation \ref{eqn:h-constraints}. We find empirically that $a=250, b=1000, \gamma=0.8$ yield good burn-in times for our MALA implementations.
+
+\subsection{Algorithms}
+
+\begin{algorithm} % enter the algorithm environment
+	\caption{Block membership sample generation} % give the algorithm a caption
+	\label{alg:b-samples} % and a label for \ref{} commands later in the document
+	\begin{algorithmic} % enter the algorithmic environment
+		
+		\FOR{$t \in \{0, 1 \dots T_b - 1\}$}
+		\STATE $b' \gets \sim q_b(b^{(t)}, b' | A)$
+		\STATE $\log \alpha_b \gets \log \alpha_b(b^{(t)}, b' | A)$
+		\STATE $\eta \gets \sim \textrm{Unif}(0,1)$
+		\IF{$\log \eta < \log \alpha_b$}
+		\STATE $b^{(t+1)} \gets b'$
+		\ELSE
+		\STATE $b^{(t+1)} \gets b^{(t)}$
+		\ENDIF
+		\ENDFOR
+		
+		\STATE \textbf{return} $\{b^{(t)}\}_{t=1}^{T_b}$
+		
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm} % enter the algorithm environment
+	\caption{FFBM parameter pseudo-marginal inference} % give the algorithm a caption
+	\label{alg:theta-samples} % and a label for \ref{} commands later in the document
+	\begin{algorithmic} % enter the algorithmic environment
+		
+		\STATE $\hat{Y}_{ij} \gets \frac{1}{\mathcal{|S|}} \sum_{t \in \mathcal{S}} \one \{ b^{(t)}_i = j\} \quad \forall i,j$
+		
+		\item[]
+		
+		\FOR{$t \in \{0, 1 \dots T_\theta - 1\}$}
+		\STATE $\xi \gets \sim \Gaussian(0, I)$
+		\STATE $\theta' \gets \theta^{(t)} - h_t \nabla U(\theta^{(t)} | X, \hat{Y}) + \sqrt{2h_t} \cdot \xi$
+		\STATE $\log \alpha_\theta \gets \log \alpha_\theta(\theta^{(t)}, \theta' | A, \hat{Y})$
+		\STATE $\eta \gets \sim \textrm{Unif}(0,1)$
+		\IF{$\log \eta < \log \alpha_\theta$}
+		\STATE $\theta^{(t+1)} \gets \theta'$
+		\ELSE
+		\STATE $\theta^{(t+1)} \gets \theta^{(t)}$
+		\ENDIF
+		\ENDFOR
+		
+		\STATE \textbf{return} $\{\theta^{(t)}\}_{t=1}^{T_\theta}$
+		
+	\end{algorithmic}
+\end{algorithm}

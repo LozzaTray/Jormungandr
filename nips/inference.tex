@@ -174,56 +174,6 @@ We obtain an unbiased estimate for this quantity as simply the empirical distrib
 %
 We therefore, choose to feed each $\theta^{(t)}$ update step the same $\hat{y}_{ij}$ for all $t$ rather than the corresponding $y^{(t)}_{ij}$. This means we no longer need to run the $b$ and $\theta$ Markov chains concurrently. Instead, we run the $b$-chain to completion and use it to generate $\hat{y}_{ij}$ for $i \in \{1 \dots N\}$ and $j \in \{1 \dots B\}$. This is an estimate of $p(b | A, X)$ that we use for every iteration of the $\theta$ Markov chain. This affords us the flexibility to vary the number of samples we draw for $b$ and $\theta$; we refer to these as $T_b$ and $T_\theta$ henceforth. Furthermore, this changeover reduces the burn-in time for the $\theta$-chain by reducing the variance in our evaluation of $U$ and $\nabla U$.
 
-\begin{algorithm} % enter the algorithm environment
-	\caption{Block membership sample generation} % give the algorithm a caption
-	\label{alg:b-samples} % and a label for \ref{} commands later in the document
-	\begin{algorithmic} % enter the algorithmic environment
-		
-		\FOR{$t \in \{0, 1 \dots T_b - 1\}$}
-		\STATE $b' \gets \sim q_b(b^{(t)}, b' | A)$
-		\STATE $\log \alpha_b \gets \log \alpha_b(b^{(t)}, b' | A)$
-		\STATE $\eta \gets \sim \textrm{Unif}(0,1)$
-		\IF{$\log \eta < \log \alpha_b$}
-		\STATE $b^{(t+1)} \gets b'$
-		\ELSE
-		\STATE $b^{(t+1)} \gets b^{(t)}$
-		\ENDIF
-		\ENDFOR
-		
-		\STATE \textbf{return} $\{b^{(t)}\}_{t=1}^{T_b}$
-		
-	\end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm} % enter the algorithm environment
-	\caption{FFBM parameter pseudo-marginal inference} % give the algorithm a caption
-	\label{alg:theta-samples} % and a label for \ref{} commands later in the document
-	\begin{algorithmic} % enter the algorithmic environment
-		
-		\STATE $\mathcal{S} \gets \textrm{range}(\textrm{burn-in}, T_b, \textrm{thinning})$
-		\STATE $\hat{Y}_{ij} \gets \frac{1}{\mathcal{|S|}} \sum_{t \in \mathcal{S}} \one \{ b^{(t)}_i = j\} \quad \forall i,j$
-		
-		\item[]
-		
-		\FOR{$t \in \{0, 1 \dots T_\theta - 1\}$}
-		\STATE $\xi \gets \sim \Gaussian(0, I)$
-		\STATE $\theta' \gets \theta^{(t)} - h_t \nabla U(\theta^{(t)} | X, \hat{Y}) + \sqrt{2h_t} \cdot \xi$
-		\STATE $\log \alpha_\theta \gets \log \alpha_\theta(\theta^{(t)}, \theta' | A, \hat{Y})$
-		\STATE $\eta \gets \sim \textrm{Unif}(0,1)$
-		\IF{$\log \eta < \log \alpha_\theta$}
-		\STATE $\theta^{(t+1)} \gets \theta'$
-		\ELSE
-		\STATE $\theta^{(t+1)} \gets \theta^{(t)}$
-		\ENDIF
-		\ENDFOR
-		
-		\STATE \textbf{return} $\{\theta^{(t)}\}_{t=1}^{T_\theta}$
-		
-	\end{algorithmic}
-\end{algorithm}
-
-\subsection{Complexity Analysis}
-
 \subsection{Choosing the number of blocks}
 
 For the purposes of our model (the FFBM), the number of blocks $B$ is a constant which must be specified by the data scientist. We could however, allow our choice of $B$ to be influenced by the observed data. This places us in the domain of empirical Bayes, which must be negotiated carefully. Prior beliefs must be determined a priori else they are not prior. However, as the number of blocks only specifies the coarseness of the analysis, it is fine to allow it to vary. Indeed, \citet{peixoto-determine-B} shows that for a fixed average degree the maximum number of detectable blocks scales as $O(\sqrt{N})$ where $N$ is the number of vertices.
