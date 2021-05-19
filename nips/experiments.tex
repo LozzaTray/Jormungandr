@@ -8,9 +8,10 @@ We apply the developed methods to a variety of datasets, to show the power of th
 	\item \textbf{Law firm} \cite{LawFirm} - a network of relationships between members of a law firm. Each relationship is categorised according to type: coworkers, friends or advice.
 	\item \textbf{Maier Facebook Egonet} \cite{FB-Maier}  ($N=349, E=2336, D=32$) - egonet of the author's Facebook friends list. Each vertex has been manually labelled with a variety of features describing their relationship to the author. For our purposes we remove all nodes of degree 1 (those that are only connected to the egonode) as these cannot be said to be part of any community present in the graph.
 	\item \textbf{Twitch users} \cite{twitch} - a network of user-user friendships on the streaming service Twitch. Vertex labels are extracted according to video-games played, location and streaming habits. This dataset is also broken down into disjoint networks according to language. We only consider the English users with is a subnet with $N=7126$ vertices and $E=35324$ edges).
+	\item \textbf{Political books} \cite{polbooks} ($N=105, E=441, D=1$) - network of Amazon book sales about U.S. politics, published close to the presidential election in 2004. Two books are connected if they were frequently co-purchased on Amazon. Vertex features encode the broad political affiliation of the author (liberal, conservative, neutral).
 \end{itemize}
 
-A table summarising the results is given in table \ref{tab:results}.
+We require metrics to assess the relative model evidence for the FFBM. . A table summarising the results is given in table \ref{tab:results}.
 
 \begin{table}[!h]
 	\centering
@@ -18,9 +19,10 @@ A table summarising the results is given in table \ref{tab:results}.
 	\label{tab:results}
 	\begin{tabular}{c|ccc|c|cc}
 		Dataset & $N$ & $E$ & $D$ & $B$ & $\bar{S}_b /N$ & $\bar{U}_\theta /N$ \\ \hline
+		Political books & 105  & 441 & 1 & 3 & 11.7 & 0.707 \\
 		Primary school & 238 & 5539 & 13 &  18 & 43.0  & 2.75 \\
 		Maier FB egonet &  &     &     &   &           &             \\
-		&     &     &     &              &     &       
+		       
 	\end{tabular}
 \end{table}
 
