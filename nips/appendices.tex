@@ -146,8 +146,24 @@ Where $a, b, \gamma$ are hyper-parameters to be chosen. We require $a,b > 0$ and
 	\end{algorithmic}
 \end{algorithm}
 
-\subsection{Implementation details}
+\subsection{Inferring the number of blocks}
 
-The majority of data analysis was conducted using Python. Full source code is available at:
+For the purposes of our model (the FFBM), the number of blocks $B$ is a constant which must be specified by the data scientist. We could however, allow our choice of $B$ to be influenced by the observed data. This places us in the domain of empirical Bayes, which must be negotiated carefully. Prior beliefs must be determined a priori else they are not prior. However, as the number of blocks only specifies the coarseness of the analysis, it is fine to allow it to vary. Indeed, \citet{peixoto-determine-B} shows that for a fixed average degree the maximum number of detectable blocks scales as $O(\sqrt{N})$ where $N$ is the number of vertices.
+
+If we allow $B$ to vary in the $b$-chain (i.e. new blocks can be created and we permit empty blocks) then it can be run  until a minimum description length (MDL) solution is reached. We take the number of non-empty blocks at the MDL to be our fixed block number $B$ for subsequent analysis. Indeed, it is prudent to start our $b$-chain at this MDL solution as then the burn-in time is greatly reduced.
+
+\subsection{Implementation details}
+\label{sec:imp-details}
+
+All data analysis and visualisation was implemented in Python. Full source code is available at:
 
 \url{https://github.com/LozzaTray/Jormungandr}
+
+The scripts were run using a standard PC. Specs are:
+
+\begin{itemize}
+	\item \textbf{CPU}: Intel(R) Core(TM) i7-1065G7
+	\item \textbf{RAM}: 8GB
+	\item \textbf{GPU}: Intel(R) Iris(R) Plus Graphics
+\end{itemize}
+
