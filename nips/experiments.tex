@@ -6,14 +6,16 @@ We apply the developed methods to a variety of datasets, to show the power of th
 	\item \textbf{Primary school dynamic contacts} \cite{schools} ($N=238, E=5539, D=13$) - network of face-to-face contacts amongst students and teachers at a primary school in Lyon, France. Two nodes are connected if the two parties shared a face-to-face interaction over the course of the day. Vertex features include class membership, gender and whether or not the student is a teacher or pupil. These data were collected on consecutive days in October 2009. We choose to analyse just the second day. 
 	\item \textbf{College football teams} \cite{Evans_2010_football} - network of American college football teams and their interactions. Vertex labels are the division a team belongs to.
 	\item \textbf{Law firm} \cite{LawFirm} - a network of relationships between members of a law firm. Each relationship is categorised according to type: coworkers, friends or advice.
-	\item \textbf{Maier Facebook Egonet} \cite{FB-Maier} - network of the author's Facebook friends list. Each vertex has been manually labelled with a variety of features describing their relationship to the author.
+	\item \textbf{Maier Facebook Egonet} \cite{FB-Maier}  ($N=349, E=2336, D=32$) - egonet of the author's Facebook friends list. Each vertex has been manually labelled with a variety of features describing their relationship to the author. For our purposes we remove all nodes of degree 1 (those that are only connected to the egonode) as these cannot be said to be part of any community present in the graph.
 	\item \textbf{Twitch users} \cite{twitch} - a network of user-user friendships on the streaming service Twitch. Vertex labels are extracted according to video-games played, location and streaming habits. This dataset is also broken down into disjoint networks according to language. We only consider the English users with is a subnet with $N=7126$ vertices and $E=35324$ edges).
 \end{itemize}
 
 A table summarising the results is given in table \ref{tab:results}.
 
-\begin{table}[]
+\begin{table}[!h]
 	\centering
+	\caption{FFBM fit for various datasets}
+	\label{tab:results}
 	\begin{tabular}{c|ccc|c|cc}
 		Dataset & $N$ & $E$ & $D$ & $B$ & $\bar{S}_b /N$ & $\bar{U}_\theta /N$ \\ \hline
 		Primary school & 238 & 5539 & 13 &  18 & 43.0  & 2.75 \\
