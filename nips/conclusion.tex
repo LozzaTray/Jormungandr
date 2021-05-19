@@ -1,1 +1,5 @@
 \section{Conclusion}
+
+The FFBM was developed to address the shortcomings of other graphical models when trying to test how vertex features affect graphical. The idea is to divide the graph into its most natural partition and only then bring in the vertex features to determine which ones best predict the partition. The inference algorithm proposed sidesteps an expensive summation over all latent block-states through the use of the microcanonical rather than the traditional SBM
+
+The overall method is shown to be effective at extracting and describing the most natural communities in a labelled network. Nevertheless, the approach can only currently explain the structure on the macro-scale. Future work may benefit from extending the FFBM to be hierarchical in nature. That way, the structure of the network can be explained at each length-scale.

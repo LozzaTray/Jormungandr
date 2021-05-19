@@ -179,3 +179,30 @@ We therefore, choose to feed each $\theta^{(t)}$ update step the same $\hat{y}_{
 For the purposes of our model (the FFBM), the number of blocks $B$ is a constant which must be specified by the data scientist. We could however, allow our choice of $B$ to be influenced by the observed data. This places us in the domain of empirical Bayes, which must be negotiated carefully. Prior beliefs must be determined a priori else they are not prior. However, as the number of blocks only specifies the coarseness of the analysis, it is fine to allow it to vary. Indeed, \citet{peixoto-determine-B} shows that for a fixed average degree the maximum number of detectable blocks scales as $O(\sqrt{N})$ where $N$ is the number of vertices.
 
 If we allow $B$ to vary in the $b$-chain (i.e. new blocks can be created and we permit empty blocks) then it can be run  until a minimum description length (MDL) solution is reached. We take the number of non-empty blocks at the MDL to be our fixed block number $B$ for subsequent analysis. Indeed, it is prudent to start our $b$-chain at this MDL solution as then the burn-in time is greatly reduced.
+
+\subsection{Dimensionality reduction}
+
+Once we have the samples $\left\{ \theta^{(t)} \right\}_{t=1}^{T_\theta} \sim p(\theta | A, X)$, we can compute the empirical mean and standard deviation of each component of $\theta$. Switching back to matrix notation we define $\theta = W$, such that $W_{ij}$ is the weight component for block $i$ and feature $j$, we can define:
+%
+\begin{equation}
+	\hat{\mu}_{ij} \coloneqq \frac{1}{T_\theta} \sum_{t=1}^{T_\theta} W_{ij}^{(t)} \qquad \textrm{and} \qquad
+	\hat{\sigma_{ij}} \coloneqq \frac{1}{T_\theta} \sum_{t=1}^{T_\theta} \left( W_{ij}^{(t)} - \hat{\mu}_{ij} \right)^2
+\end{equation}
+%
+A simple heuristic to discard the least important features requires specifying a cutoff $c > 0$ and a multiplier $k > 0$. We then discard all features $j$ wuch that equation \ref{eqn:discard} is satisfied.
+%
+\begin{equation}
+	(\hat{\mu}_{ij} - k \hat{\sigma}_{ij}, \hat{\mu}_{ij} + k \hat{\sigma}_{ij}) \cap (-c, +c) = \emptyset \quad \forall i \in \{1,2 \dots B\}
+	\label{eqn:discard}
+\end{equation}
+%
+Intuitively, this means discarding any feature for which $\hat{\mu}_{ij} \pm k\hat{\sigma_{ij}}$ lies within or spans the null region $(-c, c)$. If we were to use the Laplace approximation for the posterior $p(W_{ij} | A, X) \approx \Gaussian(W_{ij}; \mu_{ij}, \sigma_{ij})$, then this is effectively a hypothesis test on the value of $W_{ij}$.
+%
+\begin{equation}
+	\begin{aligned}
+		H_0&: |W_{ij}| \leq c \\
+		H_1&: |W_{ij}| > c
+	\end{aligned}
+\end{equation}
+%
+With the multiplier $k$ specifying the degree of significance of the result (equivalent to the probability of a type-1 error). However, as the approximation is not exact we will only treat this dimensionality reduction method as a useful heuristic.
