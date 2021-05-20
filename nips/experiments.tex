@@ -1,6 +1,6 @@
 \section{Experiments}
 
-We apply the developed methods to a variety of datasets, to show the power of the method across different scenarios. We choose datasets to span a range of node counts $N$, edge counts $E$ and feature space dimension $D$.
+We apply the developed methods to a variety of datasets, to show the power of the method across different scenarios. We choose datasets to span a range of node counts $N$, edge counts $E$ and feature space dimension $D$. We consider the following datasets:
 
 \begin{itemize}
 	\item \textbf{Political books} \cite{polbooks} ($N=105, E=441, D=3$) - network of Amazon book sales about U.S. politics, published close to the presidential election in 2004. Two books are connected if they were frequently co-purchased by the same customer. Vertex features encode the broad political affiliation of the author (liberal, conservative or neutral).
@@ -17,24 +17,35 @@ We apply the developed methods to a variety of datasets, to show the power of th
 
 \end{itemize}
 
-We require metrics to assess the relative model evidence for the FFBM. This can be split into two separate components: the microcanonical SBM fit (concerned with the $b$-samples) and the fit of the feature-to-block generator (concerned with the $\theta$-samples). For each of these we can evaluate the mean of the unnormalised log-target of each Markov chain.
+We require metrics to assess the relative model evidence for the FFBM. This can be split into two separate components: the microcanonical SBM fit (concerned with the $b$-samples) and the fit of the feature-to-block generator (concerned with the $\theta$-samples). The SBM has been extensively analysed in other works \cite{Peixoto-Bayesian-Microcanonical} so that will not be the emphasis of our analysis. We use a simple metric to gauge its fit: the mean description length per node of the $b$-samples (equation \ref{eqn:mean-dl}).
 %
 \begin{equation}
-	\bar{S}_b \coloneqq \frac{1}{T_b} \sum_{t=1}^{T_b} S \left( b^{(t)} \right) \qquad \textrm{and} \qquad
-	\bar{U}_\theta \coloneqq \frac{1}{T_\theta} \sum_{t=1}^{T_\theta} U \left( \theta^{(t)} \right)
+	\frac{1}{N} \bar{S}_b \coloneqq \frac{1}{N |\Tcal_b|} \sum_{t\in \Tcal_b} S \left( b^{(t)} \right)
+	\label{eqn:mean-dl}
 \end{equation}
 %
-The lower these quantities, the better the fit of each stage of the model. To allow for rough comparison between datasets, we divide these quantities by the number of vertices in the graph $N$. Table \ref{tab:results} summarises the results for each experiment.
+However, to assess the performance of the feature-to-block predictor, we must partition the vertex set $[N]$ into training and test sets -- $\Gcal_0$ and $\Gcal_1$ respectively\footnote{We choose to randomly create the partition on each experiment run such that 80\% of the available vertices form our training set $\Gcal$ and the remaining 20\% are held out to form our test set $\Gcal^C$}. The $b$-chain is run using the whole network but we only use vertices $v \in \Gcal$ to train the $\theta$-chain. As $|\Gcal_0| \neq |\Gcal_1|$ sets, we cannot use the un-normalised log target $U$ (equation \ref{eqn:U-form}) for comparison between the two, as the prior term will be equal between the two but the total cross-entropy loss will be scaled by the size of each set. We therefore must use the average cross-entropy loss over each set (equation \ref{eqn:cross-entropy-loss}).
+%
+\begin{equation}
+	\bar{\Lcal}_a \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \Lcal_a \left( \theta^{(t)} \right)
+	\qquad \textrm{where} \qquad
+	\Lcal_a \left( \theta^{(t)} \right) \coloneqq \frac{1}{|\Gcal_a|} \sum_{i \in \Gcal_a}\sum_{j \in [B]} \hat{y}_{ij} \log \frac{1}{\phi_j \left(x_i; \theta^{(t)} \right)}
+	\label{eqn:cross-entropy-loss}
+\end{equation}
+%
+Where $a \in \{0, 1\}$ has been introduced to toggle between training and test sets. Table \ref{tab:results} summarises the results for each experiment. We run each experiment 5 times with the same hyperparameter values\footnote{TODO hyperparam values} and report the mean plus or minus one standard deviation.
+
+However, we also wish to determine the power of the dimensionality reduction method. For this we discard all features that satisfy equation \ref{eqn:discard}, to reduce the dimension from $D$ to $D'$. We then retrain the feature-block predictor using just the retained features and report the loss over the training and test sets for the reduced classifier -- denoted $\bar{\Lcal}_0'$ and $\bar{\Lcal}_1'$ respectively. These are also
 
 \begin{table}[!h]
 	\centering
-	\caption{FFBM fit for the datasets}
+	\caption{Table of results}
 	\label{tab:results}
-	\begin{tabular}{c|ccc|c|cc}
-		Dataset & $N$ & $E$ & $D$ & $B$ & $\bar{S}_b /N$ & $\bar{U}_\theta /N$ \\ \hline
-		Political books & 105  & 441 & 3 & 3 & 11.7 & 0.707 \\
-		Primary school & 238 & 5539 & 13 &  10 & 45.9  & 1.61 \\
-		FB egonet & 747 & 30025 & 480 & 10  & 66.9 & 7.47
+	\begin{tabular}{c|ccc|c|c|cc|c|cc}
+		Dataset & $N$ & $E$ & $D$ & $B$ & $\bar{S}_b /N$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $D'$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$  \\ \hline
+		Polbooks & 105  & 441 & 3 & 3 & 11.7 & &&--&--&-- \\
+		School & 238 & 5539 & 13 &  10 & 45.9  & &&10&& \\
+		FB egonet & 747 & 30025 & 480 & 10  & 66.9 & &&&&
 	\end{tabular}
 \end{table}
 
