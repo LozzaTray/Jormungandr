@@ -90,6 +90,7 @@ Since we are using the microcanonical SBM formulation, there is only one value o
 %
 \begin{equation}
 	S(b) = - \log \pi_b(b) = - \Big( \log p(A | b, \psi^*) + \log p(\psi^*, b | X) \Big)
+	\label{eqn:dl-form}
 \end{equation}
 %
 This entropy can be thought of as the description length of the graph because it is the sum of the information required to represent the graph given the parameters and the amount of information required to store the parameters (given the feature matrix $X$). The exact, from of the proposal distribution and accept-reject step is explored throughly by \citet{Peixoto-MCMC}. There is a widely used library for Python made available under LGPL called \verb*|graph-tool| \cite{peixoto_graph-tool_2014}, which implements this algorithm. The only modification we make is in the block membership prior $p(b)$ which we replace with $p(b|X)=B^{-N}$ which is a uniform distribution and so cancels out in the MH accept-reject step.

@@ -17,10 +17,10 @@ We apply the developed methods to a variety of datasets, to show the power of th
 
 \end{itemize}
 
-We require metrics to assess the relative model evidence for the FFBM. This can be split into two separate components: the microcanonical SBM fit (concerned with the $b$-samples) and the fit of the feature-to-block generator (concerned with the $\theta$-samples). The SBM has been extensively analysed in other works \cite{Peixoto-Bayesian-Microcanonical} so that will not be the emphasis of our analysis. We use a simple metric to gauge its fit: the mean description length per node of the $b$-samples (equation \ref{eqn:mean-dl}).
+We require metrics to assess the relative model evidence for the FFBM. This can be split into two separate components: the microcanonical SBM fit (concerned with the $b$-samples) and the fit of the feature-to-block generator (concerned with the $\theta$-samples). The SBM has been extensively analysed in other works \cite{Peixoto-Bayesian-Microcanonical} so that will not be the emphasis of our analysis. $S(b)$ (equation \ref{eqn:dl-form}) can be interpreted as the description length of the partition imposed by $b$. In other words this is the amount of information needed to describe the graph and the associated SBM parameters. It is only natural to divide this quantity by the number of entities (nodes and edges) in our graph $N+E$ to allow for rough comparison between graphs. We use a simple metric to gauge the fit of the SBM: the description length per entity averaged over the $b$-samples (equation \ref{eqn:mean-dl}):
 %
 \begin{equation}
-	\frac{1}{N} \bar{S}_b \coloneqq \frac{1}{N |\Tcal_b|} \sum_{t\in \Tcal_b} S \left( b^{(t)} \right)
+	\bar{S}_e \coloneqq \frac{1}{(N+E) |\Tcal_b|} \sum_{t\in \Tcal_b} S \left( b^{(t)} \right)
 	\label{eqn:mean-dl}
 \end{equation}
 %
@@ -35,18 +35,20 @@ However, to assess the performance of the feature-to-block predictor, we must pa
 %
 Where $a \in \{0, 1\}$ has been introduced to toggle between training and test sets. Table \ref{tab:results} summarises the results for each experiment. We run each experiment 5 times with the same hyperparameter values\footnote{TODO hyperparam values} and report the mean plus or minus one standard deviation.
 
-However, we also wish to determine the power of the dimensionality reduction method. For this we discard all features that satisfy equation \ref{eqn:discard}, to reduce the dimension from $D$ to $D'$. We then retrain the feature-block predictor using just the retained features and report the loss over the training and test sets for the reduced classifier -- denoted $\bar{\Lcal}_0'$ and $\bar{\Lcal}_1'$ respectively. These are also
+However, we also wish to determine the power of the dimensionality reduction method. For this we discard all features that satisfy equation \ref{eqn:discard}, to reduce the dimension from $D$ to $D'$. We then retrain the feature-block predictor using just the retained features and report the loss over the training and test sets for the reduced classifier -- denoted $\bar{\Lcal}_0'$ and $\bar{\Lcal}_1'$ respectively. These values are also included in the table except for the polbooks dataset as this is already very low.
 
 \begin{table}[!h]
 	\centering
-	\caption{Table of results}
+	\caption{Results}
 	\label{tab:results}
-	\begin{tabular}{c|ccc|c|c|cc|c|cc}
-		Dataset & $N$ & $E$ & $D$ & $B$ & $\bar{S}_b /N$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $D'$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$  \\ \hline
-		Polbooks & 105  & 441 & 3 & 3 & 11.7 & &&--&--&-- \\
-		School & 238 & 5539 & 13 &  10 & 45.9  & &&10&& \\
-		FB egonet & 747 & 30025 & 480 & 10  & 66.9 & &&&&
+	\resizebox{\textwidth}{!}{%
+	\begin{tabular}{c|c|c|c|cc|c|cc}
+		Dataset  & $B$ & $\bar{S}_e$ & D & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $D'$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$  \\ \hline
+		Polbooks & 3 & $2.250 \pm 0.000$ & 3 & $0.550 \pm 0.023$ & $0.605 \pm 0.081$ &--&--&-- \\
+		School & 10 & $1.900 \pm 0.011$ & 13 & $0.778 \pm 0.066$ & $0.929 \pm 0.158$ &10 & $0.760 \pm 0.058$ & $0.847 \pm 0.148$ \\
+		FB egonet & 10  & 66.9 & 480 & & & & &
 	\end{tabular}
+	}
 \end{table}
 
 \FloatBarrier
