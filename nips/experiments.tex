@@ -24,7 +24,9 @@ We require metrics to assess the relative model evidence for the FFBM. This can 
 	\label{eqn:mean-dl}
 \end{equation}
 %
-However, to assess the performance of the feature-to-block predictor, we must partition the vertex set $[N]$ into training and test sets -- $\Gcal_0$ and $\Gcal_1$ respectively\footnote{We choose to randomly create the partition on each experiment run such that 80\% of the available vertices form our training set $\Gcal$ and the remaining 20\% are held out to form our test set $\Gcal^C$}. The $b$-chain is run using the whole network but we only use vertices $v \in \Gcal$ to train the $\theta$-chain. As $|\Gcal_0| \neq |\Gcal_1|$ sets, we cannot use the un-normalised log target $U$ (equation \ref{eqn:U-form}) for comparison between the two, as the prior term will be equal between the two but the total cross-entropy loss will be scaled by the size of each set. We therefore must use the average cross-entropy loss over each set (equation \ref{eqn:cross-entropy-loss}).
+However, to assess the performance of the feature-to-block predictor, we must partition the vertex set $[N]$ into training and test sets -- $\Gcal_0$ and $\Gcal_1$ respectively
+\footnote{We choose to randomly create the partition on each experiment run such that a fraction $f$ of the available vertices form our training set $\Gcal$ and the remaining vertices are held out to form our test set $\Gcal^C$. For all the experiments $f=0.7$.}
+. The $b$-chain is run using the whole network but we only use vertices $v \in \Gcal$ to train the $\theta$-chain. As $|\Gcal_0| \neq |\Gcal_1|$ sets, we cannot use the un-normalised log target $U$ (equation \ref{eqn:U-form}) for comparison between the two, as the prior term will be equal between the two but the total cross-entropy loss will be scaled by the size of each set. We therefore must use the average cross-entropy loss over each set (equation \ref{eqn:cross-entropy-loss}).
 %
 \begin{equation}
 	\bar{\Lcal}_a \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \Lcal_a \left( \theta^{(t)} \right)
@@ -42,11 +44,11 @@ However, we also wish to determine the power of the dimensionality reduction met
 	\caption{Results}
 	\label{tab:results}
 	\resizebox{\textwidth}{!}{%
-	\begin{tabular}{c|c|c|c|cc|c|cc}
-		Dataset  & $B$ & $\bar{S}_e$ & D & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $D'$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$  \\ \hline
-		Polbooks & 3 & $2.250 \pm 0.000$ & 3 & $0.550 \pm 0.023$ & $0.605 \pm 0.081$ &--&--&-- \\
-		School & 10 & $1.900 \pm 0.011$ & 13 & $0.778 \pm 0.066$ & $0.929 \pm 0.158$ &10 & $0.760 \pm 0.058$ & $0.847 \pm 0.148$ \\
-		FB egonet & 10  & 66.9 & 480 & & & & &
+	\begin{tabular}{c|ccc|c|cc|ccc}
+		Dataset  & $B$ & $D$ & $D'$ & $\bar{S}_e$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $c^*$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$  \\ \hline
+		Polbooks & 3 & 3 & -- & $2.250 \pm 0.001$ & $0.584 \pm 0.033$ & $0.557 \pm 0.061$ & -- & -- & -- \\
+		School & 10 & 13 & 10 & $1.895 \pm 0.006$ & $0.789 \pm 0.109$ & $0.876 \pm 0.135$ & $1.114 \pm 0.224$ & $0.786 \pm 0.103$ & $0.833 \pm 0.126$ \\
+		FB egonet & 10  & 480 & 10 & & & & &
 	\end{tabular}
 	}
 \end{table}

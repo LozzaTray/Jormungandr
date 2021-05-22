@@ -92,10 +92,65 @@ There are two competing objectives when choosing the step-size $h_t$. On the one
 The first constraint ensures that we have cover sufficient distance to arrive at any arbitrary point in our domain, no matter the starting point. The second constraint ensures that once we converge to the mode rather than simply bouncing around it. \citet{Bayesian-SGLD} propose the following form for a polynomially decaying step-size which we adopt:
 %
 \begin{equation}
-	h_t = a(b + t)^{-\gamma}
+	h_t = \alpha(\beta + t)^{-\gamma}
 \end{equation}
 %
-Where $a, b, \gamma$ are hyper-parameters to be chosen. We require $a,b > 0$ and $\gamma \in (0.5, 1]$ to satisfy equation \ref{eqn:h-constraints}. We find empirically that $a=250, b=1000, \gamma=0.8$ yield good burn-in times for our MALA implementations.
+Where $\alpha, \beta, \gamma$ are hyper-parameters to be chosen. We require $\alpha,\beta > 0$ and $\gamma \in (0.5, 1]$ to satisfy equation \ref{eqn:h-constraints}. To reduce the number of hyperparameters we set these to have values given by equation \ref{eqn:step-size-params}.
+%
+\begin{equation}
+	\alpha = \frac{250 \cdot s}{N} \qquad \beta = 1000 \qquad \gamma = 0.8
+	\label{eqn:step-size-params}
+\end{equation}
+%
+Where $N$ is the number of data-points we are considering and now $s$ is the only free variable which we call the step-size scaling.
+
+\subsection{Burn-in and thinning}
+
+As with any MCMC method, we must deal with the issues presented by burn-in and thinning. We have introduced the notation $\Tcal_b$ and $\Tcal_\theta$ to denote the set of samples we keep from the $b$ and $\theta$ chains respectively. Note that we generate $T_b$ and $T_\theta$ samples total. The burn-in period refers to the time taken for the Markov Chain to converge to the stationary distribution. Sample thinning is necessary to ensure that neighbouring samples satisfy independence. However, as we do not leverage the independence property this is less important in our analysis. We can write the general set $\Tcal_\star$ as:
+%
+\begin{equation}
+	\Tcal_\star = \{T_\star \kappa_\star + i \lambda_\star :  
+	0 \leq i \leq \lfloor T_\star(1 - \kappa_\star) / \lambda_\star \rfloor \}
+\end{equation}
+%
+Where the parameter $\kappa_\star \in (0, 1)$ controls our burn-in and $\lambda_\star$ controls our thinning. $\kappa_\star$ can be determined by plotting the log-target (either $S(b^{(t)})$ or $U(\theta^{(t)})$ with respect to the epoch $t$. $\kappa_\star$ is then chosen to encompass the region where the log-target has roughly equilibrated. As we do not leverage sample independence $\lambda_\star$ can be chosen less rigorously. We often just use $\lambda_\star=5$
+
+\subsection{Hyperparameter values}
+
+\begin{table}[!h]
+	\centering
+	\caption{Hyperparameter values for each experiment}
+	\label{tab:hyperparams}
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{c|ccc|ccc|cccc|cc|cccc}
+			Dataset & 
+			$B$ & $f$ & $\sigma_\theta$ & 
+			$T_b$ & $\kappa_b$ & $\lambda_b$ & 
+			$T_\theta$ & $\kappa_\theta$ & $\lambda_\theta$ & $s$ &
+			$k$ & $D'$ &
+			$T_\theta'$ & $\kappa_\theta'$ & $\lambda_\theta'$ & $s'$
+			\\ \hline
+			Polbooks &
+			3 & 0.8 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.2 & 10 & 0.2 &
+			-- & -- & 
+			-- & -- & -- & -- \\
+			School &
+			10 & 0.8 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.2 & 10 & 0.2 &
+			1 & 10 & 
+			10,000 & 0.2 & 10 & 0.2 \\
+			FB Egonet &
+			10 & 0.8 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.2 & 10 & 0.2 &
+			1 & 10 & 
+			10,000 & 0.2 & 10 & 0.2 \\
+		\end{tabular}
+	}
+\end{table}
 
 \subsection{Algorithms}
 
@@ -146,11 +201,13 @@ Where $a, b, \gamma$ are hyper-parameters to be chosen. We require $a,b > 0$ and
 	\end{algorithmic}
 \end{algorithm}
 
+\FloatBarrier
+
 \subsection{Inferring the number of blocks}
 
 For the purposes of our model (the FFBM), the number of blocks $B$ is a constant which must be specified by the data scientist. We could however, allow our choice of $B$ to be influenced by the observed data. This places us in the domain of empirical Bayes, which must be negotiated carefully. Prior beliefs must be determined a priori else they are not prior. However, as the number of blocks only specifies the coarseness of the analysis, it is fine to allow it to vary. Indeed, \citet{peixoto-determine-B} shows that for a fixed average degree the maximum number of detectable blocks scales as $O(\sqrt{N})$ where $N$ is the number of vertices.
 
-If we allow $B$ to vary in the $b$-chain (i.e. new blocks can be created and we permit empty blocks) then it can be run  until a minimum description length (MDL) solution is reached. We take the number of non-empty blocks at the MDL to be our fixed block number $B$ for subsequent analysis. Indeed, it is prudent to start our $b$-chain at this MDL solution as then the burn-in time is greatly reduced.
+If we allow $B$ to vary in the $b$-chain (i.e. new blocks can be created and we permit empty blocks) then it can be run  until a minimum description length (MDL) solution is reached. We take the number of non-empty blocks at the MDL to be our fixed block number $B$ for subsequent analysis. Indeed, it is prudent to start our $b$-chain at this MDL solution as then we can neglect the burn-in time.
 
 \subsection{Implementation details}
 \label{sec:imp-details}

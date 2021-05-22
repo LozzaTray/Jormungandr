@@ -181,21 +181,25 @@ TODO: burn-in and thinning
 \subsection{Dimensionality reduction}
 \label{sec:dim-reduction}
 
-Once we have the samples $\left\{ \theta^{(t)} \right\}_{t=1}^{T_\theta} \sim p(\theta | A, X)$, we can compute the empirical mean and standard deviation of each component of $\theta$. Switching back to matrix notation we define $\theta = W$, such that $W_{ij}$ is the weight component for block $i$ and feature $j$, we can define:
+Once we have the samples $\left\{ \theta^{(t)} \right\} \sim p(\theta | A, X)$, we can compute the empirical mean and standard deviation of each component of $\theta$. Switching back to matrix notation we define $\theta = W$, such that $W_{ij}$ is the weight component for block $i$ and feature $j$, we can define:
 %
 \begin{equation}
 	\hat{\mu}_{ij} \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} W_{ij}^{(t)} \qquad \textrm{and} \qquad
 	\hat{\sigma}_{ij} \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \left( W_{ij}^{(t)} - \hat{\mu}_{ij} \right)^2
 \end{equation}
 %
-A simple heuristic to discard the least important features requires specifying a cutoff $c > 0$ and a multiplier $k > 0$. We then discard all features $j$ such that equation \ref{eqn:discard} is satisfied.
+A simple heuristic to discard the least important features requires specifying a cutoff $c > 0$ and a multiplier $k > 0$. We define the function $\Fcal_i(j)$ as in \ref{eqn:fij} then only keep features in $\Dcal'$ given by equation \ref{eqn:kept-feature-set}.
 %
 \begin{equation}
-	(\hat{\mu}_{ij} - k \hat{\sigma}_{ij}, \hat{\mu}_{ij} + k \hat{\sigma}_{ij}) \cap (-c, +c) = \emptyset \quad \forall i \in \{1,2 \dots B\}
-	\label{eqn:discard}
+	\Fcal_i(j) \coloneqq (\hat{\mu}_{ij} - k \hat{\sigma}_{ij}, \hat{\mu}_{ij} + k \hat{\sigma}_{ij}) \cap (-c, +c)
+	\label{eqn:fij}
+\end{equation}
+\begin{equation}
+	\Dcal' = \left\{ j \in [D] : \exists i \in [B] \textrm{ s.t. }  \Fcal_i(j) \neq \emptyset \right\}
+	\label{eqn:kept-feature-set}
 \end{equation}
 %
-Intuitively, this means discarding any feature for which $\hat{\mu}_{ij} \pm k\hat{\sigma_{ij}}$ lies within or spans the null region $(-c, c)$. If we were to use the Laplace approximation for the posterior $p(W_{ij} | A, X) \approx \Gaussian(W_{ij}; \mu_{ij}, \sigma_{ij})$, then this is effectively a hypothesis test on the value of $W_{ij}$.
+Intuitively, this means discarding any feature for which $\hat{\mu}_{ij} \pm k\hat{\sigma}_{ij}$ lies within or spans the null region $(-c, c)$ for all block indices. If we were to use the Laplace approximation for the posterior $p(W_{ij} | A, X) \approx \Gaussian(W_{ij}; \mu_{ij}, \sigma_{ij})$, then this is effectively a hypothesis test on the value of $W_{ij}$. $\Dcal'$ then comprises all features for which $H_1$ is accepted.
 %
 \begin{equation}
 	\begin{aligned}
@@ -204,4 +208,12 @@ Intuitively, this means discarding any feature for which $\hat{\mu}_{ij} \pm k\h
 	\end{aligned}
 \end{equation}
 %
-With the multiplier $k$ specifying the degree of significance of the result (equivalent to the probability of a type-1 error). However, as the approximation is not exact we will only treat this dimensionality reduction method as a useful heuristic and not an exact method.
+The multiplier $k$ specifies the degree of significance of the result (equivalent to the probability of a type-1 error). However, as the approximation is not exact we will only treat this dimensionality reduction method as a useful heuristic and not an exact method.
+
+Conversely, we could fix $k=k_0$ and the dimension of our reduced feature set $|\Dcal'|=D'$. We would then like to find the largest value of $c$ such that $|\Dcal'|=D'$ given $k=k_0$. This is summarised in equation \ref{eqn:c-star}. This approach may be preferred as it fixes the number of reduced dimensions.
+%
+\begin{equation}
+	c^* = \argmax_{c>0} (c : |\Dcal'| = D', k=k_0)
+	\label{eqn:c-star}
+\end{equation}
+%
