@@ -54,29 +54,71 @@ However, we also wish to determine the power of the dimensionality reduction met
 \end{table}
 
 \FloatBarrier
+
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}[t]{0.28\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{polbooks-graph.png}
+		\caption{Polbooks}
+		\label{fig:polbooks-graph}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.28\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{school-graph.png}
+		\caption{School}
+		\label{fig:school-graph}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.28\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{fb-graph.png}
+		\caption{Facebook egonet}
+		\label{fig:fb-graph}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.10\linewidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{10-vertical-legend.png}
+		\caption{Legend}
+		\label{fig:10-legend}
+	\end{subfigure}
+	\caption{Networks laid out and coloured according by inferred block memberships $\hat{y}$ for a given experiment iteration. Visualisation performed using \textit{graph-tool} \cite{peixoto_graph-tool_2014}}
+\end{figure}
+
+
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}[t]{0.32\linewidth}
+		\centering
+		\vskip 0pt
+		\includegraphics[width=\linewidth]{polbooks-null.png}
+		\caption{Polbooks}
+		\label{fig:polbooks-null}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.32\linewidth}
+		\centering
+		\vskip 0pt
+		\includegraphics[width=\linewidth]{school-null.png}
+		\caption{School}
+		\label{fig:school-null}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.32\linewidth}
+		\centering
+		\vskip 0pt
+		\includegraphics[width=\linewidth]{fb-null.png}
+		\caption{Facebook egonet}
+		\label{fig:fb-null}
+	\end{subfigure}
+	\caption{Reduced dimension feature-to-block generator weight samples}
+\end{figure}
+
 \subsection{Political books}
 
 This dataset was collected by \citet{polbooks}. We wish to determine whether political affiliation is a good predictor of the overall network structure. We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral). The inferred block memberships are given in figure \ref{fig:books-graph}. We sample the block-generator parameters and plot the emprical mean and standard deviation of each sample on figure \ref{fig:book-null}.
-%
-\begin{figure}[!h]
-	\centering
-	\begin{subfigure}{0.3\linewidth}
-		\centering
-		\includegraphics[width=\linewidth]{polbooks-graph.png}
-		\fbox{\includegraphics[width=0.4\linewidth]{3-legend.png}}
-		\caption{Sampled block memberships $\hat{Y}$}
-		\label{fig:books-graph}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}{0.5\linewidth}
-		\centering
-		\includegraphics[width=\linewidth]{polbooks-null.png}
-		\caption{Feature weights}
-		\label{fig:book-null}
-	\end{subfigure}
-	\caption{Political books network \cite{polbooks}}
-\end{figure}
-%
+
 Indeed, for all 3 blocks, each has a distinct political affiliation as its highest magnitude component. This is strong evidence that political affiliation is indeed the axis which best predicts the 3-way natural partition of the graph into blocks. Nevertheless, for block index 1, although \verb*|neutral| is the best predictor of the ones we have available, the value is not particularly extreme. Perhaps, there is an unobserved feature that places a book into this block. Indeed, block-0 is more of a centre-right block than true centre.
 
 \FloatBarrier
@@ -85,25 +127,6 @@ Indeed, for all 3 blocks, each has a distinct political affiliation as its highe
 These data were originally collected by \citet{schools} to quantify the transmission opportunities for respiratory infections. However, we seek to ask which vertex features best describe how people interact with one another in a primary school context. The only vertex features we have available are school-class (one of 10 values - 2 per year group), gender and a distinction between teachers and pupils.
 
 We must first choose the number of blocks $B$ to define the coarseness of our analysis. A total of 10 school-classes would suggest that $B=10$ is a natural starting point. We visualise the inferred block memberships in figure \ref{fig:school-graph}.
-%
-\begin{figure}[!h]
-	\centering
-	\begin{subfigure}{0.45\linewidth}
-		\centering
-		\includegraphics[width=\linewidth]{school-graph.png}
-		\fbox{\includegraphics[width=0.5\linewidth]{10-legend.png}}
-		\caption{Sampled block memberships $\hat{Y}$}
-		\label{fig:school-graph}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}{0.45\linewidth}
-		\centering
-		\includegraphics[width=\linewidth]{school-null.png}
-		\caption{Reduced dimension feature weights}
-		\label{fig:school-null}
-	\end{subfigure}
-	\caption{Primary school dynamic contacts network \cite{schools}}
-\end{figure}
 
 As before, we proceed to sample the block-generator parameters $\theta$ and employ the dimensionality reduction heuristic defined in section \ref{sec:dim-reduction} with null threshold $c=1$ and standard deviation multiplier $k=1$. We then plot the weights for the features that survive the discard step in figure \ref{sec:dim-reduction}. Immediately, we see that only the pupils' class memberships have survived (1A-5B); gender and teacher/student status have been discarded meaning that these are not good predictors of overall macro-structure.
 
@@ -114,25 +137,6 @@ The vast majority of blocks are composed of a single class. However, some blocks
 This dataset was chosen to showcase the power of the dimensionality reduction technique as the feature-space has high dimension ($D=480$). We sample the $b$-chain specifying $B=10$ total blocks and use this to construct the $\theta$-samples as before. 
 
 We apply the dimensionality reduction heuristic outlined in section \ref{sec:dim-reduction}, choosing $k=1$ and $c=0.8$. This leads to a reduced dimension $D'=13$. These parameter values are plotted on figure \ref{fig:fb-null}. The features that remain are those that best explain the high-level community structure. More so than language, gender or surname - the school\footnote{This includes higher education institutes} you attend is the best explanatory variable for how the observed network's communities are partitioned at the highest level. 
-%
-\begin{figure}[!h]
-	\centering
-	\begin{subfigure}{0.45\linewidth}
-		\centering
-		\includegraphics[width=\linewidth]{fb-graph.png}
-		\fbox{\includegraphics[width=0.3\linewidth]{10-legend.png}}
-		\caption{Sampled block memberships $\hat{Y}$}
-		\label{fig:fb-graph}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}{0.45\linewidth}
-		\centering
-		\includegraphics[width=\linewidth]{fb-null.png}
-		\caption{Reduced dimension feature weights}
-		\label{fig:fb-null}
-	\end{subfigure}
-	\caption{Facebook egonet id 1912 \cite{fb-snap}}
-\end{figure}
 
 Nevertheless, this example also highlights a weakness of the method for high-dimensional feature spaces. When the feature dimension is very large, it becomes increasingly likely that a particular feature may uniquely identify a small set of nodes. If these nodes are all part of the same community then the classifier will overfit for that particular parameter. The regularisation term imposed by the prior goes some way to alleviating this problem but we see in figure \ref{fig:fb-null} that the feature \verb*|birthday-5| has a very high weight as it relates to block 0. It might be possible to shift the feature values such that they take values in $\{-1, 1\}$ rather than $\{0, 1\}$ but this approach falls down when input features are mutually correlated. Indeed, for features with discrete values such as the class memberships (1A, 1B, 2A \dots 5B) it is preferred to keep $x_i \in \{0, 1\}^D$ as then each block can be readily accept more than one mutually exclusive feature-group (i.e. two school-classes are part of the same block).
 
