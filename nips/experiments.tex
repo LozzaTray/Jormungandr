@@ -35,7 +35,7 @@ However, to assess the performance of the feature-to-block predictor, we must pa
 	\label{eqn:cross-entropy-loss}
 \end{equation}
 %
-Where $a \in \{0, 1\}$ has been introduced to toggle between training and test sets. Table \ref{tab:results} summarises the results for each experiment. We run each experiment 5 times with the same hyperparameter values\footnote{TODO hyperparam values} and report the mean plus or minus one standard deviation.
+Where $a \in \{0, 1\}$ has been introduced to toggle between training and test sets. Table \ref{tab:results} summarises the results for each experiment. We run each experiment $n=10$ times with the same hyper-parameter values\footnote{For a comprehensive list of the hyper-parameters used for each experiment please see appendix \ref{appdx:hyperparams}} and report the mean plus or minus one standard deviation.
 
 However, we also wish to determine the power of the dimensionality reduction method. For this we discard all features that satisfy equation \ref{eqn:discard}, to reduce the dimension from $D$ to $D'$. We then retrain the feature-block predictor using just the retained features and report the loss over the training and test sets for the reduced classifier -- denoted $\bar{\Lcal}_0'$ and $\bar{\Lcal}_1'$ respectively. These values are also included in the table except for the polbooks dataset as this is already very low.
 
@@ -47,8 +47,8 @@ However, we also wish to determine the power of the dimensionality reduction met
 	\begin{tabular}{c|ccc|c|cc|ccc}
 		Dataset  & $B$ & $D$ & $D'$ & $\bar{S}_e$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $c^*$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$  \\ \hline
 		Polbooks & 3 & 3 & -- & $2.250 \pm 0.001$ & $0.584 \pm 0.033$ & $0.557 \pm 0.061$ & -- & -- & -- \\
-		School & 10 & 13 & 10 & $1.895 \pm 0.006$ & $0.789 \pm 0.109$ & $0.876 \pm 0.135$ & $1.114 \pm 0.224$ & $0.786 \pm 0.103$ & $0.833 \pm 0.126$ \\
-		FB egonet & 10  & 480 & 10 & & & & &
+		School & 10 & 13 & 10 & $1.894 \pm 0.006$ & $0.793 \pm 0.096$ & $0.914 \pm 0.112$ & $1.112 \pm 0.23$ & $0.791 \pm 0.096$ & $0.864 \pm 0.139$ \\
+		FB egonet & 10  & 480 & 10 & $1.626 \pm 0.003$ & $1.305 \pm 0.034$ & $1.539 \pm 0.087$ & $0.942 \pm 0.042$ & $1.496 \pm 0.093$ & $1.578 \pm 0.104$
 	\end{tabular}
 	}
 \end{table}

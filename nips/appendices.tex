@@ -105,6 +105,7 @@ Where $\alpha, \beta, \gamma$ are hyper-parameters to be chosen. We require $\al
 Where $N$ is the number of data-points we are considering and now $s$ is the only free variable which we call the step-size scaling.
 
 \subsection{Burn-in and thinning}
+\label{appdx:burn-in-thinning}
 
 As with any MCMC method, we must deal with the issues presented by burn-in and thinning. We have introduced the notation $\Tcal_b$ and $\Tcal_\theta$ to denote the set of samples we keep from the $b$ and $\theta$ chains respectively. Note that we generate $T_b$ and $T_\theta$ samples total. The burn-in period refers to the time taken for the Markov Chain to converge to the stationary distribution. Sample thinning is necessary to ensure that neighbouring samples satisfy independence. However, as we do not leverage the independence property this is less important in our analysis. We can write the general set $\Tcal_\star$ as:
 %
@@ -116,10 +117,11 @@ As with any MCMC method, we must deal with the issues presented by burn-in and t
 Where the parameter $\kappa_\star \in (0, 1)$ controls our burn-in and $\lambda_\star$ controls our thinning. $\kappa_\star$ can be determined by plotting the log-target (either $S(b^{(t)})$ or $U(\theta^{(t)})$ with respect to the epoch $t$. $\kappa_\star$ is then chosen to encompass the region where the log-target has roughly equilibrated. As we do not leverage sample independence $\lambda_\star$ can be chosen less rigorously. We often just use $\lambda_\star=5$
 
 \subsection{Hyperparameter values}
+\label{appdx:hyperparams}
 
 \begin{table}[!h]
 	\centering
-	\caption{Hyperparameter values for each experiment}
+	\caption{Hyper-parameter values for each experiment}
 	\label{tab:hyperparams}
 	\resizebox{\textwidth}{!}{%
 		\begin{tabular}{c|ccc|ccc|cccc|cc|cccc}
@@ -131,23 +133,23 @@ Where the parameter $\kappa_\star \in (0, 1)$ controls our burn-in and $\lambda_
 			$T_\theta'$ & $\kappa_\theta'$ & $\lambda_\theta'$ & $s'$
 			\\ \hline
 			Polbooks &
-			3 & 0.8 & 1 &
+			3 & 0.7 & 1 &
 			1,000 & 0.2 & 5 &
-			10,000 & 0.2 & 10 & 0.2 &
+			10,000 & 0.4 & 10 & 0.05 &
 			-- & -- & 
 			-- & -- & -- & -- \\
 			School &
-			10 & 0.8 & 1 &
+			10 & 0.7 & 1 &
 			1,000 & 0.2 & 5 &
-			10,000 & 0.2 & 10 & 0.2 &
+			10,000 & 0.4 & 10 & 0.2 &
 			1 & 10 & 
-			10,000 & 0.2 & 10 & 0.2 \\
+			10,000 & 0.4 & 10 & 0.2 \\
 			FB Egonet &
-			10 & 0.8 & 1 &
+			10 & 0.7 & 1 &
 			1,000 & 0.2 & 5 &
-			10,000 & 0.2 & 10 & 0.2 &
+			10,000 & 0.4 & 10 & 0.017 &
 			1 & 10 & 
-			10,000 & 0.2 & 10 & 0.2 \\
+			10,000 & 0.4 & 10 & 0.5 \\
 		\end{tabular}
 	}
 \end{table}

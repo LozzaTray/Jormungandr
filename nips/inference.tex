@@ -161,7 +161,7 @@ This fully specifies, the sampling procedure to generate $\{\theta^{(t)}\}_{t=1}
 
 \subsection{Sampling sequence}
 
-So far, each $\theta^{(t)}$ update uses its corresponding $b^{(t)}$ sample. This means that the evaluation of $U(\theta)$ and $\nabla U(\theta)$ has high variance. This may lead to longer burn-in and autocorrelation times of the resulting Markov Chain. The only link between $b^{(t)}$ and $\theta^{(t)}$ is in the evaluation of $U(\theta)$ and $\nabla U(\theta)$ which depends on $y_{ij}^{(t)} \coloneqq \one\{b_i^{(t)} = j\}$. We would rather deal with the expectation of each $y_{ij}^{(t)}$:
+So far, each $\theta^{(t)}$ update uses its corresponding $b^{(t)}$ sample. This means that the evaluation of $U(\theta)$ and $\nabla U(\theta)$ has high variance. This may lead to longer burn-in and autocorrelation times of the resulting Markov Chain. The only link between $b^{(t)}$ and $\theta^{(t)}$ is in the evaluation of $U(\theta)$ and $\nabla U(\theta)$ which depends only on $y_{ij}^{(t)} \coloneqq \one\{b_i^{(t)} = j\}$. We would rather deal with the expectation of each $y_{ij}^{(t)}$:
 %
 \begin{equation}
 	\Expect \left[ y_{ij}^{(t)} \right] = \Expect_{b^{(t)}} \left[ \one(b_{i}^{(t)} = j) \right]
@@ -171,12 +171,12 @@ So far, each $\theta^{(t)}$ update uses its corresponding $b^{(t)}$ sample. This
 We obtain an unbiased estimate for this quantity as simply the empirical distribution of the block membership samples $\left\{ b^{(t)} \right\}_{t=1}^T$.
 %
 \begin{equation}
-	\hat{y}_{ij} \coloneqq \frac{1}{T} \sum_{t=1}^{T} y_{ij}^{(t)} = \frac{1}{T} \sum_{t=1}^{T} \one\{b_i^{(t)} = j\}
+	\hat{y}_{ij} \coloneqq \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} y_{ij}^{(t)} = \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} \one\{b_i^{(t)} = j\}
 \end{equation}
 %
 We therefore, choose to feed each $\theta^{(t)}$ update step the same $\hat{y}_{ij}$ for all $t$ rather than the corresponding $y^{(t)}_{ij}$. This means we no longer need to run the $b$ and $\theta$ Markov chains concurrently. Instead, we run the $b$-chain to completion and use it to generate $\hat{y}_{ij}$ for $i \in \{1 \dots N\}$ and $j \in \{1 \dots B\}$. This is an estimate of $p(b | A, X)$ that we use for every iteration of the $\theta$ Markov chain. This affords us the flexibility to vary the number of samples we draw for $b$ and $\theta$; we refer to these as $T_b$ and $T_\theta$ henceforth. Furthermore, this changeover reduces the burn-in time for the $\theta$-chain by reducing the variance in our evaluation of $U$ and $\nabla U$.
 
-TODO: burn-in and thinning
+A more fleshed-out discussion of how we choose to thin our samples is given in appendix \ref{appdx:burn-in-thinning}
 
 \subsection{Dimensionality reduction}
 \label{sec:dim-reduction}
