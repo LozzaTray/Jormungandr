@@ -114,7 +114,7 @@ As with any MCMC method, we must deal with the issues presented by burn-in and t
 	0 \leq i \leq \lfloor T_\star(1 - \kappa_\star) / \lambda_\star \rfloor \}
 \end{equation}
 %
-Where the parameter $\kappa_\star \in (0, 1)$ controls our burn-in and $\lambda_\star$ controls our thinning. $\kappa_\star$ can be determined by plotting the log-target (either $S(b^{(t)})$ or $U(\theta^{(t)})$ with respect to the epoch $t$. $\kappa_\star$ is then chosen to encompass the region where the log-target has roughly equilibrated. As we do not leverage sample independence $\lambda_\star$ can be chosen less rigorously. We often just use $\lambda_\star=5$
+Where the parameter $\kappa_\star \in (0, 1)$ controls our burn-in and $\lambda_\star$ controls our thinning. $\kappa_\star$ can be determined by plotting the log-target (either $S(b^{(t)})$ or $U(\theta^{(t)})$ with respect to the epoch $t$. $\kappa_\star$ is then chosen to encompass the region where the log-target has roughly equilibrated. As we do not leverage sample independence $\lambda_\star$ can be chosen less rigorously. We often just use $\lambda_b=5$ and $\lambda_\theta = 10$.
 
 \subsection{Hyperparameter values}
 \label{appdx:hyperparams}
@@ -160,8 +160,8 @@ Where the parameter $\kappa_\star \in (0, 1)$ controls our burn-in and $\lambda_
 	\caption{Block membership sample generation} % give the algorithm a caption
 	\label{alg:b-samples} % and a label for \ref{} commands later in the document
 	\begin{algorithmic} % enter the algorithmic environment
-		
-		\FOR{$t \in \{0, 1 \dots T_b - 1\}$}
+		\STATE $b^{(0)} \gets \argmax_b S(b|A)$
+		\FOR{$t \in [T_b]$}
 		\STATE $b' \gets \sim q_b(b^{(t)}, b' | A)$
 		\STATE $\log \alpha_b \gets \log \alpha_b(b^{(t)}, b' | A)$
 		\STATE $\eta \gets \sim \textrm{Unif}(0,1)$
@@ -182,11 +182,12 @@ Where the parameter $\kappa_\star \in (0, 1)$ controls our burn-in and $\lambda_
 	\label{alg:theta-samples} % and a label for \ref{} commands later in the document
 	\begin{algorithmic} % enter the algorithmic environment
 		
-		\STATE $\hat{Y}_{ij} \gets \frac{1}{\mathcal{|S|}} \sum_{t \in \mathcal{S}} \one \{ b^{(t)}_i = j\} \quad \forall i,j$
+		\STATE $\hat{Y}_{ij} \gets \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} \one \{ b^{(t)}_i = j\} \quad \forall i,j$
+		\STATE $\theta^{(0)} \gets \sim \Gaussian(0, \sigma_\theta I)$
 		
 		\item[]
 		
-		\FOR{$t \in \{0, 1 \dots T_\theta - 1\}$}
+		\FOR{$t \in [T_\theta]$}
 		\STATE $\xi \gets \sim \Gaussian(0, I)$
 		\STATE $\theta' \gets \theta^{(t)} - h_t \nabla U(\theta^{(t)} | X, \hat{Y}) + \sqrt{2h_t} \cdot \xi$
 		\STATE $\log \alpha_\theta \gets \log \alpha_\theta(\theta^{(t)}, \theta' | A, \hat{Y})$
@@ -212,7 +213,7 @@ For the purposes of our model (the FFBM), the number of blocks $B$ is a constant
 If we allow $B$ to vary in the $b$-chain (i.e. new blocks can be created and we permit empty blocks) then it can be run  until a minimum description length (MDL) solution is reached. We take the number of non-empty blocks at the MDL to be our fixed block number $B$ for subsequent analysis. Indeed, it is prudent to start our $b$-chain at this MDL solution as then we can neglect the burn-in time.
 
 \subsection{Implementation details}
-\label{sec:imp-details}
+\label{appdx:imp-details}
 
 All data analysis and visualisation was implemented in Python. Full source code is available at:
 
@@ -225,4 +226,18 @@ The scripts were run using a standard PC. Specs are:
 	\item \textbf{RAM}: 8GB
 	\item \textbf{GPU}: Intel(R) Iris(R) Plus Graphics
 \end{itemize}
+
+On this hardware each experiment iteration took the following amount of time to execute:
+
+\begin{table}[!h]
+	\centering
+	\caption{Compute-time for each experiment}
+	\label{tab:compute-time}
+	\begin{tabular}{c|ccc|c}
+		Dataset & $b$-chain & $\theta$-chain & Reduced $\theta$-chain & Overall compute time \\ \hline
+		Polbooks & $\sim$1s & $\sim$4s & -- & $\sim$5s \\
+		School & $\sim$10s & $\sim$10s & $\sim$10s & $\sim$30s \\
+		FB Egonet & $\sim$20s & $\sim$180s & $\sim$10s & $\sim$210s
+	\end{tabular}
+\end{table}
 

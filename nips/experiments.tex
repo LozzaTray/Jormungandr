@@ -1,4 +1,5 @@
 \section{Experiments}
+\label{sec:experiments}
 
 We apply the developed methods to a variety of datasets, to show the power of the method across different scenarios. We choose datasets to span a range of node counts $N$, edge counts $E$ and feature space dimension $D$. We consider the following datasets:
 
@@ -29,31 +30,33 @@ However, to assess the performance of the feature-to-block predictor, we must pa
 . The $b$-chain is run using the whole network but we only use vertices $v \in \Gcal$ to train the $\theta$-chain. As $|\Gcal_0| \neq |\Gcal_1|$ sets, we cannot use the un-normalised log target $U$ (equation \ref{eqn:U-form}) for comparison between the two, as the prior term will be equal between the two but the total cross-entropy loss will be scaled by the size of each set. We therefore must use the average cross-entropy loss over each set (equation \ref{eqn:cross-entropy-loss}).
 %
 \begin{equation}
-	\bar{\Lcal}_a \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \Lcal_a \left( \theta^{(t)} \right)
+	\bar{\Lcal}_\star \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \Lcal_\star \left( \theta^{(t)} \right)
 	\qquad \textrm{where} \qquad
-	\Lcal_a \left( \theta^{(t)} \right) \coloneqq \frac{1}{|\Gcal_a|} \sum_{i \in \Gcal_a}\sum_{j \in [B]} \hat{y}_{ij} \log \frac{1}{\phi_j \left(x_i; \theta^{(t)} \right)}
+	\Lcal_\star \left( \theta^{(t)} \right) \coloneqq \frac{1}{|\Gcal_\star|} \sum_{i \in \Gcal_\star}\sum_{j \in [B]} \hat{y}_{ij} \log \frac{1}{\phi_j \left(x_i; \theta^{(t)} \right)}
 	\label{eqn:cross-entropy-loss}
 \end{equation}
 %
-Where $a \in \{0, 1\}$ has been introduced to toggle between training and test sets. Table \ref{tab:results} summarises the results for each experiment. We run each experiment $n=10$ times with the same hyper-parameter values\footnote{For a comprehensive list of the hyper-parameters used for each experiment please see appendix \ref{appdx:hyperparams}} and report the mean plus or minus one standard deviation.
+Where $\star \in \{0, 1\}$ has been introduced to toggle between training and test sets. Table \ref{tab:results} summarises the results for each experiment. We run each experiment $n=10$ times with the same hyper-parameter values\footnote{For a comprehensive list of the hyper-parameters used for each experiment please see appendix \ref{appdx:hyperparams}} and report the mean plus or minus one standard deviation.
 
-However, we also wish to determine the power of the dimensionality reduction method. For this we discard all features that satisfy equation \ref{eqn:discard}, to reduce the dimension from $D$ to $D'$. We then retrain the feature-block predictor using just the retained features and report the loss over the training and test sets for the reduced classifier -- denoted $\bar{\Lcal}_0'$ and $\bar{\Lcal}_1'$ respectively. These values are also included in the table except for the polbooks dataset as this is already very low.
+However, we also wish to determine the power of the dimensionality reduction method. For this we apply equation \ref{eqn:c-star}, to reduce the dimension from $D$ to $D'$ with $k=1$. We then retrain the feature-block predictor using just the retained feature set $\Dcal'$ and report the loss over the training and test sets for the reduced classifier -- denoted $\bar{\Lcal}_0'$ and $\bar{\Lcal}_1'$ respectively. These values are also included in the table except for the polbooks dataset which is already very low dimension.
 
 \begin{table}[!h]
 	\centering
-	\caption{Results}
+	\caption{Experimental results averaged over $n=10$ iterations (mean $\pm$ standard deviation)}
 	\label{tab:results}
 	\resizebox{\textwidth}{!}{%
 	\begin{tabular}{c|ccc|c|cc|ccc}
 		Dataset  & $B$ & $D$ & $D'$ & $\bar{S}_e$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $c^*$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$  \\ \hline
 		Polbooks & 3 & 3 & -- & $2.250 \pm 0.001$ & $0.584 \pm 0.033$ & $0.557 \pm 0.061$ & -- & -- & -- \\
-		School & 10 & 13 & 10 & $1.894 \pm 0.006$ & $0.793 \pm 0.096$ & $0.914 \pm 0.112$ & $1.112 \pm 0.23$ & $0.791 \pm 0.096$ & $0.864 \pm 0.139$ \\
+		School & 10 & 13 & 10 & $1.894 \pm 0.006$ & $0.793 \pm 0.096$ & $0.914 \pm 0.112$ & $1.112 \pm 0.230$ & $0.791 \pm 0.096$ & $0.864 \pm 0.139$ \\
 		FB egonet & 10  & 480 & 10 & $1.626 \pm 0.003$ & $1.305 \pm 0.034$ & $1.539 \pm 0.087$ & $0.942 \pm 0.042$ & $1.496 \pm 0.093$ & $1.578 \pm 0.104$
 	\end{tabular}
 	}
 \end{table}
 
-\FloatBarrier
+There are some general trends we can observe in these results. Firstly, the variance of the test loss $\bar{\Lcal}_1$ tends to be higher than the training loss $\bar{\Lcal}_0$. This is expected as our test set is smaller than the training set and so more susceptible to variability in its selection. Indeed, much of the variance in the evaluation of $\bar{\Lcal}_0$ and $\bar{\Lcal}_1$ comes from the random partitioning of the graph into training and test sets $\Gcal_0$ and $\Gcal_1$. Secondly, it can be seen that the dimensionality reduction procedure brings the training and test losses closer together. This implies that the features we keep are indeed correlated with the underlying graphical partition.
+
+The average description length of the graph per entity $\bar{S}_e$ has very low variance implying the detected communities can be found reliably (to within an arbitrary relabelling of blocks). For reference we plot an inferred partition for each of the graphs on figure \ref{fig:graphs-all}. Unsurprisingly, the polbooks graph yields the cleanest separation between blocks but nonetheless the inferred partitions for the other datasets do appear to partition the graph into densely connected clusters.
 
 \begin{figure}[!h]
 	\centering
@@ -84,8 +87,10 @@ However, we also wish to determine the power of the dimensionality reduction met
 		\label{fig:10-legend}
 	\end{subfigure}
 	\caption{Networks laid out and coloured according by inferred block memberships $\hat{y}$ for a given experiment iteration. Visualisation performed using \textit{graph-tool} \cite{peixoto_graph-tool_2014}}
+	\label{fig:graphs-all}
 \end{figure}
 
+On figure \ref{fig:null-all} we give the sampled feature weights for the reduced feature-set $\Dcal'$ for a given experiment iteration (or just the original $\Dcal$ for the polbooks dataset). We go on to analyse each of these in turn.
 
 \begin{figure}[!h]
 	\centering
@@ -113,30 +118,36 @@ However, we also wish to determine the power of the dimensionality reduction met
 		\label{fig:fb-null}
 	\end{subfigure}
 	\caption{Reduced dimension feature-to-block generator weight samples}
+	\label{fig:null-all}
 \end{figure}
 
 \subsection{Political books}
 
-This dataset was collected by \citet{polbooks}. We wish to determine whether political affiliation is a good predictor of the overall network structure. We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral). The inferred block memberships are given in figure \ref{fig:books-graph}. We sample the block-generator parameters and plot the emprical mean and standard deviation of each sample on figure \ref{fig:book-null}.
+This dataset was collected by \citet{polbooks}. We wish to determine whether political affiliation is a good predictor of the overall network structure. We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral). The inferred block memberships are given in figure \ref{fig:polbooks-graph}. We sample the block-generator parameters and plot the emprical mean and standard deviation of each sample on figure \ref{fig:polbooks-null}.
 
-Indeed, for all 3 blocks, each has a distinct political affiliation as its highest magnitude component. This is strong evidence that political affiliation is indeed the axis which best predicts the 3-way natural partition of the graph into blocks. Nevertheless, for block index 1, although \verb*|neutral| is the best predictor of the ones we have available, the value is not particularly extreme. Perhaps, there is an unobserved feature that places a book into this block. Indeed, block-0 is more of a centre-right block than true centre.
+Indeed, for all 3 blocks, each has a distinct political affiliation as its highest magnitude component. This is strong evidence that political affiliation is indeed the axis which best predicts the 3-way natural partition of the graph into blocks. Nevertheless, for block index 0, although \verb*|neutral| is the best predictor of the ones we have available, the value is not particularly extreme. Perhaps, there is an unobserved feature that places a book into this block. However, by inspecting figure \ref{fig:polbooks-graph} we note that there are very few edges between blocks 1 and 2 (the detected conservative and liberal blocks as per figure \ref{fig:school-null}) and indeed block 0 effectively acts as a separator for blocks 1 and 2. It is therefore, possible that the moderate value of the neutral weight for block 0 reflects the fact that this block contains a few peripheral conservative and liberal books at the corners of the block.
 
-\FloatBarrier
+From table \ref{tab:results} we see that the training and test losses are very similar (the test loss mean is even below the training loss) and both are quite low in magnitude. This is very strong evidence that the features we have available (the author's political affiliation) are indeed the drivers of the overall graphical structure.
+
 \subsection{Primary school dynamic contacts}
 
 These data were originally collected by \citet{schools} to quantify the transmission opportunities for respiratory infections. However, we seek to ask which vertex features best describe how people interact with one another in a primary school context. The only vertex features we have available are school-class (one of 10 values - 2 per year group), gender and a distinction between teachers and pupils.
 
 We must first choose the number of blocks $B$ to define the coarseness of our analysis. A total of 10 school-classes would suggest that $B=10$ is a natural starting point. We visualise the inferred block memberships in figure \ref{fig:school-graph}.
 
-As before, we proceed to sample the block-generator parameters $\theta$ and employ the dimensionality reduction heuristic defined in section \ref{sec:dim-reduction} with null threshold $c=1$ and standard deviation multiplier $k=1$. We then plot the weights for the features that survive the discard step in figure \ref{sec:dim-reduction}. Immediately, we see that only the pupils' class memberships have survived (1A-5B); gender and teacher/student status have been discarded meaning that these are not good predictors of overall macro-structure.
+As before, we proceed to sample the block-generator parameters $\theta$ and employ the dimensionality reduction heuristic with standard deviation multiplier $k=1$ to pick out the top $D'=10$ features. We then plot the weights for the surviving features $d \in \Dcal'$ on figure \ref{fig:school-null}. Immediately, we see that only the pupils' class memberships have survived (1A-5B); gender and teacher/student status have been discarded meaning that these are not good predictors of overall macro-structure.
 
-The vast majority of blocks are composed of a single class. However, some blocks have 2 comparably good classes as their predictor. For example, blocks 2 and 4 contain classes 4A and 4B as their 2 best predictors. This suggests that the social divide between classes is less pronounced for pupils in year 4 but there is nonetheless an unobserved variable that splits year 4 into 2 communities. The most surprising block is number 5 - which has comparable weightings for classes 5A and 1B. Perhaps there was a joint event between those two classes on the day the data were collected.
+The vast majority of blocks are composed of a single class. However, some blocks have 2 comparably good classes as their predictor. For example, blocks 1 and 3 contain classes 3A and 3B as their 2 best predictors. This suggests that the social divide between classes is less pronounced for pupils in year 3 but there is nonetheless an unobserved variable that splits year 3 into 2 communities. The most surprising block is number 5 - which has comparable weightings for classes 5A and 1B. Perhaps there was a joint event between those two classes on the day the data were collected.
+
+As for the training and test losses of the original and reduced classifiers. We see that the training loss stays roughly constant between the original and reduced classifiers $\bar{\Lcal}_0 \approx \bar{\Lcal}_0'$ but the test loss of the reduced classifier is ever-so-slightly decreased (within margin of error). This would imply that the features we have discarded (gender and teacher/student status) do not impact the high-level graphical structure. Nevertheless, the features we have available do not capture the full picture but they do quite well (low overall loss).
 
 \subsection{Facebook egonet}
 
-This dataset was chosen to showcase the power of the dimensionality reduction technique as the feature-space has high dimension ($D=480$). We sample the $b$-chain specifying $B=10$ total blocks and use this to construct the $\theta$-samples as before. 
+This dataset was chosen to showcase the power of the dimensionality reduction technique as the feature-space has high dimension ($D=480$). We sample the $b$-chain, specifying $B=10$ total blocks and use this to construct the $\theta$-samples as before. 
 
-We apply the dimensionality reduction heuristic outlined in section \ref{sec:dim-reduction}, choosing $k=1$ and $c=0.8$. This leads to a reduced dimension $D'=13$. These parameter values are plotted on figure \ref{fig:fb-null}. The features that remain are those that best explain the high-level community structure. More so than language, gender or surname - the school\footnote{This includes higher education institutes} you attend is the best explanatory variable for how the observed network's communities are partitioned at the highest level. 
+We again apply the dimensionality reduction heuristic with $k=1$ to target $D'=10$ features in the reduced set. The parameter values for the surviving features are plotted on figure \ref{fig:fb-null}. The remaining features are those that best explain the high-level community structure. The majority of the surviving features are education related. More so than language, gender or surname - the school\footnote{This includes higher education institutes} you attend is the best explanatory variable for how the observed network's communities are partitioned at the highest level. Nevertheless, for $D'=10$ we do not have good explanations for the makeup of blocks 5-9 inclusive
 
-Nevertheless, this example also highlights a weakness of the method for high-dimensional feature spaces. When the feature dimension is very large, it becomes increasingly likely that a particular feature may uniquely identify a small set of nodes. If these nodes are all part of the same community then the classifier will overfit for that particular parameter. The regularisation term imposed by the prior goes some way to alleviating this problem but we see in figure \ref{fig:fb-null} that the feature \verb*|birthday-5| has a very high weight as it relates to block 0. It might be possible to shift the feature values such that they take values in $\{-1, 1\}$ rather than $\{0, 1\}$ but this approach falls down when input features are mutually correlated. Indeed, for features with discrete values such as the class memberships (1A, 1B, 2A \dots 5B) it is preferred to keep $x_i \in \{0, 1\}^D$ as then each block can be readily accept more than one mutually exclusive feature-group (i.e. two school-classes are part of the same block).
+Nevertheless, this example also highlights a weakness of the method for high-dimensional feature spaces. When the feature dimension is very large, it becomes increasingly likely that a particular feature may uniquely identify a small set of nodes. If these nodes are all part of the same community then the classifier will overfit for that particular parameter. The regularisation term imposed by the prior goes some way to alleviating this problem but we see in figure \ref{fig:fb-null} that the feature \verb*|birthday-5| has a very high weight as it relates to block 0. It might be possible to shift the feature values such that they take values in $\{-1, 1\}$ rather than $\{0, 1\}$ but this approach falls down when input features are mutually correlated. Indeed, for features with discrete values such as the class memberships (1A-5B) of the school dataset it is preferred to keep $x_i \in \{0, 1\}^D$ as then each block can be readily accept more than one mutually exclusive feature-group (i.e. two school-classes are part of the same block).
+
+The training and test losses (table \ref{tab:results}) are the highest of the considered networks. This suggests that the features we have available do not readily explain the high-level structure. Nonetheless, after reducing the problem dimension our test loss is not greatly increased which suggests that the features we do keep are the best of the ones we have available at predicting the overall network structure. 
 
