@@ -6,7 +6,7 @@
 
 % ready for submission
 \PassOptionsToPackage{numbers, compress}{natbib}
-\usepackage[final]{neurips_2021}
+\usepackage[]{neurips_2021}
 
 % to compile a preprint version, e.g., for submission to arXiv, add add the
 % [preprint] option:
@@ -33,7 +33,6 @@
 \usepackage{mathtools}
 \usepackage{bbm}
 \usepackage{amssymb}
-%\usepackage{algorithmic}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 \usepackage{caption}
@@ -41,6 +40,7 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{placeins}
+\usepackage{enumitem}
 
 %images
 \graphicspath{{./img/}}
@@ -104,19 +104,11 @@
 \maketitle
 
 \input{abstract}
-
 \input{introduction}
-
 \input{prelim}
-
 \input{ffbm}
-
 \input{inference}
-
 \input{experiments}
-
-%\input{extensions}
-
 \input{conclusion}
 
 \clearpage

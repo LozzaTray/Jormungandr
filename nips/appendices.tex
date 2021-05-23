@@ -6,7 +6,7 @@
 We have borrowed the priors proposed by \citet{Peixoto-Bayesian-Microcanonical} for $p(\psi | b)$. These, are repeated here for reference:
 %
 \begin{equation}
-	p(\psi | b) = p(e | b) p(k | e, b) = \left[ \specialchoose{ \specialchoose{B}{2} }{ E} \right]^{-1} 
+	p(\psi_e=e, \psi_k=k | b) = p(e | b) p(\psi_k | e, b) = \left[ \specialchoose{ \specialchoose{B}{2} }{ E} \right]^{-1} 
 	\cdot \left[ \prod_r \frac{\prod_j \eta_j^r !}{n_r! q(e_r, n_r)} \right]
 \end{equation}
 %
@@ -36,6 +36,33 @@ As this is a constant with respect to $b$ we conclude that $p(b | X)$ must be a 
 \begin{equation}
 	p(b | X) = B^{-N}
 \end{equation}
+
+\subsection{Derivation of U form}
+\label{appdx:form-U}
+
+The invariant distribution we wish to target for the $\theta$ samples is the posterior of $\theta$ given the values of the pair $(X, b)$. We write this as follows:
+%
+\begin{align}
+	\pi_\theta(\theta) &\propto p(\theta | X, b) \propto p(b | X, \theta) p(\theta) \propto  \exp \left( - U(\theta) \right) \\
+	\therefore U(\theta) &= - \left( \log p(b | X, \theta) + \log p(\theta) \right) + \textrm{const}
+\end{align}
+%
+Where we have introduced $U(\theta)$ equal to the negative log posterior. Each of the constituent terms of $U(\theta)$ are easily computed (equation \ref{eqn:U-constituent-terms}) by defining $y_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and $a_{ij} \coloneqq \phi_j(x_i; \theta)$.
+%
+\begin{equation}
+	\log p(b | X, \theta) = \sum_{i \in [N]} \sum_{j \in [B]} y_{ij} \log a_{ij}  \quad \textrm{and} \quad
+	\log p(\theta) = -\frac{(D+1)(B)}{2} \log 2\pi - \frac{1}{2 \sigma_\theta^2} || \theta ||^2
+	\label{eqn:U-constituent-terms}
+\end{equation}
+%
+Discarding constant terms, we write $U(\theta)$ as in equation \ref{eqn:U-form-appdx-0}. Note that $||\theta||^2 = \sum_{i} \theta_{i}^2 = \sum_{j=1}^{B} ||w_j||^2$ is the Euclidean norm of the vector of parameters $\theta$.
+%
+\begin{equation}
+	U(\theta) = \left( \sum_{i=1}^{N} \sum_{j=1}^{B} y_{ij} \log \frac{1}{a_{ij}} \right)
+	+ \frac{1}{2\sigma_\theta^2} ||\theta||^2 = N \cdot \Lcal(\theta) + \frac{1}{2\sigma_\theta^2} ||\theta||^2
+	\label{eqn:U-form-appdx-0}
+\end{equation}
+%
 
 \subsection{Derivation of U gradient with respect to feature parameters}
 \label{appdx:gradu}
