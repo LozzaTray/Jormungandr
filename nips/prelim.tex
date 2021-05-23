@@ -1,28 +1,26 @@
 \section{Preliminaries}
 
-This section defines some preliminary concepts required for the subsequent analysis. We first need a model for community-like structure in a graphical network. For this we adopt the stochastic block model (SBM) - widely used across academia. The premise is that each node in the graph belongs to a unique community called a block. The probability that two nodes are connected depends only on the block memberships of each. Graphs drawn from the SBM ensemble exhibit community structure. Specifically, we will use the microcanonical variant of the SBM, proposed by \citet{Peixoto-Bayesian-Microcanonical}. A paraphrased definition is given below for the non-degree-corrected SBM (NDC-SBM).
-
-\begin{definition}[Microcanonical NDC-SBM]
-	\label{defn:microcan-ndc-sbm}
-	Let $N \in \Integers^{+}$ denote the number of vertices in an undirected graph. The block memberships are encoded by a vector $b$ of length $N$ where each entry $b_i \in \{1, 2 \dots B\}$. $B \in \Integers^{+}$ is the number of non-empty blocks. Let $e$ be a $B \times B$ matrix of edge counts between blocks ($e_{rs}$ is number of edges from block $r$ onto block $s$ - or twice that number if $r=s$). For undirected graphs $e$ is symmetric. For a non-degree-corrected stochastic block model (NDC-SBM), we say that the graph $A$ is generated as follows:
-	%
-	\begin{equation}
-		A \sim \textrm{NDC-SBM}_{\textrm{MC}} (b, e)
-	\end{equation}
-	%
-	Where edges are placed uniformly at random but respecting the constraint imposed by $e$ and $b$. The additional parameters $N$ and $B$ are omitted as they are inferred from the shapes of $b$ and $e$. If we interpret $A$ as an adjacency matrix, then this constraint can be written formally as: $e_{rs} = \sum_{i,j} A_{ij} \one \{b_i = r\} \one \{b_j = s\}$.
-\end{definition}
-
-Nevertheless, this formulation does not accept high degree variability within blocks as is typical of real-world data. Indeed, the NDC-SBM favours a partition into high-degree and low-degree nodes rather than clusters of inter-connected nodes. We therefore introduce the degree-corrected SBM (DC-SBM) \cite{Peixoto-Bayesian-Microcanonical} to circumvent these issues. 
+We first need a model for community-like structure in a network. For this we adopt the stochastic block model (SBM) - widely used across academia. The premise is that each node in the graph belongs to a unique community called a block. The probability that two nodes are connected depends only on the block memberships of each. Graphs drawn from the SBM ensemble exhibit community structure. Specifically, we will use the microcanonical variant of the SBM, proposed by \citet{Peixoto-Bayesian-Microcanonical}. To allow for degree-variability between members of the same block, we must choose the degree-corrected formulation of the SBM (DC-SBM).
 
 \begin{definition}[Microcanonical DC-SBM]
-	\label{defn:microcan-dc-sbm}
-	This is much like the NDC-SBM but has an additional parameter $k$ which is an $N$-length vector encoding the degree sequence ($k_i$ is the degree of vertex $i$). Therefore, we write:
+	\label{defn:microcan-ndc-sbm}
+	Let $N \in \Integers^{+}$ denote the number of vertices in an undirected graph. The block memberships are encoded by a vector $b \in [B]^N$,\footnote{We introduce the notation $[K] \coloneqq \{0, 1, 2 \dots K-1\}$ to compactly define a set of $K$ indices. Clearly, $[K]$ is only defined for $K \in \Integers^+$.}
+	where $B \in \Integers^{+}$ is the number of non-empty blocks.
+	Let $e \in (\Integers_0^+)^{N \times N}$ be the matrix of edge counts between blocks. $e_{rs}$ is then the number of edges from block $r$ onto block $s$ -- or twice that number if $r=s$. For undirected graphs $e$ is symmetric.
+	Let $k \in (\Integers^+_0)^N$ be a vector denoting the degree sequence of the graph. $k_i$ is then the degree of vertex $i$.
+	
+	For the degree-corrected stochastic block model (DC-SBM), we say that the graph's adjacency matrix $A \in \{0,1\}^{N \times N}$ is generated as follows:
 	%
 	\begin{equation}
 		A \sim \textrm{DC-SBM}_{\textrm{MC}} (b, e, k)
 	\end{equation}
 	%
-	Once again, edges are placed uniformly at random but respecting the constraints imposed by the parameters. The DC-SBM has the additional constraint that $k_i = \sum_{j} A_{ij}$. In what follows, we will always assume the degree-corrected model unless otherwise specified.
-	
+	Where edges are placed uniformly at random but respecting the constraints imposed by $e$, $b$ and $k$ -- hence why this formulation is given the microcanonical moniker. Specifically, $A$ must satisfy the following:
+	%
+	\begin{equation}
+		e_{rs} = \sum_{i, j} A_{ij} \one \{b_i = r\} \one \{b_j = s\} \qquad \textrm{and} \qquad
+		k_i = \sum_j A_{ij}
+	\end{equation}
+	%
+	The additional parameters $N$ and $B$ are omitted as they can be inferred from the shapes of $b$ and $e$.
 \end{definition}
