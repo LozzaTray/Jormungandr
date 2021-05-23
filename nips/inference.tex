@@ -33,22 +33,22 @@ This accept-reject step ensures the resulting Markov Chain is in detailed balanc
 %
 This is an example of a pseudo-marginal approach. Indeed, \citet{pseudo-marginal} show that the unbiased result in equation \ref{eqn:theta-unbiased} is sufficient to prove that for sufficient samples, $\theta^{(t)} \sim \Expect_{b^{(i)}} \left[ p(\theta | X, b^{t})\right] = p(\theta 
 | A, X)$ which is exactly the distribution we are targetting (equation \ref{eqn:theta-target}).
-
-The reason we split the Markov chain into two stages is because the summation over all latent states $b \in [B]^N$ required to directly compute the likelihood $p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$ is intractable $O(B^N)$.
 %
 \begin{figure}[!h]
 	\centering
+
 	\begin{tikzpicture}[
+		scale=0.7, every node/.style={transform shape},
 		roundnode/.style={circle, draw=black, minimum size=12mm},
 		squarednode/.style={rectangle, draw=black, minimum size=12mm}
 		]
 		% nodes
 		\node[roundnode] (b0) at (0, 2) {$b^{(t)}$};
-		\node[roundnode] (b1) at (4, 2) {$b'$};
-		\node[roundnode] (b2) at (8, 2) {$b^{(t+1)}$};
+		\node[roundnode] (b1) at (5, 2) {$b'$};
+		\node[roundnode] (b2) at (10, 2) {$b^{(t+1)}$};
 		\node[roundnode] (t0) at (0, 0) {$\theta^{(t)}$};
-		\node[roundnode] (t1) at (4, 0) {$\theta'$};
-		\node[roundnode] (t2) at (8, 0) {$\theta^{(t+1)}$};
+		\node[roundnode] (t1) at (5, 0) {$\theta'$};
+		\node[roundnode] (t2) at (10, 0) {$\theta^{(t+1)}$};
 		
 		% arrows
 		\draw[->] (b0) to node[above] {$\sim q_b(b^{(t)}, b' | A)$} (b1);
@@ -60,14 +60,18 @@ The reason we split the Markov chain into two stages is because the summation ov
 		\draw[->] (t0) [out=-30, in=-150] to node[below] {$1-\alpha_\theta$} (t2);
 		
 		\draw[dashed, ->] (b0) to (2, 0.8);
-		\draw[dashed, ->] (b0) to (5.5, 0.8);
+		\draw[dashed, ->] (b0) to (6.5, 0.8);
 		
 	\end{tikzpicture}
 	\caption{Sampling sequence}
 	\label{fig:samp-sequence}
 \end{figure}
-%
-Figure \ref{fig:samp-sequence} shows an overview of the proposed method. We have introduced subscripts and conditionings to make explicit what parameters each step utilises. We note the power of the simplification given by equation \ref{eqn:b-pseudo-prior}. As $p(b| X) = B^{-N}$ does not depend on the exact value of X, we do not need to know the value of $X$ to perform the sampling on $b$. Conversely, for the $\theta^{(t)}$ samples, we use $b^{(t)}$ but not $A$ as $(\theta \indep A) | b$.
+
+The reason we split the Markov chain into two stages is because the summation over all latent states $b \in [B]^N$ required to directly compute the likelihood $p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$ is intractable $O(B^N)$.
+
+Figure \ref{fig:samp-sequence} shows an overview of the proposed method. We have introduced subscripts and conditionings to make explicit what parameters each step utilises. We note the power of the simplification given by equation \ref{eqn:b-pseudo-prior}. As $p(b| X) = B^{-N}$ does not depend on the exact value of X, we do not need to know the value of $X$ to perform the sampling on $b$. Conversely, for the $\theta^{(t)}$ samples, we use only $b^{(t)}$ but not $A$ as $(\theta \indep A) | b$.
+
+\FloatBarrier
 
 \subsection{Sampling block memberships}
 
@@ -79,11 +83,11 @@ Figure \ref{fig:samp-sequence} shows an overview of the proposed method. We have
 %
 Now $\pi_b(\cdot)$ is the un-normalised density we wish to sample from for the $b$-chain. In other words, we wish to construct a Markov chain that has $\pi_b(\cdot)$ as its invariant distribution. We can break $\pi_b$ down as follows:
 %
-\begin{align*}
-	\pi_b(b) &= p(b|X) \sum_{\psi} \nolimits p(A , \psi | b, X) \\
-	&= p(b|X) p(A, \psi^* | b, X) \\
-	&= p(A | b, \psi^*) \cdot p(\psi^* | b) \cdot p(b | X)
-\end{align*}
+\begin{equation}
+	\pi_b(b) = p(b|X) \sum_{\psi} \nolimits p(A , \psi | b, X) \\
+	= p(b|X) p(A, \psi^* | b, X) \\
+	= p(A | b, \psi^*) \cdot p(\psi^* | b) \cdot p(b | X)
+\end{equation}
 %
 Since we are using the microcanonical SBM formulation, there is only one value of $\psi$ that is compatible with the given $(A, b)$ pair (given in equation \ref{eqn:sbm-constraints}). We denote this value $\psi^* = \{\psi_k^*, \psi_e^*\}$. Therefore, the summation over all $\psi$ reduces to just the single $\psi^*$ term; this is the power of the microcanonical formulation. We also define the microcanonical entropy of the configuration as.
 %
@@ -92,9 +96,7 @@ Since we are using the microcanonical SBM formulation, there is only one value o
 	\label{eqn:dl-form}
 \end{equation}
 %
-This entropy can be thought of as the description length of the graph because it is the sum of the information required to represent the graph given the parameters and the amount of information required to store the parameters (given the feature matrix $X$). The exact form of the proposal distribution and accept-reject step is explored thoroughly by \citet{Peixoto-MCMC} and not repeated here. There is a widely used library for Python made available under LGPL called \verb*|graph-tool| \cite{peixoto_graph-tool_2014}, which implements this algorithm. The only modification we make is in the block membership prior $p(b)$ which we replace with $p(b|X)=B^{-N}$ which is a uniform distribution and so cancels out in the MH accept-reject step.
-
-The end result of this is that we can generate a set of block membership samples $\{b^{(t)}\}_{t=1}^{T}$ with each $b^{(t)} \sim p(b | A, X)$. Each of these samples can then be used for the $\theta$-chain.
+This entropy can equally be thought of as the description length of the graph -- the minimum amount of information required to store the graph and its parameters. The exact form of the proposal distribution and accept-reject step is explored thoroughly by \citet{Peixoto-MCMC} and not repeated here. There is a widely used library for Python made available under LGPL called \verb*|graph-tool| \cite{peixoto_graph-tool_2014}, which implements this algorithm. The only modification we make is in the block membership prior $p(b)$ which we replace with $p(b|X)=B^{-N}$ which is a uniform distribution and so cancels out in the MH accept-reject step.
 
 \subsection{Sampling feature-to-block classifier parameters}
 
@@ -105,7 +107,7 @@ The invariant distribution we wish to target for the $\theta$ samples is the pos
 	\therefore U(\theta) &= - \left( \log p(b | X, \theta) + \log p(\theta) \right) + \textrm{const}
 \end{align}
 %
-Where we have introduced $U(\theta)$ equal to the negative log posterior for conciseness. Each of the constituent terms of $U(\theta)$ are easily computed (equation \ref{eqn:U-constituent-terms}). Where we have defined $y_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and $a_{ij} \coloneqq \phi_j(x_i; \theta)$.
+Where we have introduced $U(\theta)$ equal to the negative log posterior. Each of the constituent terms of $U(\theta)$ are easily computed (equation \ref{eqn:U-constituent-terms}). Similarly, we define $y_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and $a_{ij} \coloneqq \phi_j(x_i; \theta)$.
 %
 \begin{equation}
 	\log p(b | X, \theta) = \sum_{i \in [N]} \sum_{j \in [B]} y_{ij} \log a_{ij}  \quad \textrm{and} \quad
@@ -113,7 +115,7 @@ Where we have introduced $U(\theta)$ equal to the negative log posterior for con
 	\label{eqn:U-constituent-terms}
 \end{equation}
 %
-Discarding constant terms, we can write $U(\theta)$ as in equation \ref{eqn:U-form}. Note that $||\theta||^2 = \sum_{i} \theta_{i}^2 = \sum_{j=1}^{B} ||w_j||^2$ is the Euclidean norm of the vector of parameters $\theta$.
+Discarding constant terms, we write $U(\theta)$ as in equation \ref{eqn:U-form}. Note that $||\theta||^2 = \sum_{i} \theta_{i}^2 = \sum_{j=1}^{B} ||w_j||^2$ is the Euclidean norm of the vector of parameters $\theta$.
 %
 \begin{equation}
 	U(\theta) = \left( \sum_{i=1}^{N} \sum_{j=1}^{B} y_{ij} \log \frac{1}{a_{ij}} \right)
@@ -121,16 +123,16 @@ Discarding constant terms, we can write $U(\theta)$ as in equation \ref{eqn:U-fo
 	\label{eqn:U-form}
 \end{equation}
 %
-$U(\theta)$ in equation \ref{eqn:U-form} appears a typical objective function to be minimised for neural network training. The first term -- which we collect into $N \cdot \Lcal(\theta)$ -- is the cross-entropy between the graph-predicted and feature-predicted block memberships. We denote the average cross-entropy $\Lcal(\theta)$ as it will become useful later on for experimentation. The second term of equation \ref{eqn:U-form} -- introduced by the prior -- brings a form of regularisation, guarding against over-fitting. In traditional applications we only seek the value of $\theta$ that minimises the objective function $U(\theta)$, which in our case would yield the maximum a posteriori (MAP) estimate. This is often done through some kind of gradient descent as $\nabla U$ is easily computable (equation \ref{eqn:U-derivative}).
+$U(\theta)$ in equation \ref{eqn:U-form} appears a typical objective function for neural network training. The first term -- which we collect into $N \cdot \Lcal(\theta)$ -- is the cross-entropy between the graph-predicted and feature-predicted block memberships summed over all vertices. The second term of equation \ref{eqn:U-form} -- introduced by the prior -- brings a form of regularisation, guarding against over-fitting. In traditional applications we only seek the value of $\theta$ that minimises the objective function $U(\theta)$, which in our case would yield the maximum a posteriori (MAP) estimate. This is often done through some kind of gradient descent as $\nabla U$ is easily computable (equation \ref{eqn:U-derivative}).
 
-However, our goal is not to find the MAP estimate but to draw samples from the posterior $\pi_\theta(\cdot) \propto \exp(-U(\cdot))$. As discussed earlier, given the invariant distribution $\pi_\theta(\cdot)$, it is sufficient to specify a proposal distribution and then apply a MH accept-reject step to ensure detailed balance of the Markov Chain. Nevertheless, we can use $\nabla U$ as a useful heuristic to bias our proposal towards regions of higher target density. We therefore adopt the Metropolis Adjusted Langevin Algorithm (MALA) -- first proposed by \citet{mala-tweedie} -- which leverages the $\nabla U$ information. Given the current sample $\theta$, we propose a new sample $\theta'$ according to equation \ref{eqn:theta-update}
+However, our goal is not to find the MAP estimate but to draw samples from the posterior $\pi_\theta(\cdot) \propto \exp(-U(\cdot))$. It is sufficient to specify a proposal distribution and then apply a MH accept-reject step to ensure detailed balance with $\pi_\theta(\cdot)$. However, we can use $\nabla U$ as a useful heuristic to bias our proposal towards regions of higher target density. We therefore adopt the Metropolis Adjusted Langevin Algorithm (MALA) -- first proposed by \citet{mala-tweedie} -- which leverages the $\nabla U$ information. Given the current sample $\theta$, we propose a new sample $\theta'$ according to:
 %
 \begin{equation}
 	\theta' = \theta - h \nabla U(\theta) + \sqrt{2h} \cdot \xi
 	\label{eqn:theta-update}
 \end{equation}
 %
-Where $\xi \sim \Gaussian(0, I)$ and $h$ is a step-size parameter -- which may vary with the sample index (appendix \ref{appdx:step-size} explores this more fully). Without the injected noise term, MALA is equivalent to gradient descent. We require the noise term to fully explore the parameter space. As such the proposal distribution, is a simple multivariate Gaussian which can be easily evaluated.
+Where $\xi \sim \Gaussian(0, I)$ and $h$ is a step-size parameter -- which may vary with the sample index (appendix \ref{appdx:step-size} explores this more fully). Without the injected noise term, MALA is equivalent to gradient descent. We require the noise term $\xi$ to fully explore the parameter space. We can write the proposal distribution simply as:
 %
 \begin{equation}
 	q_\theta(\theta, \theta') = \Gaussian \left( \theta' ; \theta - h \nabla U(\theta), 2h I \right)
@@ -143,7 +145,7 @@ The term $\nabla U$ has an easy to compute analytic form (derived in Appendix \r
 	\label{eqn:U-derivative}
 \end{equation}
 %
-After a proposed move is generated, in typical Metropolis-Hastings fashion we accept the move with probability $\alpha_\theta$.
+After a proposed move is generated, in typical Metropolis-Hastings fashion we accept the move with probability $\alpha_\theta$:
 %
 \begin{equation}
 	\alpha_\theta(\theta, \theta') = \min \left( 
@@ -155,27 +157,25 @@ After a proposed move is generated, in typical Metropolis-Hastings fashion we ac
 	} 
 	, 1 \right)
 \end{equation}
-%
-This fully specifies, the sampling procedure to generate $\{\theta^{(t)}\}_{t=1}^T$. Bear in mind that so far, each $\theta^{(t)}$ update step uses its corresponding $b^{(t)}$ block membership sample.
 
 \subsection{Sampling sequence}
 
-Up to this point, each $\theta^{(t)}$ update uses its corresponding $b^{(t)}$ sample. This means that the evaluation of $U(\theta)$ and $\nabla U(\theta)$ has high variance. This may lead to longer burn-in and autocorrelation times of the resulting Markov Chain. The only link between $b^{(t)}$ and $\theta^{(t)}$ is in the evaluation of $U(\theta)$ and $\nabla U(\theta)$ which depends only on $y_{ij}^{(t)} \coloneqq \one\{b_i^{(t)} = j\}$. We would rather deal with the expectation of each $y_{ij}^{(t)}$:
+Up to this point, each $\theta^{(t)}$ update uses its corresponding $b^{(t)}$ sample. This means that the evaluation of $U(\theta)$ and $\nabla U(\theta)$ has high variance. This may lead to longer burn-in for the resulting Markov Chain. The only link between $b^{(t)}$ and $\theta^{(t)}$ is in the evaluation of $U(\theta)$ and $\nabla U(\theta)$ which depends only on the matrix $y^{(t)}$ with entries $y_{ij}^{(t)} \coloneqq \one\{b_i^{(t)} = j\}$. We would rather deal with the expectation of each $y_{ij}^{(t)}$:
 %
 \begin{equation}
 	\Expect \left[ y_{ij}^{(t)} \right] = \Expect_{b^{(t)}} \left[ \one(b_{i}^{(t)} = j) \right]
 	= p(b_i = j | A, X)
 \end{equation}
 %
-We can obtain an unbiased estimate for this quantity using the block membership samples $\left\{ b^{(t)} \right\}$. However, as with all MCMC methods, we must only uses samples after a burn-in and thinning has been applied. We introduce $\Tcal_b$ to denote the retained set of indices for the $b$-samples and $\Tcal_\theta$ similarly for the $\theta$-chain. An in-depth discussion of how these sets are chosen is given in appendix \ref{appdx:burn-in-thinning}. The unbiased estimate for $y_{ij}^{(t)}$ using the restricted sample set $\Tcal_b$ is denoted $\hat{y}_{ij}$ and has form:
+We can obtain an unbiased estimate for this quantity using the block membership samples $\left\{ b^{(t)} \right\}$. However, as with all MCMC methods, we must only uses samples after burn-in and thinning have been applied. We introduce $\Tcal_b$ to denote the retained set of indices for the $b$-samples and $\Tcal_\theta$ similarly for the $\theta$-chain. An in-depth discussion of how these sets are chosen is given in appendix \ref{appdx:burn-in-thinning}. The unbiased estimate for $y_{ij}^{(t)}$ using the restricted sample set $\Tcal_b$ is denoted $\hat{y}_{ij}$ and has form:
 %
 \begin{equation}
 	\hat{y}_{ij} \coloneqq \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} y_{ij}^{(t)} = \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} \one\{b_i^{(t)} = j\}
 \end{equation}
 %
-We therefore, choose to feed each $\theta^{(t)}$ update step the same $\hat{y}_{ij}$ for all $t$ rather than the corresponding $y^{(t)}_{ij}$. This means we no longer need to run the $b$ and $\theta$ Markov chains concurrently. Instead, we run the $b$-chain to completion and use it to generate $\hat{y}_{ij}$ for $i \in [N]$ and $j \in [B]$. This is an estimate of $p(b | A, X)$ that we use for every iteration of the $\theta$ Markov chain.
+We therefore, choose to feed each $\theta^{(t)}$ update step the same matrix $\hat{y}$ for all $t$ rather than the corresponding $y^{(t)}$. This means we no longer need to run the $b$ and $\theta$ Markov chains concurrently. Instead, we run the $b$-chain to completion and use it to generate $\hat{y}$. This is an estimate of $p(b | A, X)$ that we use for every iteration of the $\theta$ Markov chain.
 
-This affords us the flexibility to vary the number of samples we draw for the $b$ and $\theta$-chains; we denote the total number of samples generated $T_b$ and $T_\theta$ henceforth. Note that due to burn-in and thinning, $|\Tcal_b| < T_b$ and $|\Tcal_\theta| < T_\theta$. Furthermore, this changeover reduces the burn-in time for the $\theta$-chain by reducing the variance in our evaluation of $U$ and $\nabla U$.
+This affords us the flexibility to vary the number of samples we draw for the $b$ and $\theta$-chains; we denote the total number of samples generated $T_b$ and $T_\theta$ henceforth. Note that due to burn-in and thinning, $|\Tcal_b| < T_b$ and $|\Tcal_\theta| < T_\theta$. Furthermore, this changeover from $y^{(t)}$ to $\hat{y}$ reduces the burn-in time for the $\theta$-chain by reducing the variance in our evaluation of $U$ and $\nabla U$. A description of the overall algorithms is given in appendix \ref{appdx:algorithms}.
 
 \subsection{Dimensionality reduction}
 \label{sec:dim-reduction}
@@ -187,24 +187,20 @@ Once we have the samples $\left\{ \theta^{(t)} \right\} \sim p(\theta | A, X)$, 
 	\hat{\sigma}_{ij} \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \left( W_{ij}^{(t)} - \hat{\mu}_{ij} \right)^2
 \end{equation}
 %
-A simple heuristic to discard the least important features requires specifying a cutoff $c > 0$ and a multiplier $k > 0$. We define the function $\Fcal_i(j)$ as in \ref{eqn:fij} then only keep features in $\Dcal'$ given by equation \ref{eqn:kept-feature-set}.
+A simple heuristic to discard the least important features requires specifying a cutoff $c > 0$ and a multiplier $k > 0$. We define the function $\Fcal_i(j)$ as in \ref{eqn:fij} then only keep features with indices $d \in \Dcal'$, where $\Dcal'$ is constructed as in equation \ref{eqn:kept-feature-set}.
 %
-\begin{equation}
-	\Fcal_i(j) \coloneqq (\hat{\mu}_{ij} - k \hat{\sigma}_{ij}, \hat{\mu}_{ij} + k \hat{\sigma}_{ij}) \cap (-c, +c)
-	\label{eqn:fij}
-\end{equation}
-\begin{equation}
-	\Dcal' = \left\{ j \in [D] : \exists i \in [B] \textrm{ s.t. }  \Fcal_i(j) \neq \emptyset \right\}
+\begin{align}
+	\Fcal_i(j) &\coloneqq (\hat{\mu}_{ij} - k \hat{\sigma}_{ij}, \hat{\mu}_{ij} + k \hat{\sigma}_{ij}) \cap (-c, +c)
+	\label{eqn:fij} \\
+	\Dcal' &\coloneqq \left\{ j \in [D] : \exists i \in [B] \textrm{ s.t. }  \Fcal_i(j) \neq \emptyset \right\}
 	\label{eqn:kept-feature-set}
-\end{equation}
+\end{align}
 %
-Intuitively, this means discarding any feature for which $\hat{\mu}_{ij} \pm k\hat{\sigma}_{ij}$ lies within or spans the null region $(-c, c)$ for all block indices. If we were to use the Laplace approximation for the posterior $p(W_{ij} | A, X) \approx \Gaussian(W_{ij}; \mu_{ij}, \sigma_{ij})$, then this is effectively a hypothesis test on the value of $W_{ij}$ (equation \ref{eqn:hyp-test-discard}). $\Dcal'$ then comprises all features for which $H_1$ is accepted.
+Intuitively, this means discarding any feature for which $\hat{\mu}_{ij} \pm k\hat{\sigma}_{ij}$ lies within or spans the null region $(-c, c)$ for all block indices. If we were to use the Laplace approximation for the posterior $p(W_{ij} | A, X) \approx \Gaussian(W_{ij}; \mu_{ij}, \sigma_{ij})$, then this is effectively a hypothesis test on the value of $W_{ij}$ (equation \ref{eqn:hyp-test-discard}). $\Dcal'$ then comprises all features $i$ for which $H_1$ is accepted at least once for some $j \in [B]$.
 %
 \begin{equation}
-	\begin{aligned}
-		H_0&: |W_{ij}| \leq c \\
-		H_1&: |W_{ij}| > c
-	\end{aligned}
+	H_0: |\mu_{ij}| \leq c \qquad
+	H_1: |\mu_{ij}| > c
 	\label{eqn:hyp-test-discard}
 \end{equation}
 %
