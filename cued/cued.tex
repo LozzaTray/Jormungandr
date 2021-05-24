@@ -1,9 +1,5 @@
 \documentclass[12pt]{article}
 
-% if you need to pass options to natbib, use, e.g.:
-%     \PassOptionsToPackage{numbers, compress}{natbib}
-% before loading neurips_2021
-
 \usepackage[numbers, compress]{natbib}
 \usepackage[utf8]{inputenc} % allow utf-8 input
 \usepackage[T1]{fontenc}    % use 8-bit T1 fonts
@@ -31,6 +27,8 @@
 \usepackage{enumitem}
 \usepackage[margin=1in]{geometry}
 \usepackage{pdfpages}
+\usepackage{setspace}
+\onehalfspacing
 
 %images
 \graphicspath{{./img/}}
@@ -90,7 +88,9 @@
 
 \begin{document}
 
+\pagenumbering{gobble}
 \includepdf{coversheet}
+\pagenumbering{arabic}
 
 %
 \input{abstract}
