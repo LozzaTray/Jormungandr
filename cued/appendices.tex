@@ -1,0 +1,280 @@
+\section{Appendix}
+
+\subsection{SBM prior choice explanation}
+\label{appdx:prior}
+
+We have borrowed the priors proposed by \citet{Peixoto-Bayesian-Microcanonical} for $p(\psi | b)$. These, are repeated here for reference:
+%
+\begin{equation}
+	p(\psi_e=e, \psi_k=k | b) = p(e | b) p(\psi_k | e, b) = \left[ \specialchoose{ \specialchoose{B}{2} }{ E} \right]^{-1} 
+	\cdot \left[ \prod_r \frac{\prod_j \eta_j^r !}{n_r! q(e_r, n_r)} \right]
+\end{equation}
+%
+Where $\specialchoose{n}{m}$ is shorthand for $\binom{n+m-1}{m} = \frac{(n+m-1)!}{(n-1)!(m)!}$ which can be thought of as the total number of distinct histograms with $n$ bins under the constraint they sum to $m$. $E = \frac{1}{2} \sum_{r,s} e_{rs}$ is the total number of edges in the graph. Importantly, $E$ is not allowed to vary and so $p(e|b)$ is uniform with respect to $e$. The variable $\eta_j^r$ is introduced to denote the number of vertices in block $r$ that have degree $j$. Formally, $\eta_j^r \coloneqq \sum_{i} \one\left\{b_i = r \right\} \one \left\{k_i = j \right\}$. Furthermore, $q(m, n)$ is the number of different histograms with at most $n$ non-zero bins that sum to $m$. $q(m, n)$ is related to but different from $\specialchoose{n}{m}$. Lastly, $e_r \coloneqq \sum_{s} e_{rs}$ is the total number of half edges in block r and $n_r \coloneqq \sum_{i} \one\{b_i = r\}$ is the number of vertices assigned to block $r$. 
+
+These were chosen carefully by \citet{Peixoto-Bayesian-Microcanonical} to more closely match the structure of empirical networks than simple uniform priors. We do not repeat his arguments here.
+
+\subsection{Derivation of conditional block distribution given feature matrix}
+\label{appdx:b|x}
+
+We wish to determine the form of $p(b| X)$. This can be done by integrating over the joint probability with respect to $\theta$.
+%
+\begin{align*}
+	p(b | X) &= \int p(b , \theta| X, \theta) d\theta = \int p(b | X, \theta) p(\theta | X) d\theta \\
+	&=\int p(b | X, \theta) p(\theta) d\theta = \int \prod_{i \in [N] } \phi_{b_i}(x_i; \theta) p(\theta) d\theta \\
+	&= \prod_{i \in [N]} \int \frac{\exp(w_{b_i}^T \tilde{x}_i) \prod_{j \in [B]} \Gaussian(w_j; 0, \sigma_\theta^2 I)}{\sum_{k \in [B]} \exp(w_{k}^T \tilde{x}_i)} dw_{1:B}
+\end{align*}
+%
+We note that $b_i \in [B]$ and so the integral's value is unchanged with respect to $b_i$. The integrand has the same form no matter which value $b_i$ takes as the prior is the same for each $w_j$. As such the integral can only be a function of at most $\tilde{x}_i$ and $\sigma_\theta^2$ as it is symmetric with respect to $b_i$ and all the various $w_j$ are integrated out as they are dummy variables. Therefore, denoting the integral by the (unknown) function $f(\tilde{x}_i, \sigma_\theta^2)$, we write $p(b| X)$ as follows:
+%
+\begin{align*}
+	p(b | X) &= \prod_{i=1}^{N} f(\tilde{x}_i, \sigma_\theta^2) = \textrm{const w.r.t } b = c
+\end{align*}
+%
+As this is a constant with respect to $b$ we conclude that $p(b | X)$ must be a uniform distribution. $\nicefrac{1}{c}$ is simply the size of the set of values that $b$ can take. We know $b_i \in [B]$. Therefore, $b \in [B]^N$ and $|[B]^N| = B^N = \nicefrac{1}{c}$. Putting this all together we conclude that:
+%
+\begin{equation}
+	p(b | X) = B^{-N}
+\end{equation}
+
+\subsection{Derivation of U form}
+\label{appdx:form-U}
+
+The invariant distribution we wish to target for the $\theta$ samples is the posterior of $\theta$ given the values of the pair $(X, b)$. We write this as follows:
+%
+\begin{align}
+	\pi_\theta(\theta) &\propto p(\theta | X, b) \propto p(b | X, \theta) p(\theta) \propto  \exp \left( - U(\theta) \right) \\
+	\therefore U(\theta) &= - \left( \log p(b | X, \theta) + \log p(\theta) \right) + \textrm{const}
+\end{align}
+%
+Where we have introduced $U(\theta)$ equal to the negative log posterior. Each of the constituent terms of $U(\theta)$ are easily computed (equation \ref{eqn:U-constituent-terms}) by defining $y_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and $a_{ij} \coloneqq \phi_j(x_i; \theta)$.
+%
+\begin{equation}
+	\log p(b | X, \theta) = \sum_{i \in [N]} \sum_{j \in [B]} y_{ij} \log a_{ij}  \quad \textrm{and} \quad
+	\log p(\theta) = -\frac{(D+1)(B)}{2} \log 2\pi - \frac{1}{2 \sigma_\theta^2} || \theta ||^2
+	\label{eqn:U-constituent-terms}
+\end{equation}
+%
+Discarding constant terms, we write $U(\theta)$ as in equation \ref{eqn:U-form-appdx-0}. Note that $||\theta||^2 = \sum_{i} \theta_{i}^2 = \sum_{j=1}^{B} ||w_j||^2$ is the Euclidean norm of the vector of parameters $\theta$.
+%
+\begin{equation}
+	U(\theta) = \left( \sum_{i=1}^{N} \sum_{j=1}^{B} y_{ij} \log \frac{1}{a_{ij}} \right)
+	+ \frac{1}{2\sigma_\theta^2} ||\theta||^2 = N \cdot \Lcal(\theta) + \frac{1}{2\sigma_\theta^2} ||\theta||^2
+	\label{eqn:U-form-appdx-0}
+\end{equation}
+%
+
+\subsection{Derivation of U gradient with respect to feature parameters}
+\label{appdx:gradu}
+The goal is to determine $\nabla U(\theta)$, the gradient of the negative log posterior with respect to the parameters. We repeat the form of $U(\theta)$ in equation \ref{eqn:U-form-appdx}.
+%
+\begin{equation}
+	U(\theta) = \left( \sum_{i \in [N]} \sum_{j \in [B]} y_{ij} \log \frac{1}{a_{ij}} \right)
+	+ \frac{1}{2\sigma_\theta^2} ||\theta||^2
+	\label{eqn:U-form-appdx}
+\end{equation}
+%
+Where $y_{ij}$ is independent of $\theta$ and $a_{ij}$ is the output from the softmax layer, with form as given in equation \ref{eqn:a-ij}.
+%
+\begin{equation}
+	a_{ij} \coloneqq \phi_{j} (x_i; \theta) = \frac{\exp(w_j^T \tilde{x}_i)}{\sum_{r \in [B]} \exp(w_r^T \tilde{x}_i)}
+	\label{eqn:a-ij} 
+\end{equation}
+%
+We note that $\theta = \{w_k\}_{k=1}^B$, and as such we can write this in vector form $\theta = \left[w_1^T, w_2^T \dots w_B^T  \right]^T$. Therefore, $\nabla U(\theta) = \left[\nicefrac{\partial U}{\partial w_1}^T,\nicefrac{\partial U}{\partial w_2}^T \dots \nicefrac{\partial U}{\partial w_B}^T  \right]^T$; to compute $\nabla U(\theta)$ it suffices to find the form of $\nicefrac{\partial U}{\partial w_k}$ with respect to a general $k$.
+
+To this end, we must first find partial derivatives of $a_{ij}$ and $||\theta||$ with respect to $w_k$. Starting with $a_{ij}$:
+%
+\begin{align}
+	\frac{\partial a_{ij}}{\partial w_k} &= \frac
+	{\tilde{x}_i \exp(w_j^T \tilde{x}_i) \delta_{jk} \cdot \sum_{r \in [B]} \exp(w_r^T \tilde{x}_i) 
+		- 
+		\exp(w_j^T \tilde{x}_i) \cdot \tilde{x}_i \exp(w_k^T \tilde{x}_i)}
+	{\left( \sum_{r \in [B]} \exp(w_r^T \tilde{x}_i) \right)^2} \nonumber \\
+	&= \tilde{x}_i \left( a_{ij} \delta_{jk} - a_{ij}a_{ik} \right) 
+\end{align}
+%
+Where $\delta_{jk} \coloneqq \one \left\{ j = k \right\}$. Now moving onto the derivative of $||\theta||^2$:
+%
+\begin{equation}
+	\frac{ \partial}{\partial w_k} ||\theta||^2 = \frac{\partial}{\partial w_k} \left( \sum_{r \in [B]} ||w_r||^2 \right) = 2w_k
+\end{equation}
+%
+We are ready to put this all together, to find the partial derivative of $U(\theta)$ with respect to each $w_k$:
+\begin{align}
+	\frac{\partial U}{\partial w_k} &= 
+	\sum_{i=1}^{N} \sum_{j=1}^{B} y_{ij} 
+	\left( \frac{-\tilde{x}_i}{a_{ij}} \left( a_{ij} \delta_{jk} - a_{ij} a_{ik} \right) \right)
+	+ \frac{w_k}{\sigma_\theta^2} \nonumber \\
+	&=  - \left( \sum_{i=1}^{N} \tilde{x}_i \left( y_{ik} - a_{ik} \sum_{j=1}^{B} y_{ij} \right)
+	- \frac{w_k}{\sigma_\theta^2} \right) \nonumber \\
+	&= - \left( \sum_{i=1}^{N} \Big\{ \tilde{x}_i (y_{ik} - a_{ik}) \Big\} - \frac{w_k}{\sigma_\theta^2} \right)
+\end{align}
+%
+This is the required result. This form can be computed efficiently through matrix operations. The only property of $y_{ij}$ we have used in the derivation is the sum-to-one constraint $\sum_{j=1}^{B} y_{ij} = 1$ for all $i$.
+
+\subsection{Choosing the MALA step-size}
+\label{appdx:step-size}
+
+For sampling from the $\theta$-chain of the block membership generator parameters, we employed the Metropolis Adjusted Langevin Algorithm (MALA). At iteration $t$, the proposed sample is generated by:
+%
+\begin{equation}
+	\theta' = \theta^{(t)} - h_t \nabla U(\theta^{(t)}) + \sqrt{2h_t} \cdot \xi
+\end{equation}
+%
+There are two competing objectives when choosing the step-size $h_t$. On the one hand, we want the step-size to be large so that we arrive at a high density region quickly. However, too large a step-size will lead to a lower acceptance ratio and thus inefficient sampling. A solution to this problem would be to slowly decrease the step-size with $t$ - often called simulated annealing. Therefore, we still have a short burn-in time but will not bounce around the mode for large $t$. As well as the trivial constraint for $h_t$ to be strictly positive, we introduce two further constraints as outlined by \citet{Bayesian-SGLD}:
+%
+\begin{equation}
+	\sum_{t=1}^{\infty} h_t = \infty \qquad \textrm{and} \qquad
+	\sum_{t=1}^{\infty} h_t^2 < \infty
+	\label{eqn:h-constraints}
+\end{equation}
+%
+The first constraint ensures that we have cover sufficient distance to arrive at any arbitrary point in our domain, no matter the starting point. The second constraint ensures that once we converge to the mode rather than simply bouncing around it. \citet{Bayesian-SGLD} propose the following form for a polynomially decaying step-size which we adopt:
+%
+\begin{equation}
+	h_t = \alpha(\beta + t)^{-\gamma}
+\end{equation}
+%
+Where $\alpha, \beta, \gamma$ are hyper-parameters to be chosen. We require $\alpha,\beta > 0$ and $\gamma \in (0.5, 1]$ to satisfy equation \ref{eqn:h-constraints}. To reduce the number of hyperparameters we set these to have values given by the equations \ref{eqn:step-size-params}.
+%
+\begin{equation}
+	\alpha = \frac{250 \cdot s}{N} \qquad \beta = 1000 \qquad \gamma = 0.8
+	\label{eqn:step-size-params}
+\end{equation}
+%
+Where $N$ is the number of data-points we are considering and now $s$ is the only free variable which we call the step-size scaling. For approximate methods, we can choose to bypass the MH accept-reject entirely to speed up computation. If this is done, the algorithm is instead called stochastic gradient Langevin diffusion (SGLD) \cite{Bayesian-SGLD}. This speeds up computation at the expense of exactness of the method.
+
+\subsection{Burn-in and thinning}
+\label{appdx:burn-in-thinning}
+
+As with any MCMC method, we must deal with the issues presented by burn-in and thinning. We have introduced the notation $\Tcal_b$ and $\Tcal_\theta$ to denote the set of samples we keep from the $b$ and $\theta$ chains respectively. Note that we generate $T_b$ and $T_\theta$ samples total. The burn-in period refers to the time taken for the Markov Chain to converge to the stationary distribution. Sample thinning is necessary to ensure that neighbouring samples satisfy independence. However, as we do not leverage the independence property this is less important in our analysis. We can write the general set $\Tcal_\star$ as:
+%
+\begin{equation}
+	\Tcal_\star = \{T_\star \kappa_\star + i \lambda_\star :  
+	0 \leq i \leq \lfloor T_\star(1 - \kappa_\star) / \lambda_\star \rfloor \}
+\end{equation}
+%
+Where the parameter $\kappa_\star \in (0, 1)$ controls our burn-in and $\lambda_\star$ controls our thinning. $\kappa_\star$ can be determined by plotting the log-target (either $S(b^{(t)})$ or $U(\theta^{(t)})$ with respect to the epoch $t$. $\kappa_\star$ is then chosen to encompass the region where the log-target has roughly equilibrated. As we do not leverage sample independence $\lambda_\star$ can be chosen less rigorously. We often just use $\lambda_b=5$ and $\lambda_\theta = 10$.
+
+\subsection{Initializing the b-chain}
+
+For the purposes of our model (the FFBM), the number of blocks $B$ is a constant which must be specified by the data scientist. We could however, allow our choice of $B$ to be influenced by the observed data. This places us in the domain of empirical Bayes, which must be negotiated carefully. Prior beliefs must be determined a priori else they are not prior. However, as the number of blocks only specifies the coarseness of the analysis, it is fine to allow it to vary. Indeed, \citet{peixoto-determine-B} shows that for a fixed average degree the maximum number of detectable blocks scales as $O(\sqrt{N})$ where $N$ is the number of vertices.
+
+If we allow $B$ to vary in the $b$-chain (i.e. new blocks can be created and we permit empty blocks) then it can be run  until a minimum description length (MDL) solution is reached. We take the number of non-empty blocks at the MDL to be our fixed block number $B$ for subsequent analysis. Indeed, it is prudent to start our $b$-chain at this MDL solution as then we can burn-in time is greatly reduced.
+
+\subsection{Algorithms}
+\label{appdx:algorithms}
+
+\begin{algorithm} % enter the algorithm environment
+	\caption{Block membership sample generation} % give the algorithm a caption
+	\label{alg:b-samples} % and a label for \ref{} commands later in the document
+	\begin{algorithmic} % enter the algorithmic environment
+		\State $b^{(0)} \gets \argmin_b S(b|A)$ \Comment{Implemented as greedy heuristic in \textit{graph-tool} library}
+		\For{$t \in \{0, 1 \dots T_b - 1\}$}
+		\State $b' \gets \sim q_b(b^{(t)}, b' | A)$
+		\State $\log \alpha_b \gets \log \alpha_b(b^{(t)}, b' | A)$
+		\State $\eta \gets \sim \textrm{Unif}(0,1)$
+		\If{$\log \eta < \log \alpha_b$}
+		\State $b^{(t+1)} \gets b'$
+		\Else
+		\State $b^{(t+1)} \gets b^{(t)}$
+		\EndIf
+		\EndFor
+		
+		\State \textbf{return} $\{b^{(t)}\}_{t=1}^{T_b}$
+		
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm} % enter the algorithm environment
+	\caption{FFBM parameter pseudo-marginal inference} % give the algorithm a caption
+	\label{alg:theta-samples} % and a label for \ref{} commands later in the document
+	\begin{algorithmic} % enter the algorithmic environment
+		
+		\State $\hat{Y}_{ij} \gets \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} \one \{ b^{(t)}_i = j\} \quad \forall i,j$
+		\State $\theta^{(0)} \gets \sim \Gaussian(0, \sigma_\theta I)$
+		
+		\item[]
+		
+		\For{$t \in \{0, 1 \dots T_\theta - 1\}$}
+		\State $\xi \gets \sim \Gaussian(0, I)$
+		\State $\theta' \gets \theta^{(t)} - h_t \nabla U(\theta^{(t)} | X, \hat{Y}) + \sqrt{2h_t} \cdot \xi$
+		\State $\log \alpha_\theta \gets \log \alpha_\theta(\theta^{(t)}, \theta' | A, \hat{Y})$
+		\State $\eta \gets \sim \textrm{Unif}(0,1)$
+		\If{$\log \eta < \log \alpha_\theta$}
+		\State $\theta^{(t+1)} \gets \theta'$
+		\Else
+		\State $\theta^{(t+1)} \gets \theta^{(t)}$
+		\EndIf
+		\EndFor
+		
+		\State \textbf{return} $\{\theta^{(t)}\}_{t=1}^{T_\theta}$
+		
+	\end{algorithmic}
+\end{algorithm}
+
+\FloatBarrier
+\subsection{Hyperparameter values}
+\label{appdx:hyperparams}
+
+\begin{table}[!h]
+	\centering
+	\caption{Hyper-parameter values for each experiment}
+	\label{tab:hyperparams}
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{c|ccc|ccc|cccc|cc|cccc}
+			Dataset & 
+			$B$ & $f$ & $\sigma_\theta$ & 
+			$T_b$ & $\kappa_b$ & $\lambda_b$ & 
+			$T_\theta$ & $\kappa_\theta$ & $\lambda_\theta$ & $s$ &
+			$k$ & $D'$ &
+			$T_\theta'$ & $\kappa_\theta'$ & $\lambda_\theta'$ & $s'$
+			\\ \hline
+			Polbooks &
+			3 & 0.7 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.4 & 10 & 0.05 &
+			-- & -- & 
+			-- & -- & -- & -- \\
+			School &
+			10 & 0.7 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.4 & 10 & 0.2 &
+			1 & 10 & 
+			10,000 & 0.4 & 10 & 0.2 \\
+			FB Egonet &
+			10 & 0.7 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.4 & 10 & 0.017 &
+			1 & 10 & 
+			10,000 & 0.4 & 10 & 0.5 \\
+		\end{tabular}
+	}
+\end{table}
+
+\subsection{Implementation details}
+\label{appdx:imp-details}
+
+All data analysis and visualisation was implemented in Python. Full source code is available in the supplementary material. The scripts were run using a standard PC using the Windows Subsystem for Linux (WSL) environment. Specs are:
+
+\begin{itemize}
+	\item \textbf{CPU}: Intel(R) Core(TM) i7-1065G7
+	\item \textbf{RAM}: 8GB
+	\item \textbf{GPU}: Intel(R) Iris(R) Plus Graphics
+\end{itemize}
+
+On this hardware each experiment iteration took the following amount of time to execute:
+
+\begin{table}[!h]
+	\centering
+	\caption{Compute-time for each experiment}
+	\label{tab:compute-time}
+	\begin{tabular}{c|ccc|c}
+		Dataset & $b$-chain & $\theta$-chain & Reduced $\theta$-chain & Overall compute time \\ \hline
+		Polbooks & $\sim$1s & $\sim$4s & -- & $\sim$5s \\
+		School & $\sim$10s & $\sim$10s & $\sim$10s & $\sim$30s \\
+		FB Egonet & $\sim$20s & $\sim$180s & $\sim$10s & $\sim$210s
+	\end{tabular}
+\end{table}
+
