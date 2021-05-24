@@ -30,6 +30,7 @@
 \usepackage{placeins}
 \usepackage{enumitem}
 \usepackage[margin=1in]{geometry}
+\usepackage{pdfpages}
 
 %images
 \graphicspath{{./img/}}
@@ -89,30 +90,12 @@
 
 \begin{document}
 
-\begin{titlepage}
-	\centering
-	\includegraphics[width=0.15\textwidth]{cambridge} \hspace{1in}
-	\includegraphics[width=0.18\textwidth]{sjc}\par\vspace{1cm}
-	{\scshape\LARGE Cambridge University Engineering Department \par}
-	\vspace{1cm}
-	{\scshape\Large IIB Project Report \par}
-	\vspace{1.5cm}
-	{\scshape \huge Inferring community characteristics in labelled networks\par}
-	\vspace{2cm}
-	{\Large Lawrence Tray\par}
-	{St John's College}
-	\vfill
-	supervised by\par
-	Prof.~Ioannis Kontoyiannis
-	
-	\vfill
-	
-	% Bottom of the page
-	{\large \today\par}
-\end{titlepage}
+\includepdf{coversheet}
 
 %
 \input{abstract}
+\clearpage
+\input{nomenclature}
 \clearpage
 \tableofcontents
 \clearpage
@@ -124,8 +107,7 @@
 \input{experiments}
 \input{conclusion}
 
-%\clearpage
-%\input{ack}
+\clearpage
 
 %references
 \bibliography{sources.bib}
@@ -135,6 +117,8 @@
 %
 \input{appendices}
 %
+\clearpage
+\input{risk}
 \clearpage
 \input{covid}
 
