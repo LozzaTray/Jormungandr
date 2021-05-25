@@ -82,6 +82,28 @@ As with any MCMC method, we must deal with the issues presented by burn-in and t
 %
 Where the parameter $\kappa_\star \in (0, 1)$ controls our burn-in and $\lambda_\star$ controls our thinning. $\kappa_\star$ can be determined by plotting the log-target (either $S(b^{(t)})$ or $U(\theta^{(t)})$ with respect to the epoch $t$. $\kappa_\star$ is then chosen to encompass the region where the log-target has roughly equilibrated. As we do not leverage sample independence $\lambda_\star$ can be chosen less rigorously. We often just use $\lambda_b=5$ and $\lambda_\theta = 10$.
 
+By way of illustration, we can consider the primary school dataset \cite{schools}. We plot the normalised objective function $U\left( \theta^{(t)} \right) / N$ with respect to MALA iteration on figure \ref{fig:school-U-orginal}. We see that the chain converges to the modal neighbourhood quickly (within about 2000 iterations of a total 10,000). Nevertheless, we pick $\kappa_\theta=0.4 > 0.2$ just to be on the safe-side. $\lambda_\theta=10$ is chosen somewhat arbitrarily as we do not require neighbouring samples to be independent. Nevertheless, this thinning does speed up computation of quantities that require an average over all the retained samples -- as $|\Tcal_\theta| < T_\theta$.
+%
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}[t]{0.4\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{school-U-original.png}
+		\caption{Original samples $t \in [T_\theta]$}
+		\label{fig:school-U-orginal}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.4\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{school-U-thinned.png}
+		\caption{Thinned samples $t \in \Tcal_\theta$ indexed by $i$}
+		\label{fig:school-U-thinned}
+	\end{subfigure}
+	\hspace{1cm}
+	\caption{Primary school dataset normalised objective function against sample index}
+\end{figure}
+
+We see on figure \ref{fig:school-U-thinned} that $U(\theta^{(i)})$ does bounce around a small amount. This is to be expected we are sampling from the posterior rather than converging to the MAP. The variations do appear to be rather long in time-scale but we can live with this as we do not require sample independence.
+\FloatBarrier
 \subsection{Initializing the b-chain}
 
 For the purposes of our model (the FFBM), the number of blocks $B$ is a constant which must be specified by the data scientist. We could however, allow our choice of $B$ to be influenced by the observed data. This places us in the domain of empirical Bayes, which must be negotiated carefully. Prior beliefs must be determined a priori else they are not prior. However, as the number of blocks only specifies the coarseness of the analysis, it is fine to allow it to vary. Indeed, \citet{peixoto-determine-B} shows that for a fixed average degree the maximum number of detectable blocks scales as $O(\sqrt{N})$ where $N$ is the number of vertices.
