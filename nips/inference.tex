@@ -167,8 +167,8 @@ A simple heuristic to discard the least important features requires specifying a
 Intuitively, this means discarding any feature for which $\hat{\mu}_{ij} \pm k\hat{\sigma}_{ij}$ lies within or spans the null region $(-c, c)$ for all block indices. If we were to use the Laplace approximation for the posterior $p(W_{ij} | A, X) \approx \Gaussian(W_{ij}; \mu_{ij}, \sigma_{ij})$, then this is effectively a hypothesis test on the value of $W_{ij}$ (equation \ref{eqn:hyp-test-discard}). $\Dcal'$ then comprises all features $i$ for which $H_1$ is accepted at least once for some $j \in [B]$.
 %
 \begin{equation}
-	H_0: |\mu_{ij}| \leq c \qquad
-	H_1: |\mu_{ij}| > c
+	H_0: |W_{ij}| \leq c \qquad
+	H_1: |W_{ij}| > c
 	\label{eqn:hyp-test-discard}
 \end{equation}
 %
