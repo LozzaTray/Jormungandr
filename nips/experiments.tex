@@ -6,7 +6,7 @@ We apply the developed methods to a variety of datasets. These are chosen to spa
 \begin{itemize}[leftmargin=*]
 	\item \textbf{Political books} \cite{polbooks} ($N=105, E=441, D=3$) -- network of Amazon book sales about U.S. politics, published close to the presidential election in 2004. Two books are connected if they were frequently co-purchased by customers. Vertex features encode the political affiliation of the author (liberal, conservative or neutral).
 		
-	\item \textbf{Primary school dynamic contacts} \cite{schools} ($N=238, E=5539, D=13$) -- network of face-to-face contacts amongst students and teachers at a primary school in Lyon, France. Two nodes are connected if the two parties shared a face-to-face interaction over the school-day. Vertex features include class membership (one of 10 values: 1A-5B), gender and teacher/student distinction. No further identifiable information is retained. We choose to analyse just the second day of results.
+	\item \textbf{Primary school dynamic contacts} \cite{schools} ($N=238, E=5539, D=13$) -- network of face-to-face contacts amongst students and teachers at a primary school in Lyon, France. Two nodes are connected if the two parties shared a face-to-face interaction over the school-day. Vertex features include class membership (one of 10 values: 1A-5B), gender (male, female) and teacher status encoded as an 11th school-class. No further identifiable information is retained. We choose to analyse just the second day of results.
 	
 	\item \textbf{Facebook egonet} \cite{fb-snap} ($N=747, E=30025, D=480$) -- an assortment of Facebook users' friends lists. Vertex features are extracted from each user's profile and are fully anonymised. They include information about education history, languages spoken, gender, home-town, birthday etc. We focus on the egonet with id 1912.
 
@@ -78,9 +78,9 @@ We apply the developed methods to a variety of datasets. These are chosen to spa
 	\resizebox{\textwidth}{!}{%
 		\begin{tabular}{c|ccc|c|cc|ccc}
 			Dataset  & $B$ & $D$ & $D'$ & $\bar{S}_e$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $c^*$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$  \\ \hline
-			Polbooks & 3 & 3 & -- & $2.250 \pm 0.001$ & $0.584 \pm 0.033$ & $0.557 \pm 0.061$ & -- & -- & -- \\
-			School & 10 & 13 & 10 & $1.894 \pm 0.006$ & $0.793 \pm 0.096$ & $0.914 \pm 0.112$ & $1.112 \pm 0.230$ & $0.791 \pm 0.096$ & $0.864 \pm 0.139$ \\
-			FB egonet & 10  & 480 & 10 & $1.626 \pm 0.003$ & $1.305 \pm 0.034$ & $1.539 \pm 0.087$ & $0.942 \pm 0.042$ & $1.496 \pm 0.093$ & $1.578 \pm 0.104$
+			Polbooks & 3 & 3 & -- & $2.250 \pm 0.000$ & $0.563 \pm 0.042$ & $0.595 \pm 0.089$ & -- & -- & -- \\
+			School & 10 & 13 & 10 & $1.894 \pm 0.004$ & $0.787 \pm 0.127$ & $0.885 \pm 0.129$ & $1.198 \pm 0.249$ & $0.793 \pm 0.132$ & $0.853 \pm 0.132$ \\
+			FB egonet & 10  & 480 & 10 & $1.626 \pm 0.003$ & $1.326 \pm 0.043$ & $1.538 \pm 0.069$ & $0.94 \pm 0.019$ & $1.580 \pm 0.150$ & $1.605 \pm 0.106$
 		\end{tabular}
 	}
 \end{table}
@@ -110,7 +110,7 @@ The average description length per entity of the graph $\bar{S}_e$ has very low 
 
 \subsection{Political books}
 
-We wish to determine whether the author's political affiliation is a good predictor of the overall network structure. We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral). From, figure \ref{fig:polbooks-null}, we see that all 3 blocks have a distinct political affiliation as their largest positive component. This is strong evidence that political affiliation is indeed the axis which best predicts the 3-way natural partition of the graph into blocks. Furthermore, table \ref{tab:results} we see that the training and test losses are very similar (the test loss mean is even below the training loss) and both are low in magnitude. This provides further evidence to the claim that political affiliation is the best explanatory variable for the overall network structure.
+We wish to determine whether the author's political affiliation is a good predictor of the overall network structure. We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral). From, figure \ref{fig:polbooks-null}, we see that all 3 blocks have a distinct political affiliation as their largest positive component. This is strong evidence that political affiliation is indeed the axis which best predicts the 3-way natural partition of the graph into blocks. Furthermore, from table \ref{tab:results} we see that the training and test losses are very similar and both are low in magnitude. This provides further evidence to the claim that political affiliation is the best explanatory variable for the overall network structure.
 
 \subsection{Primary school dynamic contacts}
 

@@ -89,7 +89,25 @@ For the purposes of our model (the FFBM), the number of blocks $B$ is a constant
 If we allow $B$ to vary in the $b$-chain (i.e. new blocks can be created and we permit empty blocks) then it can be run  until a minimum description length (MDL) solution is reached. We take the number of non-empty blocks at the MDL to be our fixed block number $B$ for subsequent analysis. Indeed, it is prudent to start our $b$-chain at this MDL solution as then we can burn-in time is greatly reduced.
 
 \subsection{Dimensionality discussion}
+\label{appdx:dimension}
 
 There is a challenge when dealing with vertex-features. Many vertex feature often take only one of several discrete values within a set. For example, with the primary school dataset \cite{schools}, a pupil's school-class can take one of 10 values from \{"1A", "1B", "2A", "2B" \dots "5A", "5B"\}.
 
-It is not immediately obvious how to encode this for the feature-to-block classifier. Although this is technically only a single dimension, we choose to expand the data into a set of 10 binary feature flags $\in \Xcal = \{0, 1\}$. Although only one flag will be set at a time it is the simplest method for representing discrete-valued data. The reason we choose $\Xcal=\{0, 1\}$ and not $\Xcal = \{-1, 1\}$ is that the former allows for simpler analysis of the resulting weight values. When a feature is switched off, it has no impact on the Softmax classifier. It is simpler to only model positive relationships. We prefer to say that this block is comprised of the vertices with feature $d$ on rather than this block contains the vertices with feature $d$ switched off. Nevertheless, this dimensionality expansion means that we cannot include a bias term in our classifier as then there is no unique MAP solution.
+It is not immediately obvious how to encode this for the feature-to-block classifier. Although this is technically only a single dimension, we choose to expand the data into a set of 10 binary feature flags $\in \Xcal = \{0, 1\}$. Although only one flag will be set at a time it is the simplest method for representing discrete-valued data. The reason we choose $\Xcal=\{0, 1\}$ and not $\Xcal = \{-1, 1\}$ is that the former allows for simpler analysis of the resulting weight values. When a feature is switched off, it has no impact on the softmax classifier. It is simpler to only model positive relationships. We prefer to say that this block is comprised of the vertices with feature $d$ on rather than this block contains the vertices with feature $d$ switched off. To make this explicit, say we have a feature encoding a pupil's gender: \{"male", "female"\}, we represent this as 2 binary feature flags "male": \{0, 1\} and "female": \{0, 1\}. This approach may seem inefficient but it is vital to ensure we can interpret the resulting parameter distributions.
+
+Nevertheless, this dimensionality expansion means that we cannot include a bias term in our classifier as then the MAP solution is less peaked and our $\theta$-samples will have higher variance. To illustrate this point we need only look at the form of the soft-max classifier with bias vector $\beta$, operating on a vector $x$ which only has feature $d$ turned on such that $x_i = \one\{i = d\}$. Component $j$ of the output is given by:
+%
+\begin{equation}
+	\phi_j(x) = \frac{\exp(w_j^T x + \beta_j)}{\sum_{k=1}^{B} \exp(w_k^T x + \beta_k)} = 
+	\frac{\exp(w_{jd} + \beta_j)}{\sum_{k=1}^{B} \exp({w_{kd} + \beta_k})}
+	\label{eqn:softmax-bias}
+\end{equation}
+%
+For the case that $x$ can only has one entry $x_d=1$ and the rest are 0, the term $w_{kd} + \beta_k$ is effectively the new weight for component $k$. The bias term $\beta_k$ becomes an unnecessary extra degree of freedom. To illustrate this point, we set $\beta_k=\beta_0 \forall j$. If this is the case then equation \ref{eqn:softmax-bias} can be simplified to:
+%
+\begin{equation}
+	\phi_j(x) = \frac{\exp(\beta_0) \cdot \exp(w_{jd})}{\sum_{k=1}^{B} \exp(\beta_0) \cdot \exp(w_{kd})}
+	= \frac{\exp(w_{jd})}{\sum_{k=1}^{B} \exp(w_{kd})}
+\end{equation}
+%
+This expression is independent of $\beta_0$ and so it is free to vary. This is not the whole picture as we also have the prior which introduces a regularisation term which favours weights closer to 0. Nevertheless, for mutually exclusive binary feature flags, the bias term does not add to the expressiveness of the model and only serves to complicate analysis. We therefore remove the bias term from the Softmax classifier. Even for data comprised of several such features (e.g. school class and data) we prefer to discard the bias term. The bias term only serves to decrease the loss function by leveraging information about the size of each detected block and not feature information. We do not wish to be overly confident in our model predictions when such prediction is influenced by block size and not feature information. Indeed, the approach was initially developed with a bias term but we found its removal yielded more reliable and reproducible results. 
