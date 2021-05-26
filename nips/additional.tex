@@ -70,6 +70,24 @@ Where $\alpha, \beta, \gamma$ are hyper-parameters to be chosen. We require $\al
 %
 Where $N$ is the number of data-points we are considering and now $s$ is the only free variable which we call the step-size scaling. For approximate methods, we can choose to bypass the MH accept-reject entirely to speed up computation. If this is done, the algorithm is instead called stochastic gradient Langevin diffusion (SGLD) \cite{Bayesian-SGLD}. This speeds up computation at the expense of exactness of the method.
 
+Nevertheless, to choose the value of $s$ we must quantify the trade-off between acceptance ratio and burn-in time. We do this by way of an example with the primary school dataset \cite{schools}. We run the $b$-chain for $T_b = 1,000$ iterations and subsample such that $\Tcal_b$ is computed with $\kappa_b=0.2$ and $\lambda_b=5$. We then use this to run the $\theta$-chain for $T_\theta = 10,000$ iterations. The acceptance ratio -- which we denote $r_\alpha$ -- is easy enough to compute as simply the fraction of proposed moves which we accept. However, to quantify burn-in time we must use a different metric. We can plot the mean of the objective function averaged over all samples as a proxy for burn-in time:
+%
+\begin{equation}
+	\bar{U} \coloneqq \frac{1}{T_\theta} \sum_{t \in [T_\theta]} U\left( \theta^{(t)} \right)
+\end{equation}
+%
+As the chain will equilibrate in the vicinity of a minima in $U(\theta)$, the average over all samples is a rough indicator of the speed of burn-in. This assumes that the random starting point has high $U(\theta)$. The higher the value of $\bar{U}$, the longer the chain took to burn in and reach equilibrium. We plot the acceptance ratio $r_\alpha$ and average objective $\bar{U}$ for $10$ values of the step-size multiplier $s$ logarithmically spaced in the range $(10^{-2}, 10^1)$ on figure \ref{fig:step-size-tradeoff}.
+%
+\begin{figure}[!h]
+	\centering
+	\includegraphics[width=0.6\linewidth]{step-size-tradeoff}
+	\caption{Primary school dataset \cite{schools} illustration of step-size tradeoff}
+	\label{fig:step-size-tradeoff}
+\end{figure}
+
+We see immediately that acceptance ratio $r_\alpha$ steadily decreases with $s$. This is expected as it is unlikely we stay in a high density region of our target distribution if we are making very large steps each time. A low acceptance ratio leads to wasted samples and this inefficiency is obviously undesirable. Nevertheless, $\bar{U}$ decreases with $s$ indicating shorter burn-in times for larger step-sizes. Nevertheless, this effect plateaus for $s>0.2$ for this particular dataset. Therefore, we choose $s=0.2$ as our step-size multiplier for the primary school datasets as this yields the best trade-off between $r_\alpha$ and $\bar{U}$. Indeed, the acceptance ratio is still high for $r_\alpha \approx 0.8$ for $s=0.2$. The step-sizes for the other datasets were chosen following the same argument.
+
+\FloatBarrier
 \subsection{Burn-in and thinning}
 \label{appdx:burn-in-thinning}
 
