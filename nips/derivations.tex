@@ -130,4 +130,34 @@ Where we have used the set of samples for $W$ drawn according to the exact poste
 	\hat{\sigma}_{ij}^2 \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \left( W_{ij}^{(t)} - \hat{\mu}_{ij} \right)^2
 \end{equation}
 %
-The probability
+This approximation is not exact but can show it is accurate empirically. Indeed, if we run the primary school experiment with hyper-parameters given in appendix \ref{appdx:hyperparams}, we can then plot histograms of the collected $W$-samples and compare these to the Laplace approximation. The results are given on figure \ref{fig:school-histogram}. Even though the Laplace approximation is not exact, it is remarkably reliable. 
+
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}[t]{0.3\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{school-sample-histogram-16.png}
+		\caption{Weight for block 1, class 3B}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.3\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{school-sample-histogram-37.png}
+		\caption{Weight for block 3, class 4A}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.3\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{school-sample-histogram-84.png}
+		\caption{Weight for block 8, class 2B}
+	\end{subfigure}
+
+	\caption{Histograms of sampled weights for the primary school experiment \cite{schools}. Dotted line is the applied Laplace approximation.}
+	\label{fig:school-histogram}
+\end{figure}
+
+Using the approximation, we can construct a test to determine whether a particular weight value has $|W_{ij}| > c$ with high probability. Assuming without loss of generality that
+%
+\begin{equation}
+	p(|W_{ij}| > c) = p(W_{ij})
+\end{equation}
