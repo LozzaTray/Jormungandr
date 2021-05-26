@@ -98,3 +98,36 @@ We are ready to put this all together, to find the partial derivative of $U(\the
 \end{align}
 %
 This is the required result. This form can be computed efficiently through matrix operations. The only property of $y_{ij}$ we have used in the derivation is the sum-to-one constraint $\sum_{j=1}^{B} y_{ij} = 1$ for all $i$.
+
+\subsection{Hypothesis test on feature weights}
+
+We are given samples $\{\theta^{(t)}\}_{t \in \Tcal_\theta} \sim p(\theta | A, X)$ and wish to determine the statistical significance of the weights. We adopt matrix notation for simplicity by representing $\theta$ with the matrix $B \times D$ matrix of feature weights $W$. The question is to determine the significance of a particular feature $d$ by examining the value of $W_{id}$ for all the values $i \in [B]$. We know that the posterior is proportional to the prior multiplied by the likelihood (assuming that the feature matrix $X$ is already given):
+%
+\begin{equation}
+	p(\theta|A, X) \propto p(\theta) \cdot p(A | \theta, X)
+\end{equation}
+%
+The prior term can be evaluated but the likelihood is intractable. The closest we can get is through a Monte-Carlo integration over $b$:
+%
+\begin{align}
+	p(A | \theta, X) &= \sum_{b \in [B]^N} p(A, b | \theta, X) \nonumber \\
+	&= \sum_{b \in [B]^N} p(A | b, \theta, X) \cdot p(b | \theta, X) \nonumber \\
+	&= \sum_{b \in [B]^N} p(A | b) \cdot p(b | \theta, X) \nonumber \\
+	&\approx \sum_{i} p\left( A | b^{(i)} \right) \quad \textrm{with} \quad b^{(i)} \sim p(b| \theta, X)
+	\label{eqn:mc-likelihood}
+\end{align}
+%
+This could be implemented for a single value of $\theta$ but such a form cannot be used to characterise the overall form of the posterior. Nevertheless, the form in equation \ref{eqn:mc-likelihood} still does highlight something interesting. The likelihood is peaked around areas of $\theta$ that generate a partition $b$ that is highly likely in the SBM sense -- high $p(A|b)$. This provides the motivation for using the Laplace approximation for modelling the posterior $p(\theta | A, X) \approx p(\theta; \mu, \Sigma)$. Indeed, the Laplace approximation is often used for modelling the posterior in logistic classification \cite{laplace}. As a simplification we assume that $\Sigma$ is diagonal, therefore each element of $\theta$ is independent. This assumption does not hold in general but it motivates the derivation of the dimensionality reduction we construct by analogy with hypothesis testing. Assuming, $\Sigma$ is diagonal then the posterior for each element of the weight matrix $W$ can be approximated by:
+%
+\begin{equation}
+	p(W_{ij}|A, X) \approx \Gaussian(W_{ij}|\hat{\mu}_{ij}, \hat{\sigma}_{ij}^2)
+\end{equation}
+%
+Where we have used the set of samples for $W$ drawn according to the exact posterior, to calculate unbiased estimates for the mean and standard deviation:
+%
+\begin{equation}
+	\hat{\mu}_{ij} \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} W_{ij}^{(t)} \qquad \textrm{and} \qquad
+	\hat{\sigma}_{ij}^2 \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \left( W_{ij}^{(t)} - \hat{\mu}_{ij} \right)^2
+\end{equation}
+%
+The probability
