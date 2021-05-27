@@ -100,6 +100,7 @@ We are ready to put this all together, to find the partial derivative of $U(\the
 This is the required result. This form can be computed efficiently through matrix operations. The only property of $y_{ij}$ we have used in the derivation is the sum-to-one constraint $\sum_{j=1}^{B} y_{ij} = 1$ for all $i$.
 
 \subsection{Hypothesis test on feature weights}
+\label{appdx:hyp-test}
 
 We are given samples $\{\theta^{(t)}\}_{t \in \Tcal_\theta} \sim p(\theta | A, X)$ and wish to determine the statistical significance of the weights. We adopt matrix notation for simplicity by representing $\theta$ with the matrix $B \times D$ matrix of feature weights $W$. The question is to determine the significance of a particular feature $d$ by examining the value of $W_{id}$ for all the values $i \in [B]$. We know that the posterior is proportional to the prior multiplied by the likelihood (assuming that the feature matrix $X$ is already given):
 %
@@ -156,8 +157,49 @@ This approximation is not exact but can show it is accurate empirically. Indeed,
 	\label{fig:school-histogram}
 \end{figure}
 
-Using the approximation, we can construct a test to determine whether a particular weight value has $|W_{ij}| > c$ with high probability. Assuming without loss of generality that
+Using the approximation, we wish to construct a test to determine whether a particular weight value has $|W_{ij}| > c$ with high probability, where $c>0$. More specifically, we wish to determine:
 %
 \begin{equation}
-	p(|W_{ij}| > c) = p(W_{ij})
+	\begin{aligned}
+		H_0&: |W_{ij}| \leq c \\
+		H_1&: |W_{ij}| > c
+	\end{aligned}
 \end{equation}
+%
+We can consider the probabilities $p(W_{ij} > c)$ and $p(W_{ij} < c)$ separately. Starting with $p(W_{ij} > c)$ we can write:
+%
+\begin{align*}
+	p(W_{ij} > c) &= p\left(Z > \frac{c - \hat{\mu}_{ij}}{\hat{\sigma}_{ij}}\right) \\
+	&= p\left(-Z < \frac{\hat{\mu}_{ij} - c}{\hat{\sigma}_{ij}}\right)\\
+	&= \Phi\left(\frac{\hat{\mu}_{ij} - c}{\hat{\sigma}_{ij}}\right)
+\end{align*}
+%
+Where $Z \sim \Gaussian(0,1)$ was introduced as a temporary variable and $\Phi(\cdot)$ is the standard Gaussian cdf. Now we introduce the variable $k$ to control the degree of significance of the result. By enforcing $k$ to be less than the argument of $\Phi$ we show that: 
+%
+\begin{align*}
+	\frac{\hat{\mu}_{ij} - c}{\hat{\sigma}_{ij}} &> k \\
+	\hat{\mu}_{ij} - k \hat{\sigma}_{ij} &> c
+\end{align*}
+%
+As $\Phi(\cdot)$ is monotonically increasing, this result gives us that:
+%
+\begin{equation}
+	p(W_{ij} > c) > \Phi(k) \iff \hat{\mu}_{ij} - k \hat{\sigma}_{ij} > c
+	\label{eqn:hyp-test-positive}
+\end{equation}
+%
+A similar argument can be made to show that:
+%
+\begin{equation}
+	p(W_{ij} < -c) > \Phi(k) \iff \hat{\mu}_{ij} + k \hat{\sigma}_{ij} < -c
+	\label{eqn:hyp-test-negative}
+\end{equation}
+%
+Clearly equations \ref{eqn:hyp-test-positive} and \ref{eqn:hyp-test-negative} cannot both hold as $c>0$. Nevertheless, a necessary and sufficient condition for one of them holding is:
+%
+\begin{equation}
+	(\hat{\mu}_{ij} - k \hat{\sigma}_{ij}, \hat{\mu}_{ij} + k \hat{\sigma}_{ij}) \cap (-c, +c) = \emptyset
+	\label{eqn:hyp-test-empty}
+\end{equation}
+%
+We therefore choose to reject the null hypothesis $H_0$ if and only if equation \ref{eqn:hyp-test-empty}. This tells us with confidence greater than $\Phi(k)$ that either $W_{ij} < -c$ or $W_{ij} > c$ thus rejecting the null $H_0: |W_{ij}| \leq c$. Note that we choose to accept $H_0$ for the case where the combined probabilities of $p(W_{ij} < -c) + p(W_{ij} > c) > \Phi(k)$, if equation \ref{eqn:hyp-test-empty} is not satisfied. This is because we wish to apply this for dimensionality reduction purposes. We only want to keep weights that have a confident prediction outside the null-space not those that succeed by summing the two extremes of their distribution. Note that this case is very rare empirically.
