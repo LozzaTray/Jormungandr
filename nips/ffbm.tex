@@ -16,7 +16,7 @@ block membership $b_i\in[B]$ is generated based on the feature
 vector $x_i$, independently between nodes. The conditional
 distribution of $b_i$ given $x_i$ also depends on a collection
 of weight vectors $\theta=\{w_k\}_{k=1}^B$, where each
-$w_k$ has dimension $D+1$. Specifically, 
+$w_k$ has dimension $D$. Specifically, 
 the distribution of $b$ given $X$ and $\theta$ is,
 %
 \begin{equation}
@@ -24,10 +24,9 @@ the distribution of $b$ given $X$ and $\theta$ is,
 	= \prod_{i=1}^{N} \frac{\exp\left(w_{b_i}^T x_i\right)}{\sum_{k=1}^{B} \exp \left( w_k^T x_i\right)}
 \end{equation}
 %
-We deliberately exclude a bias term to ensure that the relationships we model are based on features and not information about the size of each detected block;
-a more complete discussion on this topic is given in \ref{appdx:dimension}. 
+This is the form of a softmax; we deliberately exclude a bias term to ensure that the relationships we model are based on features and not information about the size of each detected block. 
 We will later also find it convenient
-to write the parameters $\theta$ as a $B \times (D+1)$ matrix of weights $W$; this form has computational benefits as then $z_i \coloneqq W x_i$, which is the input to the softmax activation function.
+to write the parameters $\theta$ as a $B \times D$ matrix of weights $W$.
 
 More complex models based on different choices for the distributions
 $\phi_{b_i}$ above are also possible, but then deriving meaning from 
