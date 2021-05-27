@@ -1,15 +1,37 @@
 \section{Feature-first block model}
 
-In this section we propose a novel generative model for labelled networks. We call this the feature-first block model (FFBM) and outline its structure in \ref{fig:ffbm} As before, we let $N$ denote the number of nodes and $B$ the number of blocks in our graph. We define the vector $x_i \in \Xcal^D$ as the feature vector for the $i$'th vertex. $D$ is the number of features. For the datasets we analyse, we deal with binary feature flags so $\Xcal = \{0, 1\}$. The feature vectors $\{x_i\}_{i=1}^{N}$ may be compactly subsumed into the feature matrix $X \in \Xcal^{N \times D}$.
+In this section we propose a novel generative model for labelled networks. We call this the feature-first block model (FFBM).
 
-For the FFBM, we start with the feature matrix X and probabilistically generate a vector of block memberships $b \in [B]^N$. The parameters of this step are encapsulated by $\theta$. Each feature vector $x_i$ is treated independently and used to generate the corresponding block membership $b_i \in [B]$. We choose a single softmax layer to model $p(b_i | x_i, \theta)$. More complex models are possible but then deriving meaning from the inferred parameter distributions is more difficult. Summarising, we write $p(b | X, \theta)$ as follows:
+Let $N$ denote the number of nodes, $B$ the number of blocks in the graph,
+and ${\cal X}$ the set of all possible features.
+We define the vector $x_i \in \Xcal^D$ as the feature vector of vertex $i$, 
+where $D$ is the number of features associated with each vertex.
+For the datasets we analyse, we deal with binary feature flags so $\Xcal = \{0, 1\}$. We write $X$ for the $N\times D$ {\em feature matrix} containing
+the feature vectors $\{x_i\}_{i=1}^{N}$ 
+as its rows.
+
+For the FFBM, we start with the feature matrix $X$ and generate a random
+vector of block memberships $b \in [B]^N$. For each node $i$, the
+block membership $b_i\in[B]$ is generated based on the feature
+vector $x_i$, independently between nodes. The conditional
+distribution of $b_i$ given $x_i$ also depends on a collection
+of weight vectors $\theta=\{w_k\}_{k=1}^B$, where each
+$w_k$ has dimension $D+1$. Specifically, 
+the distribution of $b$ given $X$ and $\theta$ is,
 %
 \begin{equation}
 	p(b| X, \theta) = \prod_{i=1}^{N} p(b_i | x_i, \theta) = \prod_{i=1}^{N} \phi_{b_i} (x_i; \theta)
 	= \prod_{i=1}^{N} \frac{\exp\left(w_{b_i}^T x_i\right)}{\sum_{k=1}^{B} \exp \left( w_k^T x_i\right)}
 \end{equation}
 %
-We deliberately exclude a bias term to ensure that the relationships we model are based on features and not information about the size of each detected block; a more complete discussion on this topic is given in \ref{appdx:dimension}. The parameter vector $\theta$ for this stage contains all the weight vectors $\theta = \{w_k\}_{k=1}^{B}$. Each $w_k$ has dimension $D$. We could instead write the parameters $\theta$ as a $B \times D$ matrix of weights $W$; this form has computational benefits as then $z_i \coloneqq W x_i$, which is the input to the softmax activation function.
+We deliberately exclude a bias term to ensure that the relationships we model are based on features and not information about the size of each detected block;
+a more complete discussion on this topic is given in \ref{appdx:dimension}. 
+We will later also find it convenient
+to write the parameters $\theta$ as a $B \times (D+1)$ matrix of weights $W$; this form has computational benefits as then $z_i \coloneqq W x_i$, which is the input to the softmax activation function.
+
+More complex models based on different choices for the distributions
+$\phi_{b_i}$ above are also possible, but then deriving meaning from 
+the inferred parameter distributions is more difficult. 
 
 \begin{figure}[!h]
 	\centering
@@ -30,35 +52,55 @@ We deliberately exclude a bias term to ensure that the relationships we model ar
 	\label{fig:ffbm}
 \end{figure}
 
-Once the block memberships $b$ have been generated, we then draw the graph $A$ from the microcanonical DC-SBM (equation \ref{eqn:A-generation}) with additional parameters encapsulated by $\psi = \{\psi_e, \psi_k\}$.
+Once the block memberships $b$ have been generated, we then draw the 
+graph $A$ from the microcanonical DC-SBM with additional parameters 
+$\psi = \{\psi_e, \psi_k\}$:
 %
 \begin{equation}
-	A \sim \textrm{DC-SBM}_{\textrm{MC}} (b, \psi_e, \psi_k)
+	A \sim \textrm{DC-SBM}_{\textrm{MC}} (b, \psi_e, \psi_k).
 	\label{eqn:A-generation}
 \end{equation}
 
 
 \subsection{Prior selection}
 
-Before performing any inference, we must specify priors on $\theta$ and $\psi$. For $\theta$ it seems sensible to choose a Gaussian prior, with zero mean and variance matrix $\sigma^2_\theta I$ such that each element of $\theta$ is independent and distributed like $\sim \Gaussian(0, \sigma_\theta^2)$. In vector form, the prior for $\theta$ is therefore:
+To complete the description of our Bayesian framework,
+priors on $\theta$ and $\psi$ must also be specified. 
+We place a Gaussian prior on $\theta$ with zero mean
+and covariance matrix $\sigma^2_\theta I$, so that
+each element of $\theta$ has an independent ${\cal N}(0,\sigma_\theta^2)$
+prior, for a hyperparameter $\sigma_\theta^2$:
 %
 \begin{equation}
-	p(\theta) = \Gaussian \left( \theta ; 0, \sigma_\theta^2 I \right)
+	p(\theta) \sim \Gaussian \left( \theta ; 0, \sigma_\theta^2 I \right).
 	\label{eqn:theta-prior}
 \end{equation}
 %
-In our model, the block memberships vector $b$ is an intermediate latent variable and so we are not free to choose a prior for it. Nevertheless, as far as inference on the right-hand-side of figure \ref{fig:ffbm}, we regard $p(b | X)$ as a pseudo-prior on $b$. We can show (appendix \ref{appdx:b|x}) that our choice of prior for $p(\theta)$ in equation \ref{eqn:theta-prior} leads to a uniform $p(b | X)$ in equation \ref{eqn:b-pseudo-prior}.
+Interestingly, this choice of prior leads to a particularly
+simple distribution on the block membership vector $b$.
+We show in Appendix~\ref{appdx:b|x} that,
+after integrating out $\theta$,
+$b$ is uniformly distributed:
 %
 \begin{equation}
-	p(b | X) = \int p(b | X, \theta) p(\theta) d\theta = B^{-N}
+	p(b | X) = \int p(b | X, \theta) p(\theta) d\theta = B^{-N}.
 	\label{eqn:b-pseudo-prior}
 \end{equation}
 %
-This is an enormously important simplification as evaluating $p(b | X)$ does not require an expensive Monte-Carlo integration over the $\theta$-domain nor does it require the exact value of $X$. \citet{Peixoto-Bayesian-Microcanonical} proposes careful choices for the additional microcanonical SBM parameters $\psi$ which we adopt. Peixoto's idea is to write the joint prior on $(b, e, k)$ as a product of conditionals $p(b, e, k) = p(b) p(e | b) p(k | e, b)= p(b) p(\psi | b)$. For our purposes we must insert a conditioning on $X$, to form our pseudo-prior for $b$ and $\psi$, to give equation \ref{eqn:joint-pseudo-prior}.
+This is an important simplification as evaluating $p(b | X)$ does not require an expensive Monte Carlo integration over $\theta$ nor does it require the exact value of $X$. 
+\citet{Peixoto-Bayesian-Microcanonical} proposes careful choices for 
+the additional microcanonical SBM parameters $\psi$, which we adopt. 
+The idea is to write the joint distribution on $(b, e, k)$ as a product of 
+conditionals, $p(b, e, k) = p(b) p(e | b) p(k | e, b)= p(b) p(\psi | b)$. 
+In our case, conditioning on $X$ is also necessary, leading to,
 %
 \begin{equation}
-	p(b, \psi | X) = p(b | X) p(\psi | b, X) = p(b | X) p(\psi | b)
+	p(b, \psi | X) = p(b | X) p(\psi | b, X) = p(b | X) p(\psi | b),
 	\label{eqn:joint-pseudo-prior}
 \end{equation}
 %
-Where we leverage the fact $(\psi \indep X) | b$. We then borrow the priors proposed by \citet{Peixoto-Bayesian-Microcanonical} for $p(\psi | b)$ to complete our model. Please refer to appendix \ref{appdx:sbm} for the exact form of $p(\psi | b)$. All that concerns the main argument is we have a computable form.
+where we used the fact $\psi$ and $X$ are conditionally 
+independent given $b$.  The exact form of the prior
+$p(\psi|b)$ is described in Appendix \ref{appdx:prior}.
+All that concerns the main argument is that it has
+an easily computable form.

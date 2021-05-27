@@ -1,24 +1,36 @@
 \section{Preliminaries}
 
-We first need a model for community-like structure in a network. For this we adopt the stochastic block model (SBM) - widely used across academia. Each node in the graph belongs to a unique community called a block. The probability that two nodes are connected depends only on the block memberships of each. Specifically, we will use the microcanonical variant of the SBM, proposed by \citet{Peixoto-Bayesian-Microcanonical}. To allow for degree-variability between members of the same block, we must choose the degree-corrected formulation (DC-SBM).
+We first need a model for community-like structure in a network. For this we adopt the widely-used stochastic block model (SBM).
+Each node in the graph belongs to a unique community called a block. The probability that two nodes are connected depends only on the block memberships of each. Specifically, we will use the microcanonical variant of the SBM, proposed by \citet{Peixoto-Bayesian-Microcanonical}. To allow for degree-variability between members of the same block, we adopt the degree-corrected formulation (DC-SBM).
+
+For each integer $K\geq 1$, we use the notation $[K]:=\{1,2,\ldots,K\}$.
 
 \begin{definition}[Microcanonical DC-SBM]
 	\label{defn:microcan-dc-sbm}
-	Let $N \in \Integers^{+}$ denote the number of vertices in an undirected graph. The block memberships are encoded by a vector $b \in [B]^N$,\footnote{We introduce the notation $[K] \coloneqq \{1, 2 \dots K\}$ to compactly define a set of $K$ indices. Clearly, $[K]$ is only defined for $K \in \Integers^+$.}
-	where $B \in \Integers^{+}$ is the number of non-empty blocks.
-	Let $e \in (\Integers_0^+)^{N \times N}$ be the matrix of edge counts between blocks. $e_{rs}$ is then the number of edges from block $r$ onto block $s$ -- or twice that number if $r=s$. For undirected graphs, $e$ is symmetric.
-	Let $k \in (\Integers^+_0)^N$ be a vector denoting the degree sequence of the graph. $k_i$ is then the degree of vertex $i$. The graph's adjacency matrix $A \in \{0,1\}^{N \times N}$ is generated as follows:
+	Let $N \geq 1$ denote the number of vertices in an undirected graph. The block memberships are encoded by a vector $b \in [B]^N$,
+where $B$ is the number of non-empty blocks.
+	Let $e=(e_{rs})$ be the $N\times N$ symmetric matrix of edge counts 
+between blocks, so that $e_{rs}$ is the number of edges from block $r$ to 
+block $s$ -- or twice that number if $r=s$. 
+	Let $k =(k_i)$ denote the vector of length $N$ containing the degree
+sequence of the graph, with $k_i$ being the degree of vertex $i$.
+
+The graph's adjacency matrix $A \in \{0,1\}^{N \times N}$ is generated 
+by placing edges uniformly at random, but respecting the constraints 
+imposed by $e$, $b$ and $k$ (hence the qualification `microcanonical').
+Specifically, $A$ must satisfy the following, for all $r,s\in[B]$
+and all $i\in[N]$:
 	%
 	\begin{equation}
-		A \sim \textrm{DC-SBM}_{\textrm{MC}} (b, e, k)
-	\end{equation}
-	%
-	Where edges are placed uniformly at random but respecting the constraints imposed by $e$, $b$ and $k$ -- hence the microcanonical moniker. Specifically, $A$ must satisfy the following:
-	%
-	\begin{equation}
-		e_{rs} = \sum_{i, j \in [N]} A_{ij} \one \{b_i = r\} \one \{b_j = s\} \quad \forall r,s \in [B]
-		\quad \textrm{and} \quad
-		k_i = \sum_{j \in [N]} A_{ij} \quad \forall i \in [N]
+		e_{rs} = \sum_{i, j \in [N]} A_{ij} 
+	\one \{b_i = r\} \one \{b_j = s\} 
+		\qquad 
+		\textrm{and} \qquad
+		k_i = \sum_{j \in [N]} A_{ij}.
 		\label{eqn:sbm-constraints}
+	\end{equation}
+We use the following notation to indicate this distribution:
+\begin{equation}
+		A \sim \mbox{\rm DC-SBM}_{\rm MC} (b, e, k).
 	\end{equation}
 \end{definition}
