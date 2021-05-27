@@ -15,7 +15,7 @@ do we have a stronger case for causation.
 Using this new model,
 we go on to describe an efficient inference algorithm to sample 
 the parameters $\theta$ of the feature-to-block generator. 
-This takes the form of two concurrent Markov chains,
+This takes the form of a two-level Markov chain,
 used to sample the block memberships $b$ and block generator 
 parameters $\theta$. These chains can either be executed
 in parallel or 
@@ -29,7 +29,7 @@ the most natural communities in a labelled network. Nevertheless, the approach
 can only currently explain the structure at the macro-scale. We cannot 
 explain structure within each block. Future work will benefit from extending 
 the FFBM to be hierarchical in nature. That way, the structure of the network 
-can be explained at all several scales of interest. So long as data 
+can be explained at all length-scales of interest. So long as data 
 collection techniques remain ethical and care is taken to respect 
 personal privacy, such empowered decision-making can only help humankind.
 

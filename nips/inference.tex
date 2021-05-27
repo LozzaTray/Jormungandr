@@ -3,7 +3,7 @@
 
 Having completed the definition of the FFBM, we wish to leverage it 
 to perform inference. Given a vertex-labelled graph $(A, X)$,
-the first step is to sample from the posterior distribution
+the goal is to sample from the posterior distribution
 of $\theta$:
 %
 \begin{equation}
@@ -83,7 +83,7 @@ is sufficient to prove that, for large enough $t$, $\theta^{(t)} \sim \Expect_{b
 	\label{fig:samp-sequence}
 \end{figure}
 
-The reason for splitting the Markov chain into two levels is because the summation over all latent states $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$,
+The reason for splitting the Markov chain into two levels is that the summation over all latent states $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$,
 is intractable, as the sum involves $B^N$ terms. 
 Figure \ref{fig:samp-sequence} shows an overview of the proposed method. 
 The Metropolis-Hastings accept/reject probabilities 
@@ -98,10 +98,10 @@ of the block membership vector $b$.
 And on the other level, in order to obtain 
 samples of the parameter vector $\theta$
 we use only $b$ but not $A$, as $\theta$ and $A$ are
-conditionally independnet given $b$. 
+conditionally independent given $b$. 
 
 \FloatBarrier
-
+\clearpage
 \subsection{Sampling block memberships}
 
 We adopt the Markov chain Monte Carlo procedure of
@@ -130,7 +130,7 @@ recall the constraints in~(\ref{eqn:sbm-constraints}).
 We denote this value $\psi^* = \{\psi_k^*, \psi_e^*\}$. Therefore, 
 the summation over all $\psi$ reduces to just the single $\psi^*$ term.
 % ; this is the power of the microcanonical formulation. 
-We also define the microcanonical entropy of the configuration as:
+We also define the microcanonical entropy of the configuration as,
 %
 \begin{equation}
 	S(b) = - \log \pi_b(b) = - \Big( \log p(A | b, \psi^*) + \log p(\psi^*, b | X) \Big).
@@ -154,7 +154,7 @@ The invariant distribution we wish to target for the $\theta$ samples is the pos
 We write this as,
 %
 \begin{equation}
-	\pi_\theta(\theta) \propto p(\theta | X, b) \propto p(b | X, \theta) p(\theta) \propto \pi_\theta (\theta) \propto  \exp \left( - U(\theta) \right),
+	\pi_\theta(\theta) \propto p(\theta | X, b) \propto p(b | X, \theta) p(\theta) \propto  \exp \left( - U(\theta) \right),
 	\label{eq:U}
 \end{equation}
 %
@@ -162,24 +162,28 @@ where we write $U(\theta)$ for the negative log-posterior. Let $y_{ij} \coloneqq
 Discarding constant terms, we can write $U(\theta)$ as,
 %
 \begin{equation}
-	U(\theta) = \left( \sum_{i=1}^{N} \sum_{j=1}^{B} y_{ij} \log \frac{1}{a_{ij}} \right)
+	U(\theta) = \left( \sum_{i \in [N]} \sum_{j \in [B]} y_{ij} \log \frac{1}{a_{ij}} \right)
 	+ \frac{1}{2\sigma_\theta^2} \|\theta\|^2 = N \cdot \Lcal(\theta) + \frac{1}{2\sigma_\theta^2} \|\theta\|^2;
 	\label{eqn:U-form}
 \end{equation}
-see Appendix \ref{appdx:form-U} for the derivation.
-%
-The function $U(\theta)$ is a typical objective function for neural network training. The first term is introduced by the likelihood. We collect it into $N \cdot \Lcal(\theta)$, which is the cross-entropy between the graph-predicted and feature-predicted block memberships summed over all vertices. 
+
+See Appendix \ref{appdx:form-U} for the derivation. The function $U(\theta)$ is a typical objective function for neural network training. The first term is introduced by the likelihood. We collect it into $N \cdot \Lcal(\theta)$, which is the cross-entropy between the graph-predicted and feature-predicted block memberships summed over all vertices. 
 The second, introduced by the prior, brings a form of regularisation, guarding against over-fitting. Unlike in many applications where the goal 
 is to find the minimiser of $U(\theta)$, our goal is to draw samples from the posterior $\pi_\theta(\cdot) \propto \exp(-U(\cdot))$. We can use $\nabla U$ as a useful heuristic to bias our proposal towards regions of higher target density. We therefore adopt the Metropolis-adjusted Langevin algorithm (MALA) \cite{mala-tweedie}. Given the current sample $\theta$, we generate 
 a new sample $\theta'$ as,
-%
-$$	\theta' = \theta - h \nabla U(\theta) + \sqrt{2h} \cdot \xi,$$
+\begin{equation*}
+	\theta' = \theta - h \nabla U(\theta) + \sqrt{2h} \cdot \xi,
+\end{equation*}
+
 where $\xi \sim \Gaussian(0, I)$ and $h$ is a step-size parameter 
 which may vary with the sample index (see Appendix \ref{appdx:step-size}).
 This leads to the proposal distribution,
-$$q_\theta(\theta, \theta') \sim \Gaussian \left( \theta' ; \theta - h \nabla U(\theta), 2h I \right).$$
+\begin{equation*}
+	q_\theta(\theta, \theta') \sim \Gaussian \left( \theta' ; \theta - h \nabla U(\theta), 2h I \right).
+\end{equation*}
+
 Without the injected noise term, MALA is equivalent to gradient descent. We require the noise term $\xi$ to fully explore the parameter space. 
-The term $\nabla U$ has an easy to compute analytic form (derived in Appendix \ref{appdx:gradu}). By noting that $\theta = \{w_k\}_{k=1}^{B}$, we write the derivative with respect to each $w_k$ as:
+The term $\nabla U$ has an easy to compute analytic form (derived in Appendix \ref{appdx:gradu}). By noting that $\theta = \{w_k\}_{k=1}^{B}$, we write the derivative with respect to each $w_k$ as,
 %
 \begin{equation}
 	\frac{\partial U}{\partial w_k} = - \left( \sum_{i=1}^{N} \Big\{ \tilde{x}_i (y_{ik} - a_{ik}) \Big\} - \frac{w_k}{\sigma_\theta^2} \right).
@@ -247,7 +251,7 @@ as in~(\ref{eqn:fij}) and only keep features with indices $d \in \Dcal'$, where 
 %
 Intuitively, this means discarding any feature $j$ for which 
 $\hat{\mu}_{ij} \pm k\hat{\sigma}_{ij}$ lies outside the region
-$(-c, c)$ for all block indices $i$. If we were to use the Laplace approximation for the posterior $p(W_{ij} | A, X) \approx \Gaussian(W_{ij}; \mu_{ij}, \sigma_{ij}^2)$, then this is analogous to a hypothesis test on the value of $W_{ij}$ as in~(\ref{eqn:hyp-test-discard});
+$(-c, c)$ for all block indices $i$. If we were to use the Laplace approximation for the posterior $p(W_{ij} | A, X) \approx \Gaussian(W_{ij}; \hat{\mu}_{ij}, \hat{\sigma}_{ij}^2)$, then this is analogous to a hypothesis test on the value of $W_{ij}$ as in~(\ref{eqn:hyp-test-discard});
 then $\Dcal'$ comprises all features $i$ for which $H_1$ is not rejected at least once for some $j \in [B]$
 %
 \begin{equation}
@@ -256,7 +260,7 @@ then $\Dcal'$ comprises all features $i$ for which $H_1$ is not rejected at leas
 	\label{eqn:hyp-test-discard}
 \end{equation}
 %
-The multiplier $k$ in equation \ref{eqn:fij} determines the degree of significance of the result. Appendix \ref{appdx:hyp-test} explores the derivation in more detail. However, as the Laplace approximation is not exact we will only treat this dimensionality reduction method as a useful heuristic and not an exact method. Conversely, we could fix $k=k_0$ and the dimension of our reduced feature set $|\Dcal'|=D'$. We would then like to find the largest value of $c$ such that $|\Dcal'|=D'$ given $k=k_0$. This is summarised in equation \ref{eqn:c-star}. This approach is often preferred as it fixes the number of reduced dimensions.
+The multiplier $k$ in equation \ref{eqn:fij} determines the degree of significance of the result. However, as the Laplace approximation is not exact we will only treat this dimensionality reduction method as a useful heuristic and not an exact method. Conversely, we could fix $k=k_0$ and the dimension of our reduced feature set $|\Dcal'|=D'$. We would then like to find the largest value of $c$ such that $|\Dcal'|=D'$ given $k=k_0$. This is summarised in equation \ref{eqn:c-star}.
 %
 \begin{equation}
 	c^* = \argmax \{c>0\; : \;|\Dcal'| = D', k=k_0\}.

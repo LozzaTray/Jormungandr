@@ -3,7 +3,7 @@
 In this section we propose a novel generative model for labelled networks. We call this the feature-first block model (FFBM).
 
 Let $N$ denote the number of nodes, $B$ the number of blocks in the graph,
-and ${\cal X}$ the set of all possible features.
+and ${\cal X}$ the set of values each feature can take.
 We define the vector $x_i \in \Xcal^D$ as the feature vector of vertex $i$, 
 where $D$ is the number of features associated with each vertex.
 For the datasets we analyse, we deal with binary feature flags so $\Xcal = \{0, 1\}$. We write $X$ for the $N\times D$ {\em feature matrix} containing
@@ -11,9 +11,9 @@ the feature vectors $\{x_i\}_{i=1}^{N}$
 as its rows.
 
 For the FFBM, we start with the feature matrix $X$ and generate a random
-vector of block memberships $b \in [B]^N$. For each node $i$, the
+vector of block memberships $b \in [B]^N$. For each vertex $i$, the
 block membership $b_i\in[B]$ is generated based on the feature
-vector $x_i$, independently between nodes. The conditional
+vector $x_i$, independently between vertices. The conditional
 distribution of $b_i$ given $x_i$ also depends on a collection
 of weight vectors $\theta=\{w_k\}_{k=1}^B$, where each
 $w_k$ has dimension $D$. Specifically, 
@@ -21,10 +21,10 @@ the distribution of $b$ given $X$ and $\theta$ is,
 %
 \begin{equation}
 	p(b| X, \theta) = \prod_{i=1}^{N} p(b_i | x_i, \theta) = \prod_{i=1}^{N} \phi_{b_i} (x_i; \theta)
-	= \prod_{i=1}^{N} \frac{\exp\left(w_{b_i}^T x_i\right)}{\sum_{k=1}^{B} \exp \left( w_k^T x_i\right)}
+	= \prod_{i=1}^{N} \frac{\exp\left(w_{b_i}^T x_i\right)}{\sum_{k=1}^{B} \exp \left( w_k^T x_i\right)}.
 \end{equation}
 %
-This is the form of a softmax; we deliberately exclude a bias term to ensure that the relationships we model are based on features and not information about the size of each detected block. 
+$\phi_{b_i}$ is the form of a softmax activation function; we deliberately exclude a bias term to ensure that we only leverage feature information. 
 We will later also find it convenient
 to write the parameters $\theta$ as a $B \times D$ matrix of weights $W$.
 
@@ -68,7 +68,7 @@ priors on $\theta$ and $\psi$ must also be specified.
 We place a Gaussian prior on $\theta$ with zero mean
 and covariance matrix $\sigma^2_\theta I$, so that
 each element of $\theta$ has an independent ${\cal N}(0,\sigma_\theta^2)$
-prior, for a hyperparameter $\sigma_\theta^2$:
+prior, with hyperparameter $\sigma_\theta^2$:
 %
 \begin{equation}
 	p(\theta) \sim \Gaussian \left( \theta ; 0, \sigma_\theta^2 I \right).
@@ -76,10 +76,10 @@ prior, for a hyperparameter $\sigma_\theta^2$:
 \end{equation}
 %
 Interestingly, this choice of prior leads to a particularly
-simple distribution on the block membership vector $b$.
+simple distribution on the block membership vector $b$ given $X$.
 We show in Appendix~\ref{appdx:b|x} that,
 after integrating out $\theta$,
-$b$ is uniformly distributed:
+$b$ is uniformly distributed given $X$:
 %
 \begin{equation}
 	p(b | X) = \int p(b | X, \theta) p(\theta) d\theta = B^{-N}.
@@ -88,7 +88,7 @@ $b$ is uniformly distributed:
 %
 This is an important simplification as evaluating $p(b | X)$ does not require an expensive Monte Carlo integration over $\theta$ nor does it require the exact value of $X$. 
 \citet{Peixoto-Bayesian-Microcanonical} proposes careful choices for 
-the additional microcanonical SBM parameters $\psi$, which we adopt. 
+the priors on the additional microcanonical SBM parameters $\psi$, which we adopt. 
 The idea is to write the joint distribution on $(b, e, k)$ as a product of 
 conditionals, $p(b, e, k) = p(b) p(e | b) p(k | e, b)= p(b) p(\psi | b)$. 
 In our case, conditioning on $X$ is also necessary, leading to,

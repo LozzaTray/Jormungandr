@@ -68,7 +68,7 @@ We apply the developed methods to a variety of datasets. These are chosen to spa
 		\caption{Facebook egonet}
 		\label{fig:fb-null}
 	\end{subfigure}
-	\caption{Reduced dimension feature-to-block generator weight samples.}
+	\caption{Reduced dimension feature-to-block generator weight samples. Dotted line is $\pm c^*$}
 	\label{fig:null-all}
 \end{figure}
 \begin{table}[!h]
@@ -104,7 +104,7 @@ averaged over the $b$-samples:
 \end{equation}
 %
 
-Next, in order to assess the performance of the feature-to-block predictor, 
+Next, to assess the performance of the feature-to-block predictor, 
 we partition the vertex set $[N]$ into training and test sets. We choose to 
 randomly partition the vertices on each experiment run,
 so that a constant fraction $f$ of the available vertices go to form 
@@ -122,7 +122,7 @@ over each set,
 	\label{eqn:cross-entropy-loss}
 \end{equation}
 %
-and where $\star \in \{0, 1\}$ indicates whehter the training or test
+where $\star \in \{0, 1\}$ indicates whether the training or test
 set is being considered.
 
 Table~\ref{tab:results} summarises the results for each experiment;
@@ -133,7 +133,7 @@ of Section~\ref{sec:dim-reduction}
 to the two higher dimensional datasets (the school and FB egonet). 
 For this we use equation~(\ref{eqn:c-star}) with $k=1$,
 in order to reduce the dimension from 
-$D$ to a desired $D'$ with $k=1$ based on the maximal cutoff $c^*$. 
+$D$ to a desired $D'$. 
 We then retrain the feature-block predictor using only the retained 
 feature set $\Dcal'$, and report the log-loss over the training and 
 test sets for the reduced classifier -- 
@@ -157,13 +157,13 @@ $\bar{S}_e$, of the graph,
 has very small variance, suggesting that
 the detected communities can be found reliably (to within an arbitrary 
 relabelling of blocks). For reference, we plot an inferred partition for each 
-of the graphs in Figure~\ref{fig:graphs-all}. The polbooks graph yields the cleanest separation between blocks but nonetheless the inferred partitions for the other datasets do succeed at partitioning the graph into densely connected clusters.
+of the graphs in Figure~\ref{fig:graphs-all}. The polbooks graph yields the cleanest separation between blocks but nonetheless the inferred partitions for the other datasets do succeed at dividing the graph into densely connected clusters.
 
 \subsection{Political books}
 
 The goal here is to 
 determine whether the authors' political affiliations are a good predictor 
-of the overall network structure. We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal. or neutral). From Figure~\ref{fig:polbooks-null} we see that all 3 blocks have a distinct political affiliation as their largest positive component. 
+of the overall network structure. We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral). From Figure~\ref{fig:polbooks-null} we see that all 3 blocks have a distinct political affiliation as their largest positive component. 
 This strongly indicates that political affiliation is indeed the axis 
 which best predicts the 3-way natural partition of the graph into blocks. 
 Furthermore, in Table~\ref{tab:results} we see that the training and test losses 

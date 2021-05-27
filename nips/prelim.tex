@@ -1,7 +1,7 @@
 \section{Preliminaries}
 
 We first need a model for community-like structure in a network. For this we adopt the widely-used stochastic block model (SBM).
-Each node in the graph belongs to a unique community called a block. The probability that two nodes are connected depends only on the block memberships of each. Specifically, we will use the microcanonical variant of the SBM, proposed by \citet{Peixoto-Bayesian-Microcanonical}. To allow for degree-variability between members of the same block, we adopt the degree-corrected formulation (DC-SBM).
+Each node in the graph belongs to a unique community called a block. The probability that two nodes are connected depends only on the block memberships of each. Specifically, we will use the microcanonical variant of the SBM, proposed by \citet{Peixoto-Bayesian-Microcanonical}. To allow for degree-variability between members of the same block, we adopt the degree-corrected formulation (DC-SBM), defined in~(\ref{defn:microcan-dc-sbm}).
 
 For each integer $K\geq 1$, we use the notation $[K]:=\{1,2,\ldots,K\}$.
 
@@ -10,7 +10,7 @@ For each integer $K\geq 1$, we use the notation $[K]:=\{1,2,\ldots,K\}$.
 	Let $N \geq 1$ denote the number of vertices in an undirected graph. The block memberships are encoded by a vector $b \in [B]^N$,
 where $B$ is the number of non-empty blocks.
 	Let $e=(e_{rs})$ be the $N\times N$ symmetric matrix of edge counts 
-between blocks, so that $e_{rs}$ is the number of edges from block $r$ to 
+between blocks, such that $e_{rs}$ is the number of edges from block $r$ to 
 block $s$ -- or twice that number if $r=s$. 
 	Let $k =(k_i)$ denote the vector of length $N$ containing the degree
 sequence of the graph, with $k_i$ being the degree of vertex $i$.

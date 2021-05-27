@@ -1,8 +1,8 @@
 \section{Introduction}
 
 An important characteristic of many real-world networks is that they exhibit strong community structure, with most nodes often belonging to a densely connected cluster. 
-Finding ways to recover the latent communities from the observed graphs is an important
-task in many applications, includng
+Finding ways to recover the latent communities from the observed graph is an important
+task in many applications, including
 graph/network compression \cite{cluster-compression} and link prediction in 
 incomplete networks \cite{link-prediction}.
 
@@ -14,4 +14,4 @@ model have been considered -- the most popular ones being the mixed-membership s
 To analyse a labelled network using one of the simple SBM variants, a typical inference procedure would be to first partition the graph into blocks grouped by distinct values of the feature of interest, and then use the associated model to test for evidence of heterogeneous connectivity between the feature-grouped blocks. Nevertheless, this approach is limited in that it can only consider one feature at a time. This makes it difficult to rank-order the features by  magnitude of impact. Lastly, the feature-grouped blocks are often an unnatural partition of the graph, leading to a poor model fit. We would instead prefer to partition the graph into its most natural blocks and then find which of the available features -- if any -- best predict the resulting partition.
 
 Thus motivated, we present a novel framework for modelling labelled networks, which we call the feature-first block model (FFBM). This is an extension of the SBM to labelled networks. We go on to present an efficient algorithm for sampling from the parameters of the feature-to-block generator, and to describe how the 
-sampled FFBM parameters can be interpreted in order to determine which features have the largest impact on overall graphical structure.
+sampled FFBM parameters can be interpreted to determine which features have the largest impact on overall graphical structure.
