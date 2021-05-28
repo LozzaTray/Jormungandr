@@ -27,7 +27,8 @@
 \usepackage{pdfpages}
 \usepackage{setspace}
 \onehalfspacing
-
+\setlength\parskip{0.8em plus 0.1em minus 0.1em}
+\setlength\parindent{0pt}
 
 %images
 \graphicspath{{./img/}}
@@ -77,7 +78,12 @@
 	\clearpage
 	\input{nomenclature}
 	\clearpage
-	\tableofcontents
+	{
+	\setlength\parskip{0pt}
+	\begin{singlespace}
+		\tableofcontents
+	\end{singlespace}
+	}
 	\clearpage
 	
 	\input{introduction}
@@ -85,6 +91,7 @@
 	\input{ffbm}
 	\input{inference}
 	\input{experiments}
+	\input{extensions}
 	\input{conclusion}
 	
 	\clearpage
@@ -95,6 +102,7 @@
 	\clearpage
 	\appendix
 	
+	\section*{Appendices}
 	\input{additional}
 	\clearpage
 	

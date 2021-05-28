@@ -1,39 +1,39 @@
-\section{Appendix: Additional material}
+\section{Additional material}
 
 \subsection{SBM likelihood and prior}
 \label{appdx:sbm}
 
-For reference, we provide the likelihood and priors for the microcanonical SBM proposed by \citet{Peixoto-Bayesian-Microcanonical}. We have that the graph $A$ is drawn from the SBM:
+For reference, we provide the likelihood and priors for the microcanonical SBM proposed by \citet{Peixoto-Bayesian-Microcanonical}. We have that the graph $A$ is drawn from the SBM,
 %
 \begin{equation}
-	A \sim \textrm{DC-SBM}_{\textrm{MC}}(b, e, k)
+	A \sim \textrm{DC-SBM}_{\textrm{MC}}(b, e, k),
 \end{equation}
 %
-With edges placed uniformly at random but respecting the constraints imposed by $b, e$ and $k$. The likelihood calculation for $p(A|k, e, b)$ then reduces to a case of counting configurations that yield the same adjacency matrix, $\Xi (A)$, and dividing by the total number of configurations possible, $\Omega(e)$. This is why this formulation is given the microcanonical moniker. If we consider the half-edges to be distinguishable for a moment, the total number of configurations that satisfy the $e$ constraint is:
+with edges placed uniformly at random but respecting the constraints imposed by $b, e$ and $k$. The computation of the likelihood, $p(A|k, e, b)$, is simply a case of counting the number of configurations that yield the same adjacency matrix and dividing by the total number of configurations possible. This is what gives this formulation the `microcanonical' moniker. If we consider the half-edges to be distinguishable for a moment, the total number of configurations that satisfy the $e$ constraint is,
 %
 \begin{equation}
-	\Omega(e) = \frac{\prod_{r} e_r !}{\prod_{r,s : r < s} e_{rs}! \cdot \prod_{r} e_{rr}!!}
+	\Omega(e) = \frac{\prod_{r} e_r !}{\prod_{r,s : r < s} e_{rs}! \cdot \prod_{r} e_{rr}!!},
 \end{equation}
 %
-Where $e_r \coloneqq \sum_{s} e_{rs}$ and $(2m)!! \coloneqq 2^m m!$. Nevertheless, a great number of these configurations yield the same graph $A$. We denote the number of configurations that yield the adjacency matrix $A$ with $\Xi(A)$, which can be computed as:
+where $e_r \coloneqq \sum_{s} e_{rs}$ and $(2m)!! \coloneqq 2^m m!$. Nevertheless, a great number of these $\Omega(e)$ total configurations yield the same graph $A$. We denote the number of configurations that yield the adjacency matrix $A$ with,
 %
 \begin{equation}
-	\Xi(A) \coloneqq \frac{\prod_i k_i !}{\prod_{i,j : i < j} A_{ij} ! \prod_i A_{ii} !! }
+	\Xi(A) \coloneqq \frac{\prod_i k_i !}{\prod_{i,j : i < j} A_{ij} ! \prod_i A_{ii} !! }.
 \end{equation}
 %
-Note the similarity between the forms of $\Omega(e)$ and $\Xi(A)$ as $e$ is effectively the adjacency matrix of the block-graph. With these defined we can write the overall likelihood:
+Note the similarity between the forms of $\Omega(e)$ and $\Xi(A)$ as $e$ is effectively the adjacency matrix of the block-graph. With these defined we can write the overall likelihood as the ratio of the two:
 %
 \begin{equation}
-	p(A|k,e,b) = \frac{\Xi(A)}{\Omega(e)}
+	p(A|k,e,b) = \frac{\Xi(A)}{\Omega(e)}.
 \end{equation}
 %
-Obviously, this form is only defined if $A$ respects the constraints imposed by $(k,e,b)$ else the likelihood is 0. With the likelihood defined, we move on to the prior. As discussed in the main text, the block membership vector $b$ is an intermediate variable in the FFBM and not a parameter so we are not free to choose a prior for it.
+Obviously, this form is only defined if $A$ respects the constraints imposed by $(k,e,b)$ else the likelihood is 0. 
 
-Here we recall for reference
-the priors $p(\psi | b)$ from \cite{Peixoto-Bayesian-Microcanonical}:
+With the likelihood defined, we turn our attention to the prior, necessary for Bayesian analysis. As discussed in the main text, the block membership vector $b$ is an intermediate variable in the FFBM so we are not free to choose a prior for it. Nevertheless, we can define the prior on $(e,k)$ as a conditional on $b$. We switch back to the FFBM notation of $\psi = \{\psi_e, \psi_k\}$ to encapsulate $e$ and $k$. We recall for reference
+the prior $p(\psi | b)$ from \cite{Peixoto-Bayesian-Microcanonical}:
 %
 \begin{equation}
-	p(\psi_e=e, \psi_k=k | b) = p(e | b) p(\psi_k | e, b) = \left[ \specialchoose{ \specialchoose{B}{2} }{ E} \right]^{-1} 
+	p(\psi_e=e, \psi_k=k | b) = p(e | b) p(k | e, b) = \left[ \specialchoose{ \specialchoose{B}{2} }{ E} \right]^{-1} 
 	\cdot \left[ \prod_r \frac{\prod_j \eta_j^r !}{n_r! q(e_r, n_r)} \right],
 \end{equation}
 %
@@ -53,7 +53,7 @@ Finally, $e_r \coloneqq \sum_{s} e_{rs}$ is the total number
 of half edges in block $r$ and $n_r \coloneqq \sum_{i} \one\{b_i = r\}$ 
 is the number of vertices assigned to block $r$. 
 
-These were chosen carefully in \cite{Peixoto-Bayesian-Microcanonical} to 
+These priors were chosen carefully in \cite{Peixoto-Bayesian-Microcanonical} to 
 more closely match the structure of empirical networks than simple 
 uniform priors. We do not repeat these arguments here.
 
@@ -62,7 +62,7 @@ uniform priors. We do not repeat these arguments here.
 
 Recall that in 
 Section~\ref{s:sfb} we used 
-the Metropolis Adjusted Langevin Algorithm (MALA)
+the Metropolis-adjusted Langevin algorithm (MALA)
 to 
 sample from the $\theta$-chain of the block membership 
 generator parameters.
@@ -101,16 +101,16 @@ We make the specific choices,
 %
 where $N$ is the number of data-points and $s$,
 the {\em step-size scaling}, is the only free parameter.
-%
-%For approximate methods, we can choose to bypass the MH accept-reject entirely to speed up computation. If this is done, the algorithm is instead called stochastic gradient Langevin diffusion (SGLD) \cite{Bayesian-SGLD}. This speeds up computation at the expense of the exactness of the method. Indeed, it relies on the fact that as the step-size is annealed to 0, the acceptance probability is close 1.
-%
-Nevertheless, to choose the value of $s$ we must quantify the trade-off between acceptance ratio and burn-in time. We do this by way of an example with the primary school dataset \cite{schools}. We run the $b$-chain for $T_b = 1,000$ iterations and subsample such that $\Tcal_b$ is computed with $\kappa_b=0.2$ and $\lambda_b=5$. We then use this to run the $\theta$-chain for $T_\theta = 10,000$ iterations. The acceptance ratio -- which we denote $r_\alpha$ -- is easy enough to compute as simply the fraction of proposed moves which we accept. However, to quantify burn-in time we must use a different metric. We can plot the mean of the objective function averaged over all samples as a proxy for burn-in time:
+
+As an aside, we note that an interesting modification to MALA can be made if we skip out the Metropolis-Hastings accept/reject step entirely. If this is done, the algorithm is instead called the stochastic gradient Langevin dynamics (SGLD) \cite{Bayesian-SGLD}. This speeds up computation at the expense of the exactness of the method. Indeed, it relies on the fact that as the step-size is annealed to 0, the acceptance probability gets close to 1. Figure \ref{fig:step-size-tradeoff} gives empirical backing to this approximate rule-of-thumb. Nevertheless, as SGLD is not exact, we only use MALA for experimentation.
+
+In order to choose the exact value of the {\em step-size scaling} $s$ for each experiment, we must quantify the trade-off between acceptance ratio and burn-in time. We illustrate the adopted method using the primary school dataset \cite{schools} as an example. We run the $b$-chain for $T_b = 1,000$ iterations and subsample such that $\Tcal_b$ is computed with $\kappa_b=0.2$ and $\lambda_b=5$. We then use this to run the $\theta$-chain for $T_\theta = 10,000$ iterations. The acceptance ratio -- which we denote $r_\alpha$ -- is simply the fraction of proposed moves which we accept. However, to measure burn-in we define a new metric: the mean of the objective function averaged over all samples,
 %
 \begin{equation}
-	\bar{U} \coloneqq \frac{1}{T_\theta} \sum_{t \in [T_\theta]} U\left( \theta^{(t)} \right)
+	\bar{U} \coloneqq \frac{1}{T_\theta} \sum_{t \in [T_\theta]} U\left( \theta^{(t)} \right).
 \end{equation}
 %
-As the chain will equilibrate in the vicinity of a minima in $U(\theta)$, the average over all samples is a rough indicator of the speed of burn-in. This assumes that the random starting point has high $U(\theta)$. This assumption holds as the domain of $\theta$ is a high dimensional space so we are unlikely to get a low $U(\theta)$ simply from a lucky guess. The higher the value of $\bar{U}$, the longer we infer the chain took to burn in and reach equilibrium. We plot the acceptance ratio $r_\alpha$ and average objective $\bar{U}$ for $10$ values of the step-size multiplier $s$ logarithmically spaced in the range $(10^{-2}, 10^1)$ on figure \ref{fig:step-size-tradeoff}.
+Since the chain will equilibrate in the vicinity of a minima in $U(\theta)$, the average over all samples is a rough indicator of the speed of burn-in. The higher the value of $\bar{U}$, the longer we infer the chain took to burn in and reach equilibrium. This method relies on the assumption that the random starting point $\theta^{(0)}$ has a high value for the objective function $U(\theta^{(0)})$; this assumption holds as the domain of $\theta$ is a high dimensional space so we are unlikely to get a low $U(\theta)$ from a lucky guess. We plot the acceptance ratio $r_\alpha$ and average objective $\bar{U}$ for $10$ values of the step-size multiplier $s$ logarithmically spaced in the range $(10^{-2}, 10^1)$ on Figure \ref{fig:step-size-tradeoff}.
 %
 \begin{figure}[!h]
 	\centering
@@ -119,9 +119,9 @@ As the chain will equilibrate in the vicinity of a minima in $U(\theta)$, the av
 	\label{fig:step-size-tradeoff}
 \end{figure}
 
-We see immediately that acceptance ratio $r_\alpha$ steadily decreases with $s$. This is expected as it is unlikely we stay in a high density region of our target distribution if we are making very large steps each time. A low acceptance ratio leads to wasted samples and this inefficiency is obviously undesirable. Indeed, figure \ref{fig:step-size-tradeoff} suggests that a low step-size $s$ yields high acceptance probability thus justifying the approximation used in SGLD.
+We see immediately that the acceptance ratio $r_\alpha$ steadily decreases with $s$. This is expected as large jumps for each proposal make it unlikely we stay in a high density region of our target distribution. A low acceptance ratio leads to wasted samples and is obviously undesirable.
 
-Nevertheless, $\bar{U}$ decreases with $s$ indicating shorter burn-in times for larger step-sizes. However, this effect plateaus for $s>0.2$ for this particular dataset. Therefore, we choose $s=0.2$ as our step-size multiplier for the primary school datasets as this yields the best trade-off between $r_\alpha$ and $\bar{U}$. Indeed, the acceptance ratio is still high for $r_\alpha \approx 0.8$ for $s=0.2$. The step-sizes for the other datasets were chosen following the same argument but we do not repeat the process here.
+Nevertheless, $\bar{U}$ decreases with $s$ indicating shorter burn-in times for larger step-sizes. However, this effect plateaus for $s>0.2$ for this particular dataset. Therefore, we choose $s=0.2$ as our step-size multiplier for the primary school dataset as this yields the best trade-off between $r_\alpha$ and $\bar{U}$. The step-sizes for the other datasets were chosen following the same argument but we do not repeat the process here.
 
 \FloatBarrier
 \subsection{Burn-in and thinning}
@@ -152,7 +152,7 @@ roughly reached equilibrium. As we do not leverage sample independence,
 $\lambda_\star$ can be chosen less rigorously; we often simply
 use $\lambda_b=5$ and $\lambda_\theta = 10$.
 
-By way of illustration, we can consider the primary school dataset \cite{schools}. We plot the normalised objective function $U\left( \theta^{(t)} \right) / N$ with respect to MALA iteration on figure \ref{fig:school-U-orginal}. We see that the chain converges to the modal neighbourhood quickly (within about 2000 iterations of a total 10,000). Nevertheless, we pick $\kappa_\theta=0.4 > 0.2$ just to be on the safe-side. $\lambda_\theta=10$ is chosen somewhat arbitrarily as we do not require neighbouring samples to be independent. Nevertheless, this thinning does speed up computation of quantities that require an average over all the retained samples -- as $|\Tcal_\theta| < T_\theta$.
+By way of illustration, we can consider the primary school dataset \cite{schools}. We plot the normalised objective function $U\left( \theta^{(t)} \right) / N$ with respect to MALA iteration on Figure \ref{fig:school-U-orginal} -- using the hyperparameters given in Appendix \ref{appdx:hyperparams}. We see that the chain converges to the modal neighbourhood quickly (within about 2000 iterations of a total 10,000). Nevertheless, we pick $\kappa_\theta=0.4 > 0.2$ to be on the safe-side. $\lambda_\theta=10$ is chosen somewhat arbitrarily as we do not require neighbouring samples to be independent. However, this thinning also has the advantage of speeding up computation of quantities that require an average over all the retained samples -- as $|\Tcal_\theta| < T_\theta$.
 %
 \begin{figure}[!h]
 	\centering
@@ -172,7 +172,7 @@ By way of illustration, we can consider the primary school dataset \cite{schools
 	\caption{Primary school dataset normalised objective function against sample index}
 \end{figure}
 
-We see on figure \ref{fig:school-U-thinned} that $U(\theta^{(i)})$ does bounce around a small amount. This is to be expected we are sampling from the posterior rather than converging to the MAP. There does appear to be variation over a long time-scale but we can live with this as we do not require sample independence.
+We plot the retained samples on Figure \ref{fig:school-U-thinned}. $U(\theta^{(i)})/N$ does bounce around a small amount but this is expected as we are sampling from the posterior rather than converging to the MAP solution. There does appear to be variation over a long time-scale but this is acceptable as we do not strictly require sample independence.
 \FloatBarrier
 \subsection{Initializing the b-chain}
 
@@ -197,25 +197,27 @@ the necessary burn-in time can be greatly reduced.
 \subsection{Dimensionality discussion}
 \label{appdx:dimension}
 
-There is a challenge when dealing with vertex-features. Many vertex feature often take only one of several discrete values within a set. For example, with the primary school dataset \cite{schools}, a pupil's school-class can take one of 10 values from \{"1A", "1B", "2A", "2B" \dots "5A", "5B"\}.
+Many vertex feature often take only one of several discrete values within a set. For example, with the primary school dataset \cite{schools}, a pupil's school-class can take one of 10 values from \{``1A", ``1B", ``2A", ``2B" \dots ``5A", "5B"\}.
 
-It is not immediately obvious how to encode this for the feature-to-block classifier. Although this is technically only a single dimension, we choose to expand the data into a set of 10 binary feature flags $\in \Xcal = \{0, 1\}$. Although only one flag will be set at a time it is the simplest method for representing discrete-valued data. The reason we choose $\Xcal=\{0, 1\}$ and not $\Xcal = \{-1, 1\}$ is that the former allows for simpler analysis of the resulting weight values; when a feature $d$ is switched off then $x_{d}=0$ given $\Xcal = \{0, 1\}$, and the feature has no impact on the softmax layer.
+It is not immediately obvious how to encode this for the feature-to-block classifier. Although this is technically only a single dimension, we choose to expand the data into a set of 10 binary feature flags all taking values in the set $\Xcal = \{0, 1\}$. Although only one flag will be set at a time it is the simplest method for representing discrete-valued data. The reason we choose $\Xcal=\{0, 1\}$ and not $\Xcal = \{-1, 1\}$ is that the former allows for simpler analysis of the resulting weight values; when a feature $d$ is switched off then $x_{d}=0$ given $\Xcal = \{0, 1\}$, and the feature has no impact on the softmax output. This would not be the case for $\Xcal = \{-1, 1\}$.
 
-It is more intuitive to only model positive relationships. In other words, we prefer to say that this block is comprised of the vertices with feature $d$ turned on rather than this block contains the vertices with feature $d$ switched off. To make this explicit, say we have a feature encoding a pupil's gender: \{"male", "female"\}, we represent this as 2 binary feature flags "male": \{0, 1\} and "female": \{0, 1\}. This approach may seem inefficient but it is vital to ensure we can interpret the resulting parameter distributions.
+Furthermore, it is more intuitive to only model positive relationships. In other words, we prefer to say that this block is comprised of the vertices with feature $d$ turned on rather than this block contains the vertices with feature $d$ switched off. To summarise the approach explicitly, say we have a feature encoding a pupil's gender: \{"male", "female"\}, we represent this as 2 binary feature flags "male": \{0, 1\} and "female": \{0, 1\}. This approach may seem inefficient but it is vital to ensure we can interpret the resulting parameter distributions.
 
-Nevertheless, this dimensionality expansion means that we cannot include a bias term in our classifier as then the MAP solution is less peaked and our $\theta$-samples will have higher variance. To illustrate this point we need only look at the form of the soft-max classifier with bias vector $\beta$, operating on a vector $x$ which only has one non-zero entry $x_d=1$. Component $j$ of the output is given by:
+Nevertheless, this dimensionality expansion means that we should not include a bias term in our softmax as then the MAP solution is less peaked and our $\theta$-samples will have higher variance. To illustrate this point we need only look at the form of the softmax activation function with bias vector $\beta$, operating on a vector $x$ which only has one non-zero entry $x_d=1$. Component $j$ of the output is given by:
 %
 \begin{equation}
 	\phi_j(x) = \frac{\exp(w_j^T x + \beta_j)}{\sum_{k \in [B]} \exp(w_k^T x + \beta_k)} = 
-	\frac{\exp(w_{jd} + \beta_j)}{\sum_{k \in [B]} \exp({w_{kd} + \beta_k})}
+	\frac{\exp(w_{jd} + \beta_j)}{\sum_{k \in [B]} \exp({w_{kd} + \beta_k})}.
 	\label{eqn:softmax-bias}
 \end{equation}
 %
-The term $w_{kd} + \beta_k$ is effectively the new weight for component $k$ as this term always appears together. The bias term $\beta_k$ is an unnecessary extra degree of freedom. To illustrate this point, we set $\beta_k=\beta_0 \forall j$. If this is the case then equation \ref{eqn:softmax-bias} can be simplified to:
+The term $w_{kd} + \beta_k$ is effectively the new weight for component $k$ as these two terms will always appear together. The bias term $\beta_k$ is therefore an unnecessary extra degree of freedom. To illustrate this point, we set $\beta_k=\beta_0$ for all $j$. If this is the case then equation \ref{eqn:softmax-bias} can be simplified to:
 %
 \begin{equation}
 	\phi_j(x) = \frac{\exp(\beta_0) \cdot \exp(w_{jd})}{\sum_{k \in [B]} \exp(\beta_0) \cdot \exp(w_{kd})}
 	= \frac{\exp(w_{jd})}{\sum_{k \in [B]} \exp(w_{kd})}
 \end{equation}
 %
-This expression is independent of $\beta_0$ and so it is free to vary. This is not the whole picture as we also have the prior which introduces a regularisation term which favours weights closer to 0. Nevertheless, for mutually exclusive binary feature flags, the bias term does not add to the expressiveness of the model and only serves to complicate analysis. We therefore remove the bias term from the Softmax classifier. Even for data comprised of several such features (e.g. school class and gender) we prefer to discard the bias term. The bias term only serves to decrease the loss function by leveraging information about the size of each detected block and not feature information. We do not wish to be overly confident in our block predictions when such predictions are influenced by block size and not feature information. Indeed, the approach was initially developed with a bias term but we found its removal yielded more reliable and reproducible results.
+This expression is independent of $\beta_0$ and so it is free to vary. This is not the whole picture as we also have the prior which introduces a regularisation term which favours weights closer to 0. This ensures the MAP solution is unique. Nevertheless, for mutually exclusive binary feature flags, the bias term does not add to the expressiveness of the model and only serves to complicate analysis. We therefore remove the bias term from the softmax.
+
+Even for data comprised of several feature-classes each expanded into flags (e.g. school class and gender) we prefer to discard the bias term. The bias term only serves to decrease the objective function by leveraging information about the size of each detected block and not feature information. We do not wish to be overly confident in our block predictions when such predictions are influenced by block size and not feature information. Indeed, the approach was initially developed with a bias term but we found its removal yielded more reliable and reproducible results.
