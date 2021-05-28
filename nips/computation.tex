@@ -7,6 +7,7 @@
 	\caption{Block membership sample generation} % give the algorithm a caption
 	\label{alg:b-samples} % and a label for \ref{} commands later in the document
 	\begin{algorithmic} % enter the algorithmic environment
+		\Procedure{SampleBlockMemberships}{$A, T_b$}
 		\State $b^{(0)} \gets \argmin_b S(b|A)$ \Comment{Implemented as greedy heuristic in \textit{graph-tool} library}
 		\For{$t \in \{0, 1 \dots T_b - 1\}$}
 		\State $b' \gets \sim q_b(b^{(t)}, b' | A)$
@@ -20,7 +21,7 @@
 		\EndFor
 		
 		\State \textbf{return} $\{b^{(t)}\}_{t=1}^{T_b}$
-		
+		\EndProcedure
 	\end{algorithmic}
 \end{algorithm}
 
@@ -28,7 +29,7 @@
 	\caption{FFBM parameter pseudo-marginal inference} % give the algorithm a caption
 	\label{alg:theta-samples} % and a label for \ref{} commands later in the document
 	\begin{algorithmic} % enter the algorithmic environment
-		
+		\Procedure{SampleFeatureWeights}{$X, \{b^{(t)}\}, \Tcal_b, \sigma_\theta, s$}
 		\State $\hat{Y}_{ij} \gets \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} \one \{ b^{(t)}_i = j\} \quad \forall i,j$
 		\State $\theta^{(0)} \gets \sim \Gaussian(0, \sigma_\theta I)$
 		
@@ -36,7 +37,10 @@
 		
 		\For{$t \in \{0, 1 \dots T_\theta - 1\}$}
 		\State $\xi \gets \sim \Gaussian(0, I)$
-		\State $\theta' \gets \theta^{(t)} - h_t \nabla U(\theta^{(t)} | X, \hat{Y}) + \sqrt{2h_t} \cdot \xi$
+		\State $h_t \gets \frac{s}{N} \cdot 250(1000 + t)^{-0.8}$
+		\State $g_t \gets \nabla U(\theta^{(t)}| X, \hat{Y})$
+		\item[]
+		\State $\theta' \gets \theta^{(t)} - h_t \cdot g_t + \sqrt{2h_t} \cdot \xi$
 		\State $\log \alpha_\theta \gets \log \alpha_\theta(\theta^{(t)}, \theta' | A, \hat{Y})$
 		\State $\eta \gets \sim \textrm{Unif}(0,1)$
 		\If{$\log \eta < \log \alpha_\theta$}
@@ -47,7 +51,41 @@
 		\EndFor
 		
 		\State \textbf{return} $\{\theta^{(t)}\}_{t=1}^{T_\theta}$
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm} % enter the algorithm environment
+	\caption{Dimensionality reduction} % give the algorithm a caption
+	\label{alg:retained-set} % and a label for \ref{} commands later in the document
+	\begin{algorithmic} % enter the algorithmic environment
+		\Procedure{ReduceDimension}{$\{W^{(t)}\}, \Tcal_\theta, k, D'$}
 		
+		\State $(B, D) \gets W^{(0)}$.shape
+		\State $\hat{\mu}_{ij} \gets \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} W_{ij}^{(t)} \quad \forall i \in [B], j \in [D]$
+		\State $\hat{\sigma}_{ij} \gets \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \left( W_{ij}^{(t)} - \hat{\mu}_{ij} \right)^2 \quad \forall i \in [B], j \in [D]$
+		
+		\item[]
+		
+		\For{$d \in [D]$}
+			\For{$i \in [B]$}
+				\State $l_i \gets \hat{\mu}_{id} - k \cdot \hat{\sigma}_{id}$
+				\State $u_i \gets \hat{\mu}_{id} + k \cdot \hat{\sigma}_{id}$
+				\If{$l_i \leq 0$ and $u_i \geq 0$}
+					\State $l_i, u_i \gets 0$
+				\EndIf
+			\EndFor
+			\State $c_d \gets \max_i \min\left(|l_i|, |u_i| \right)$
+		\EndFor
+		
+		\item[]
+		
+		\State indexArray $\gets$ indexSort($c$, descending=True)[$0:D'$]
+		\State $d^* \gets$ indexArray[-1]
+		\State $\Dcal' \gets $ Set(indexArray)
+		\State $c^* \gets c_{d^*}$
+		\State \textbf{return} $\Dcal', c^*$
+		\EndProcedure
 	\end{algorithmic}
 \end{algorithm}
 
@@ -109,9 +147,9 @@ On this hardware each experiment iteration took the following amount of time to 
 	\label{tab:compute-time}
 	\begin{tabular}{c|ccc|c}
 		Dataset & $b$-chain & $\theta$-chain & Reduced $\theta$-chain & Overall compute time \\ \hline
-		Polbooks & $\sim$1s & $\sim$4s & -- & $\sim$5s \\
-		School & $\sim$10s & $\sim$10s & $\sim$10s & $\sim$30s \\
-		FB Egonet & $\sim$20s & $\sim$180s & $\sim$10s & $\sim$210s
+		Polbooks & $\sim$1s & $\sim$10s & -- & $\sim$11s \\
+		School & $\sim$1s & $\sim$7s & $\sim$7s & $\sim$15s \\
+		FB Egonet & $\sim$2s & $\sim$50s & $\sim$8s & $\sim$60s
 	\end{tabular}
 \end{table}
 

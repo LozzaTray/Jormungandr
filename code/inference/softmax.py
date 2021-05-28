@@ -9,6 +9,7 @@ import math
 from inference.store import Store, compute_log_acceptance_prob
 from tqdm import tqdm
 from utils.colors import plt_color
+import matplotlib.mlab as mlab
 
 
 class SoftmaxNeuralNet:
@@ -37,21 +38,18 @@ class SoftmaxNeuralNet:
         return expZ / expZ.sum(axis=0, keepdims=True)
 
     def _initialize_parameters(self):
-
         for l in range(1, len(self.layers_size)):
             W = np.random.randn(
                 self.layers_size[l], self.layers_size[l - 1]) / np.sqrt(self.layers_size[l - 1])
-            b = np.zeros((self.layers_size[l], 1))
 
             self.parameters.set_W(W, l)
-            self.parameters.set_b(b, l)
 
     def _forward(self, X, store):
         A = X.T
         store.set_A(A, 0)
         # hidden sigmoid layers
         for l in range(1, self.L + 1):
-            Z = store.get_W(l).dot(A) + store.get_b(l)
+            Z = store.get_W(l).dot(A)
 
             if l < self.L:
                 A = self._sigmoid(Z)
@@ -87,17 +85,14 @@ class SoftmaxNeuralNet:
         dAPrev = store.get_W(self.L).T.dot(dZ)
 
         store.set_dW(dW, self.L)
-        store.set_db(db, self.L)
 
         for l in range(self.L - 1, 0, -1):
             dZ = dAPrev * self._sigmoid_derivative(store.get_Z(l))
             dW = dZ.dot(store.get_A(l-1).T)
-            db = np.sum(dZ, axis=1, keepdims=True)
             if l > 1:
                 dAPrev = store.get_W(l).T.dot(dZ)
 
             store.set_dW(dW, l)
-            store.set_db(db, l)
 
     def _compute_grad_U(self, X, Y, store):
         """Computes derivatives of U w.r.t params W and b
@@ -116,13 +111,8 @@ class SoftmaxNeuralNet:
 
         for l in range(1, self.L+1):
             dW_log_prior = - store.get_W(l) / (self.sigma ** 2)
-            db_log_prior = - store.get_b(l) / (self.sigma ** 2)
-
             dW = store.get_dW(l) - dW_log_prior
-            db = store.get_db(l) - db_log_prior
-
             store.set_dW(dW, l)
-            store.set_db(db, l)
 
     def _compute_log_likelihood(self, A, Y):
         """Computes log likelihood (-ve cross entropy loss)"""
@@ -132,8 +122,7 @@ class SoftmaxNeuralNet:
         log_prior = 0
         for l in range(1, self.L+1):
             weight_term = norm.logpdf(store.get_W(l), scale=self.sigma).sum()
-            bias_term = norm.logpdf(store.get_b(l), scale=self.sigma).sum()
-            log_prior = log_prior + weight_term + bias_term
+            log_prior = log_prior + weight_term
 
         return log_prior
 
@@ -328,6 +317,11 @@ class SoftmaxNeuralNet:
 
         return num_correct / num_total
 
+    def mean_std_normalised_U(self):
+        U_arr = [store.get_U() / self.n for store in self.store_history]
+        return np.mean(U_arr), np.std(U_arr)
+
+        
     def compute_mean_variances(self):
         D = self.layers_size[0]
         B = self.layers_size[1]
@@ -336,7 +330,6 @@ class SoftmaxNeuralNet:
         param_std_devs = np.zeros(shape=(B, D+1))
 
         W_history = [store.get_W(1) for store in self.store_history]
-        b_history = [store.get_b(1) for store in self.store_history]
 
         B = W_history[0].shape[0]
         D = W_history[0].shape[1]
@@ -345,19 +338,13 @@ class SoftmaxNeuralNet:
         assert D == W_history[0].shape[1]
         assert B == W_history[0].shape[0]
 
-        for d in range(0, D + 1):
+        for d in range(0, D):
             mean = np.zeros(B)
             square = np.zeros(B)
 
-            if d == D:
-                for b in b_history:
-                    mean[:] += b[:, 0]
-                    square[:] += b[:, 0] ** 2
-
-            else:
-                for W in W_history:
-                    mean[:] += W[:, d]
-                    square[:] += W[:, d] ** 2
+            for W in W_history:
+                mean[:] += W[:, d]
+                square[:] += W[:, d] ** 2
 
             mean = mean / n
             square = square / n
@@ -423,7 +410,6 @@ class SoftmaxNeuralNet:
         """
         D = self.layers_size[0]
 
-        kept_features = []
         cutoff_arr = np.empty(D)
         for d in range(0, D):  # do not consider bias
             means = self.param_means[:, d]
@@ -462,8 +448,10 @@ class SoftmaxNeuralNet:
         U_arr = [store.get_U() / self.n for store in self.store_history]
         x_arr = np.arange((len(U_arr)))
         plt.plot(x_arr, U_arr)
+        plt.xlim((x_arr[0], x_arr[-1] + 1))
         plt.xlabel("Index $"+ index_symbol + "$")
         plt.ylabel(r"$U \left( \theta^{(" + index_symbol + r")} \right) / N$")
+        plt.grid()
         plt.title(title)
         plt.show()
         return np.mean(U_arr)
@@ -694,9 +682,15 @@ class SoftmaxNeuralNet:
         W_history = [store.get_W(1) for store in self.store_history]
         n = len(W_history)
         values = [w[block_index, feat_index] for w in W_history]
-        plt.hist(values)
+        mean = np.mean(values)
+        std = np.std(values)
 
-        plt.title("Weight samples (n={})".format(n))
+        x, bins, p = plt.hist(values, density=True)
+        y = norm.pdf(bins, loc=mean, scale=std)
+        l = plt.plot(bins, y, '--')
+
+        weight = r"$W_{"+ str(block_index+1) + r"," + str(feat_index+1) + r"}$"
+        plt.title(weight + " samples (n={})".format(n))
         plt.xlabel("Value")
         plt.ylabel("Frequency")
         plt.grid()
