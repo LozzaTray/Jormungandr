@@ -1,7 +1,7 @@
 \section{Additional material}
 
 \subsection{SBM likelihood and prior}
-\label{appdx:sbm}
+\label{appdx:sbm-likelihood}
 
 For reference, we provide the likelihood and priors for the microcanonical SBM proposed by \citet{Peixoto-Bayesian-Microcanonical}. We have that the graph $A$ is drawn from the SBM,
 %
@@ -27,9 +27,12 @@ Note the similarity between the forms of $\Omega(e)$ and $\Xi(A)$ as $e$ is effe
 	p(A|k,e,b) = \frac{\Xi(A)}{\Omega(e)}.
 \end{equation}
 %
-Obviously, this form is only defined if $A$ respects the constraints imposed by $(k,e,b)$ else the likelihood is 0. 
+Obviously, this form is only defined if $A$ respects the constraints imposed by $(k,e,b)$ else the likelihood is 0.
 
-With the likelihood defined, we turn our attention to the prior, necessary for Bayesian analysis. As discussed in the main text, the block membership vector $b$ is an intermediate variable in the FFBM so we are not free to choose a prior for it. Nevertheless, we can define the prior on $(e,k)$ as a conditional on $b$. We switch back to the FFBM notation of $\psi = \{\psi_e, \psi_k\}$ to encapsulate $e$ and $k$. We recall for reference
+\subsection{SBM prior}
+\label{appdx:sbm-prior}
+
+We turn our attention to the prior on the SBM parameters, necessary for Bayesian analysis. As discussed in the main text, the block membership vector $b$ is an intermediate variable in the FFBM so we are not free to choose a prior for it. Nevertheless, we can define the prior on $(e,k)$ as a conditional on $b$. We switch back to the FFBM notation of $\psi = \{\psi_e, \psi_k\}$ to encapsulate $e$ and $k$. We recall for reference
 the prior $p(\psi | b)$ from \cite{Peixoto-Bayesian-Microcanonical}:
 %
 \begin{equation}
@@ -56,6 +59,20 @@ is the number of vertices assigned to block $r$.
 These priors were chosen carefully in \cite{Peixoto-Bayesian-Microcanonical} to 
 more closely match the structure of empirical networks than simple 
 uniform priors. We do not repeat these arguments here.
+
+\subsection{Metropolis-Hastings}
+\label{appdx:metropolis-hastings}
+
+Recall from Section \ref{sec:inference}, we state that we can implement sampling from the $b$ and $\theta$-chains through the Metropolis-Hastings algorithm \cite{hastings-alg}. For reference, we define the prerequisites for implementing the Metropolis-Hastings algorithm.
+
+Suppose we wish to draw samples for some general $x$ from the normalised density $\pi^*(x)$. We just need to define a proposal distribution $q(x, x')$ for proposing a move $x \rightarrow x'$ and be able to evaluate an un-normalised form of the target distribution, denoted $\pi(x) \propto \pi*(x)$, point-wise. Each proposed move $x \rightarrow x'$ is then accepted with probability $\alpha$~(\ref{eqn:mh-accept}) else it is rejected and we stay at $x$.
+
+\begin{equation}
+\alpha(x, x') = \min \left( \frac{\pi(x') q(x', x)}{\pi(x) q(x, x')} , 1 \right).
+\label{eqn:mh-accept}
+\end{equation}
+
+This accept-reject step ensures the resulting Markov Chain is in detailed balance with the target distribution $\pi(\cdot)$. Therefore, the set of samples $\{x^{(t)}\} \sim \pi^*(x)$
 
 \subsection{Choosing the MALA step-size}
 \label{appdx:step-size}

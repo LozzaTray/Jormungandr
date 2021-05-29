@@ -24,17 +24,8 @@ sample $\theta^{(t)}$:
 %
 Both of these sampling steps can be implemented using
 Markov chain Monte Carlo via a Metropolis-Hastings 
-algorithm \cite{hastings-alg}, as a two-level Markov chain.
-
-% We just need to define a proposal distribution $q(x, x')$ for proposing a move $x \rightarrow x'$ and be able to evaluate an un-normalised form of the target distribution, denoted $\pi(\cdot)$, point-wise. The proposed move is then accepted with probability $\alpha$ (equation \ref{eqn:mh-accept}) else it is rejected and we stay at $x$.
-%
-% \begin{equation}
-	% \alpha(x, x') = \min \left( \frac{\pi(x') q(x', x)}{\pi(x) q(x, x')} , 1 \right)
-	% \label{eqn:mh-accept}
-% \end{equation}
-%
-% This accept-reject step ensures the resulting Markov Chain is in detailed balance with the target distribution $\pi(\cdot)$. 
-% What we propose in equations \ref{eqn:b-samples} and \ref{eqn:theta-samples} is therefore implemented through a 2-level Markov chain. 
+algorithm \cite{hastings-alg}, as a two-level Markov chain. See Appendix \ref{appdx:metropolis-hastings} for more details on this.
+ 
 As we show in the following section, the resulting samples 
 for $\theta^{(t)}$ are unbiased in the sense that the expectation of 
 their distribution is the target posterior distribution:
@@ -101,7 +92,6 @@ we use only $b$ but not $A$, as $\theta$ and $A$ are
 conditionally independent given $b$. 
 
 \FloatBarrier
-\clearpage
 \subsection{Sampling block memberships}
 
 We adopt the Markov chain Monte Carlo procedure of
