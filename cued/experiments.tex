@@ -17,27 +17,27 @@ We apply the developed methods to a variety of datasets. These are chosen to spa
 	\begin{subfigure}[t]{0.28\linewidth}
 		\centering
 		\includegraphics[width=\linewidth]{polbooks-graph.png}
-		\caption{Polbooks}
+		\caption{Polbooks.}
 		\label{fig:polbooks-graph}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[t]{0.28\linewidth}
 		\centering
 		\includegraphics[width=\linewidth]{school-graph.png}
-		\caption{School}
+		\caption{School.}
 		\label{fig:school-graph}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[t]{0.28\linewidth}
 		\centering
 		\includegraphics[width=\linewidth]{fb-graph.png}
-		\caption{Facebook egonet}
+		\caption{Facebook egonet.}
 		\label{fig:fb-graph}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.10\linewidth}
 		\centering
 		\includegraphics[width=0.8\linewidth]{10-vertical-legend.png}
-		\caption{Legend}
+		\caption{Legend.}
 		\label{fig:10-legend}
 	\end{subfigure}
 	\caption{Networks laid out and coloured according by inferred block memberships $\hat{y}$ for a given experiment iteration. Visualisation performed using \textit{graph-tool} \cite{peixoto_graph-tool_2014}.}
@@ -160,24 +160,24 @@ of the overall network structure. We choose to partition the network into $B=3$ 
 %
 \begin{figure}[!h]
 	\centering
-	\begin{subfigure}[t]{0.45\linewidth}
+	\begin{subfigure}[t]{0.452\linewidth}
 		\centering
 		\vskip 0pt
-		\includegraphics[width=\linewidth]{polbooks-null}
-		\caption{$\theta$-samples}
+		\includegraphics[width=\linewidth]{polbooks-null-1}
+		\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
 		\label{fig:polbooks-null}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.45\linewidth}
 		\centering
 		\vskip 0pt
-		\includegraphics[width=\linewidth]{polbooks-null}
-		\caption{Per-block accuracy $\eta(j)$}
+		\includegraphics[width=\linewidth]{polbooks-accuracy-1}
+		\caption{Per-block accuracy $\eta(j)$.}
 		\label{fig:polbooks-accuracy}
 	\end{subfigure}
-	\caption{Political books dataset}
+	\caption{Political books dataset.}
 	\label{fig:polbooks}
 \end{figure}
-%
+
 From Figure~\ref{fig:polbooks-null} we see that all 3 blocks have a distinct political affiliation as their largest positive component. 
 This strongly indicates that political affiliation is indeed the axis 
 which best predicts the 3-way natural partition of the graph into blocks. 
@@ -185,6 +185,8 @@ Furthermore, in Table~\ref{tab:results} we see that the training and test losses
 are very similar and both are low in magnitude. This provides further evidence 
 to the claim that political affiliation is a very appropriate explanatory 
 variable for the overall network structure.
+
+Nevertheless, from Figure~\ref{fig:polbooks-accuracy} we see that block 1 has low accuracy. This suggests that detected block 1 is not solely composed of ``neutral" books but also contains some ``liberal" and ``conservative" authors. Indeed, by examining Figure~\ref{fig:polbooks-graph} we see that block 1 is effectively a buffer between blocks 2 and 3. It is therefore not surprising that some books from either side leak into block 1. Perhaps, the three distinct categories (``conservative", ``liberal", ``neutral") are too coarse a measure of political affiliation; it may be the case that the nominally ``conservative" books found in block 1 are in fact more centre-right. It would be interesting to rerun the experiment using soft labels for political affiliation now encoded as a continuous variable $(-1,1)$. Nevertheless, political affiliation encoded as 3 distinct labels remains a fantastic predictor of network structure.
 
 \subsection{Primary school dynamic contacts}
 
@@ -204,19 +206,17 @@ meaning that these are not good predictors of overall macro-structure.
 	\centering
 	\begin{subfigure}[t]{0.45\linewidth}
 		\centering
-		\vskip 0pt
-		\includegraphics[width=\linewidth]{school-null}
-		\caption{$\theta$-samples}
+		\imagebox{6.2cm}{\includegraphics[width=\linewidth]{school-null-1}}
+		\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
 		\label{fig:school-null}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.45\linewidth}
 		\centering
-		\vskip 0pt
-		\includegraphics[width=\linewidth]{school-null}
-		\caption{Per-block accuracy $\eta(j)$}
+		\imagebox{6.2cm}{\includegraphics[width=\linewidth]{school-accuracy-1}}
+		\caption{Per-block accuracy $\eta(j)$.}
 		\label{fig:school-accuracy}
 	\end{subfigure}
-	\caption{Primary school dynamic contacts dataset}
+	\caption{Primary school dynamic contacts dataset.}
 	\label{fig:school}
 \end{figure}
 %
@@ -244,19 +244,17 @@ Figure~\ref{fig:fb-null} do not have high-magnitude components for $D'=10$.
 	\centering
 	\begin{subfigure}[t]{0.45\linewidth}
 		\centering
-		\vskip 0pt
-		\includegraphics[width=\linewidth]{fb-null}
-		\caption{$\theta$-samples}
+		\imagebox{7cm}{\includegraphics[width=\linewidth]{fb-null-1}}
+		\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
 		\label{fig:fb-null}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.45\linewidth}
 		\centering
-		\vskip 0pt
-		\includegraphics[width=\linewidth]{fb-null}
-		\caption{Per-block accuracy $\eta(j)$}
+		\imagebox{7cm}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
+		\caption{Per-block accuracy $\eta(j)$.}
 		\label{fig:fb-accuracy}
 	\end{subfigure}
-	\caption{Facebook egonet dataset}
+	\caption{Facebook egonet dataset.}
 	\label{fig:fb}
 \end{figure}
 %

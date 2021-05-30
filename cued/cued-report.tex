@@ -58,6 +58,8 @@
 \DeclareMathOperator*{\argmax}{arg\,max} % Jan Hlavacek
 \DeclareMathOperator*{\argmin}{arg\,min} % Jan Hlavacek
 
+\def\imagebox#1#2{\vtop to #1{\null\hbox{#2}\vfill}}
+
 
 
 %envs
@@ -100,6 +102,7 @@
 	\clearpage
 	
 	%references
+	\nocite{*}
 	\bibliography{sources.bib}
 	
 	\clearpage
