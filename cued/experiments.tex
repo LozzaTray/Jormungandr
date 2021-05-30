@@ -3,7 +3,7 @@
 
 We apply the developed methods to a variety of datasets. These are chosen to span a range of node counts $N$, edge counts $E$ and feature space dimension $D$. We consider the following:
 
-\begin{itemize}[leftmargin=*]
+\begin{itemize}
 	\item \textbf{Political books} \cite{polbooks} ($N=105, E=441, D=3$) -- network of Amazon book sales about U.S. politics, published close to the presidential election in 2004. Two books are connected if they were frequently co-purchased by customers. Vertex features encode the political affiliation of the author (liberal, conservative, or neutral).
 		
 	\item \textbf{Primary school dynamic contacts} \cite{schools} ($N=238, E=5539, D=13$) -- network of face-to-face contacts amongst students and teachers at a primary school in Lyon, France. Two nodes are connected if the two parties shared a face-to-face interaction over the school-day. Vertex features include class membership (one of 10 values: 1A-5B), gender (male, female) and teacher status encoded as an 11th school-class. No further identifiable information is retained. We choose to analyse just the second day of results.
@@ -42,34 +42,6 @@ We apply the developed methods to a variety of datasets. These are chosen to spa
 	\end{subfigure}
 	\caption{Networks laid out and coloured according by inferred block memberships $\hat{y}$ for a given experiment iteration. Visualisation performed using \textit{graph-tool} \cite{peixoto_graph-tool_2014}.}
 	\label{fig:graphs-all}
-\end{figure}
-\begin{figure}[!h]
-	\centering
-	\begin{subfigure}[t]{0.32\linewidth}
-		\centering
-		\vskip 0pt
-		\includegraphics[width=\linewidth]{polbooks-null.png}
-		\caption{Polbooks}
-		\label{fig:polbooks-null}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.32\linewidth}
-		\centering
-		\vskip 0pt
-		\includegraphics[width=\linewidth]{school-null.png}
-		\caption{School}
-		\label{fig:school-null}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[t]{0.32\linewidth}
-		\centering
-		\vskip 0pt
-		\includegraphics[width=\linewidth]{fb-null.png}
-		\caption{Facebook egonet}
-		\label{fig:fb-null}
-	\end{subfigure}
-	\caption{Reduced dimension feature-to-block generator weight samples. Dotted line is $\pm c^*$}
-	\label{fig:null-all}
 \end{figure}
 \begin{table}[!h]
 	\centering
@@ -159,11 +131,54 @@ the detected communities can be found reliably (to within an arbitrary
 relabelling of blocks). For reference, we plot an inferred partition for each 
 of the graphs in Figure~\ref{fig:graphs-all}. The polbooks graph yields the cleanest separation between blocks but nonetheless the inferred partitions for the other datasets do succeed at dividing the graph into densely connected clusters.
 
+Nevertheless, the cross-entropy loss over the whole training set may be too coarse a measure of model fit. It is often the case that we have good feature-based explanations for some but not all of the detected blocks. We wish to define a new measure of fit specific to each detected block. We could use a binary cross-entropy function but this would necessarily use the whole test/training set and so few vertices will belong to the block of interest. We instead prefer to compute quantities over the set of all vertices associated with block $j$, defined as,
+%
+\begin{equation}
+	\Bcal_\star(j) \coloneqq \{i \in \Gcal_\star : \hat{b}_i = j\} \quad \textrm{where} 
+	\quad \hat{b}_i \coloneqq \argmax_j \hat{y}_{ij}.
+\end{equation}
+%
+Recall that $\hat{y}_{ij}$ is our estimate for the block membership posterior~(\ref{eqn:y-hat}) using only information from the adjacency matrix $A$. Again, $\star \in \{0, 1\}$ toggles between training and test sets. Now $\Bcal_\star(j)$ is the set of all vertices within the training or test set that have maximum a posteriori probability of belonging to set $j$. We choose to resolve ties consistently by picking the lower index. We now define the accuracy for block $j$ as,
+%
+\begin{equation}
+	\eta_\star(j) \coloneqq \frac{1}{|\Bcal_\star (j)| \cdot 
+	|\Tcal_\theta| } 
+	\sum_{i \in \Bcal_\star (j)}  \sum_{t \in \Tcal_\theta}
+	\one \left\{\hat{b}_i = \argmax_j \phi_j \left( x_i; \theta^{(t)} \right) \right\}.
+	\label{eqn:accuracy}
+\end{equation}
+%
+This is effectively testing whether the feature-to-block predictions and the graph-based predictions agree in their largest component. We call this metric, $\eta_\star(j)$, the {\em block-accuracy} for block for $j$.
+
+For each of the experiments, we plot the collected $\theta$-samples for the features that survive the dimensionality reduction procedure. We also plot the per-block accuracy for the original-dimension classifiers.
+
 \subsection{Political books}
 
 The goal here is to 
 determine whether the authors' political affiliations are a good predictor 
-of the overall network structure. We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral). From Figure~\ref{fig:polbooks-null} we see that all 3 blocks have a distinct political affiliation as their largest positive component. 
+of the overall network structure. We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral).
+%
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\vskip 0pt
+		\includegraphics[width=\linewidth]{polbooks-null}
+		\caption{$\theta$-samples}
+		\label{fig:polbooks-null}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\vskip 0pt
+		\includegraphics[width=\linewidth]{polbooks-null}
+		\caption{Per-block accuracy $\eta(j)$}
+		\label{fig:polbooks-accuracy}
+	\end{subfigure}
+	\caption{Political books dataset}
+	\label{fig:polbooks}
+\end{figure}
+%
+From Figure~\ref{fig:polbooks-null} we see that all 3 blocks have a distinct political affiliation as their largest positive component. 
 This strongly indicates that political affiliation is indeed the axis 
 which best predicts the 3-way natural partition of the graph into blocks. 
 Furthermore, in Table~\ref{tab:results} we see that the training and test losses 
@@ -184,7 +199,27 @@ that only the pupils' class memberships (1A-5B) have remained
 significant;
 gender and teacher/student status have been discarded,
 meaning that these are not good predictors of overall macro-structure.
-
+%
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\vskip 0pt
+		\includegraphics[width=\linewidth]{school-null}
+		\caption{$\theta$-samples}
+		\label{fig:school-null}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\vskip 0pt
+		\includegraphics[width=\linewidth]{school-null}
+		\caption{Per-block accuracy $\eta(j)$}
+		\label{fig:school-accuracy}
+	\end{subfigure}
+	\caption{Primary school dynamic contacts dataset}
+	\label{fig:school}
+\end{figure}
+%
 The vast majority of blocks are composed of a single class. 
 However, some blocks have two comparably good classes as their predictor. 
 For example, block 2 contains classes 3A and 3B as its 2 best predictors. 
@@ -204,7 +239,27 @@ community structure. The majority of them are education related.
 Nevertheless, for $D'=10$ we only have good explanations for the makeup 
 of some of the detected blocks; several blocks in 
 Figure~\ref{fig:fb-null} do not have high-magnitude components for $D'=10$.
-
+%
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\vskip 0pt
+		\includegraphics[width=\linewidth]{fb-null}
+		\caption{$\theta$-samples}
+		\label{fig:fb-null}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\vskip 0pt
+		\includegraphics[width=\linewidth]{fb-null}
+		\caption{Per-block accuracy $\eta(j)$}
+		\label{fig:fb-accuracy}
+	\end{subfigure}
+	\caption{Facebook egonet dataset}
+	\label{fig:fb}
+\end{figure}
+%
 When the feature dimension is very large, it becomes increasingly likely that 
 a particular feature may uniquely identify a small set of nodes. If these nodes 
 are all part of the same community, then the classifier will overfit for that 
