@@ -74,8 +74,7 @@ is sufficient to prove that, for large enough $t$, $\theta^{(t)} \sim \Expect_{b
 	\label{fig:samp-sequence}
 \end{figure}
 
-The reason for splitting the Markov chain into two levels is that the summation over all latent states $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$,
-is intractable, as the sum involves $B^N$ terms. 
+The reason for splitting the Markov chain into two levels is that the summation over all latent states $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$, is intractable, as the sum involves $B^N$ terms. 
 Figure \ref{fig:samp-sequence} shows an overview of the proposed method. 
 The Metropolis-Hastings accept/reject probabilities 
 for the proposed $b$ and $\theta$ samples are denoted $\alpha_b$ and
