@@ -17,27 +17,27 @@ We apply the developed methods to a variety of datasets. These are chosen to spa
 	\begin{subfigure}[t]{0.28\linewidth}
 		\centering
 		\includegraphics[width=\linewidth]{polbooks-graph.png}
-		\caption{Polbooks.}
+		\caption{Polbooks}
 		\label{fig:polbooks-graph}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[t]{0.28\linewidth}
 		\centering
 		\includegraphics[width=\linewidth]{school-graph.png}
-		\caption{School.}
+		\caption{School}
 		\label{fig:school-graph}
 	\end{subfigure}
 	\hfill
 	\begin{subfigure}[t]{0.28\linewidth}
 		\centering
 		\includegraphics[width=\linewidth]{fb-graph.png}
-		\caption{Facebook egonet.}
+		\caption{Facebook egonet}
 		\label{fig:fb-graph}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.10\linewidth}
+	\begin{subfigure}[t]{0.11\linewidth}
 		\centering
 		\includegraphics[width=0.8\linewidth]{10-vertical-legend.png}
-		\caption{Legend.}
+		\caption{Legend}
 		\label{fig:10-legend}
 	\end{subfigure}
 	\caption{Networks laid out and coloured according by inferred block memberships $\hat{y}$ for a given experiment iteration. Visualisation performed using \textit{graph-tool} \cite{peixoto_graph-tool_2014}.}
@@ -131,7 +131,7 @@ the detected communities can be found reliably (to within an arbitrary
 relabelling of blocks). For reference, we plot an inferred partition for each 
 of the graphs in Figure~\ref{fig:graphs-all}. The polbooks graph yields the cleanest separation between blocks but nonetheless the inferred partitions for the other datasets do succeed at dividing the graph into densely connected clusters.
 
-Nevertheless, the cross-entropy loss over the whole training set may be too coarse a measure of model fit. It is often the case that we have good feature-based explanations for some but not all of the detected blocks. We wish to define a new measure of fit specific to each detected block. We could use a binary cross-entropy function but this would necessarily use the whole test/training set and so few vertices will belong to the block of interest. We instead prefer to compute quantities over the set of all vertices associated with block $j$, defined as,
+Nevertheless, the cross-entropy loss over the whole training set may be too coarse a measure of model fit. It is often the case that we have good feature-based explanations for some but not all of the detected blocks. We wish to define a new measure of fit specific to each detected block. This requires defining the set of all vertices associated with block $j$, as,
 %
 \begin{equation}
 	\Bcal_\star(j) \coloneqq \{i \in \Gcal_\star : \hat{b}_i = j\} \quad \textrm{where} 
@@ -148,9 +148,9 @@ Recall that $\hat{y}_{ij}$ is our estimate for the block membership posterior~(\
 	\label{eqn:accuracy}
 \end{equation}
 %
-This is effectively testing whether the feature-to-block predictions and the graph-based predictions agree in their largest component. We call this metric, $\eta_\star(j)$, the {\em block-accuracy} for block for $j$.
+This is effectively testing whether the feature-to-block predictions and the graph-based predictions agree in their largest component. We call this metric, $\eta_\star(j)$, the {\em block-accuracy} for block $j$. It is clearly bounded $0 \leq \eta_\star(j) \leq 1$, with an accuracy of 1 meaning perfect agreement for the vertices in detected block $j$.
 
-For each of the experiments, we plot the collected $\theta$-samples for the features that survive the dimensionality reduction procedure. We also plot the per-block accuracy for the original-dimension classifiers.
+For each of the experiments, we plot the collected $\theta$-samples for the features that survive the dimensionality reduction procedure. We also plot the per-block accuracy for the original-dimension classifiers. We discuss the results specific to each dataset in turn.
 
 \subsection{Political books}
 
@@ -186,7 +186,7 @@ are very similar and both are low in magnitude. This provides further evidence
 to the claim that political affiliation is a very appropriate explanatory 
 variable for the overall network structure.
 
-Nevertheless, from Figure~\ref{fig:polbooks-accuracy} we see that block 1 has low accuracy. This suggests that detected block 1 is not solely composed of ``neutral" books but also contains some ``liberal" and ``conservative" authors. Indeed, by examining Figure~\ref{fig:polbooks-graph} we see that block 1 is effectively a buffer between blocks 2 and 3. It is therefore not surprising that some books from either side leak into block 1. Perhaps, the three distinct categories (``conservative", ``liberal", ``neutral") are too coarse a measure of political affiliation; it may be the case that the nominally ``conservative" books found in block 1 are in fact more centre-right. It would be interesting to rerun the experiment using soft labels for political affiliation now encoded as a continuous variable $(-1,1)$. Nevertheless, political affiliation encoded as 3 distinct labels remains a fantastic predictor of network structure.
+However, from Figure~\ref{fig:polbooks-accuracy} we see that block 1 has low accuracy. This suggests that detected block 1 is not solely composed of ``neutral" books but also contains some ``liberal" and ``conservative" authors. Indeed, by examining Figure~\ref{fig:polbooks-graph} we see that block 1 is effectively a buffer between blocks 2 and 3 -- there are very few edges between blocks 2 and 3. It is therefore not surprising that some books from either side leak into block 1. Perhaps, the three distinct categories (``conservative", ``liberal", ``neutral") are too coarse a measure of political affiliation; it may be the case that the nominally ``conservative" books found in block 1 are in fact more centre-right. In the absence of more granular labels we cannot test this hypothesis. Nevertheless, political affiliation encoded as 3 distinct labels remains a fantastic predictor of network structure.
 
 \subsection{Primary school dynamic contacts}
 
@@ -219,17 +219,19 @@ meaning that these are not good predictors of overall macro-structure.
 	\caption{Primary school dynamic contacts dataset.}
 	\label{fig:school}
 \end{figure}
-%
+
 The vast majority of blocks are composed of a single class. 
 However, some blocks have two comparably good classes as their predictor. 
-For example, block 2 contains classes 3A and 3B as its 2 best predictors. 
+For example, both blocks 2 and 5 contain classes 3A and 3B as their 2 best predictors. 
 This suggests that the social divide between classes is less pronounced 
 for pupils in year 3. Conversely, some classes are found to extend over two 
-detected blocks (class 2B spans blocks 6 and 7) but we nonetheless do 
+detected blocks (class 2B spans blocks 8 and 9) but we do 
 not have a feature which explains the division. The most surprising block 
-is number 5, which has comparable weightings for classes 5A and 1B. 
+is number 7, which has comparable weightings for classes 5A and 1B. 
 Perhaps there was a joint event between those two classes on the day 
-the data were collected.
+the data were collected. Nevertheless, a hierarchical approach would help further subdivide these blocks.
+
+Figure~\ref{fig:school-accuracy} shows excellent accuracy for the majority of blocks. In fact the only blocks with low accuracy are those that have a school-class span two blocks such that we cannot reliably distinguish between the two. This is much more pronounced when we apply hard classification rather than the soft cross-entropy loss. Indeed block 1 has low accuracy because the class 1A has a higher weight component for block 3 than it does for block 1. As we use hard classification to compute accuracy, this means vertices belonging to class 1A are assigned to block 3. A similar effect is seen in block 5 which often loses out to block 2. Depending on the sample index $t$, class 2B is assigned to block 8 or 9 with maximal probability. This explains the rough 50\% accuracy for blocks 8 and 9.
 
 \subsection{Facebook egonet}
 
@@ -238,7 +240,7 @@ We choose $B=10$ and $D'=10$ for this experiment. The selected features
 community structure. The majority of them are education related. 
 Nevertheless, for $D'=10$ we only have good explanations for the makeup 
 of some of the detected blocks; several blocks in 
-Figure~\ref{fig:fb-null} do not have high-magnitude components for $D'=10$.
+Figure~\ref{fig:fb-null} do not have high-magnitude components for $D'=10$. This is further emphasised by the disparate accuracies in Figure~\ref{fig:fb-accuracy}. Nevertheless, observe that the accuracy is only high for blocks that contain high magnitude weights. The only exception to this rule is block 9 which nonetheless, although this may have high magnitude weights just below the cut-off $c^*$. Recall that the accuracy is computed as ana average over all samples and so is likely to be lower than the MAP solution.
 %
 \begin{figure}[!h]
 	\centering
@@ -257,7 +259,7 @@ Figure~\ref{fig:fb-null} do not have high-magnitude components for $D'=10$.
 	\caption{Facebook egonet dataset.}
 	\label{fig:fb}
 \end{figure}
-%
+
 When the feature dimension is very large, it becomes increasingly likely that 
 a particular feature may uniquely identify a small set of nodes. If these nodes 
 are all part of the same community, then the classifier will overfit for that 
@@ -266,5 +268,6 @@ way towards alleviating this problem. Nevertheless, we see in
 Figure~\ref{fig:fb-null} that the feature \verb*|birthday-5| has a very 
 high weight as it relates to block 1 -- but it is highly unlikely
 that birthdays determine graphical structure. 
-% The analyst must remain vigilant of such problems.
+
+However, we see the advantage of having $\Xcal=\{0,1\}$ rather than $\Xcal={-1, 1}$ as argued in Appendix \ref{appdx:dimension}. Block 1 in Figure~\ref{fig:fb-null} is allowed to contain 3 distinct feature categories. Nevertheless, one would have to apply a hierarchical approach to subdivide block 1 into smaller blocks to test whether these features determine structure at the lower-level.
 
