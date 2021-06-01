@@ -12,7 +12,7 @@ For reference, we provide the likelihood and priors for the microcanonical SBM p
 with edges placed uniformly at random but respecting the constraints imposed by $b, e$ and $k$. The computation of the likelihood, $p(A|k, e, b)$, is simply a case of counting the number of configurations that yield the same adjacency matrix and dividing by the total number of configurations possible. This is what gives this formulation the `microcanonical' moniker. If we consider the half-edges to be distinguishable for a moment, the total number of configurations that satisfy the $e$ constraint is,
 %
 \begin{equation}
-	\Omega(e) = \frac{\prod_{r} e_r !}{\prod_{r,s : r < s} e_{rs}! \cdot \prod_{r} e_{rr}!!},
+	\Omega(e) = \frac{\prod_{r} e_r !}{\prod_{r,s : r < s} e_{rs}! \prod_{r} e_{rr}!!},
 \end{equation}
 %
 where $e_r \coloneqq \sum_{s} e_{rs}$ and $(2m)!! \coloneqq 2^m m!$. Nevertheless, a great number of these $\Omega(e)$ total configurations yield the same graph $A$. We denote the number of configurations that yield the adjacency matrix $A$ with,
@@ -46,7 +46,7 @@ which can be thought of as the total number of distinct histograms
 produced by $m$ samples in $n$ bins.
 The value
 $E = \frac{1}{2} \sum_{r,s} e_{rs}$ is the total number of edges in the graph. 
-Importantly, $E$ is not allowed to vary and so $p(e|b)$ is uniform in $e$.
+Importantly, $E$ is fixed by $A$ and so $p(e|b)$ is uniform in $e$.
 The variable $\eta_j^r$ denotes the number of vertices in block $r$ 
 that have degree $j$; formally, $\eta_j^r \coloneqq \sum_{i} \one\left\{b_i = r \right\} \one \left\{k_i = j \right\}$. 
 The denominator $q(m, n)$ denotes the number of different histograms 
@@ -54,8 +54,7 @@ produced by $m$ samples in
 at most $n$ non-zero bins that sum to $m$. 
 Finally, $e_r \coloneqq \sum_{s} e_{rs}$ is the total number 
 of half edges in block $r$ and $n_r \coloneqq \sum_{i} \one\{b_i = r\}$ 
-is the number of vertices assigned to block $r$. 
-
+is the number of vertices assigned to block $r$.
 These priors were chosen carefully in \cite{Peixoto-Bayesian-Microcanonical} to 
 more closely match the structure of empirical networks than simple 
 uniform priors. We do not repeat these arguments here.
@@ -65,14 +64,14 @@ uniform priors. We do not repeat these arguments here.
 
 Recall from Section \ref{sec:inference}, we state that we can implement sampling from the $b$ and $\theta$-chains through the Metropolis-Hastings algorithm \cite{hastings-alg}. For reference, we define the prerequisites for implementing the Metropolis-Hastings algorithm.
 
-Suppose we wish to draw samples for some general $x$ from the normalised density $\pi^*(x)$. We just need to define a proposal distribution $q(x, x')$ for proposing a move $x \rightarrow x'$ and be able to evaluate an un-normalised form of the target distribution, denoted $\pi(x) \propto \pi*(x)$, point-wise. Each proposed move $x \rightarrow x'$ is then accepted with probability $\alpha$~(\ref{eqn:mh-accept}) else it is rejected and we stay at $x$.
-
+Suppose we wish to draw samples for some general $x$ from the normalised density $\pi^*(x)$. We just need to define a proposal distribution $q(x, x')$ and be able to evaluate an un-normalised form of the target distribution, denoted $\pi(x) \propto \pi^*(x)$, point-wise. Each proposed move $x \rightarrow x'$ is then accepted with probability $\alpha$~(\ref{eqn:mh-accept}) else it is rejected and we stay at $x$.
+%
 \begin{equation}
 \alpha(x, x') = \min \left( \frac{\pi(x') q(x', x)}{\pi(x) q(x, x')} , 1 \right).
 \label{eqn:mh-accept}
 \end{equation}
-
-This accept-reject step ensures the resulting Markov Chain is in detailed balance with the target distribution $\pi(\cdot)$. Therefore, the set of samples $\{x^{(t)}\} \sim \pi^*(x)$
+%
+This accept-reject step ensures the resulting Markov Chain is in detailed balance with the target distribution $\pi(\cdot)$. Therefore, the set of samples produced $\{x^{(t)}\} \sim \pi^*(x)$.
 
 \subsection{Choosing the MALA step-size}
 \label{appdx:step-size}
@@ -132,7 +131,7 @@ Since the chain will equilibrate in the vicinity of a minima in $U(\theta)$, the
 \begin{figure}[!h]
 	\centering
 	\includegraphics[width=0.6\linewidth]{step-size-tradeoff}
-	\caption{Primary school dataset \cite{schools} illustration of step-size tradeoff}
+	\caption{Primary school dataset illustration of step-size tradeoff.}
 	\label{fig:step-size-tradeoff}
 \end{figure}
 
@@ -144,13 +143,11 @@ Nevertheless, $\bar{U}$ decreases with $s$ indicating shorter burn-in times for 
 \subsection{Burn-in and thinning}
 \label{appdx:burn-in-thinning}
 
-%As with any MCMC method, we must deal with the issues presented by burn-in and thinning.
 When sampling from the $b$ and $\theta$-chains described
 in Section~\ref{sec:inference}, we respectively generate
 $T_b$ and $T_\theta$ samples total.
 We discard an initial proportion $\kappa_\star\in(0,1)$ of the samples 
-as corresponding to a ``burn-in'' period required for the distribution 
-of the chain to reach a distribution close to our target,
+as corresponding to a ``burn-in'' period required for the chain to equilibrate,
 and we also ``thin'' the remaining samples to 
 obtain a less-dependent version. For $\star\in\{b,\theta\}$,
 the remaining sample sets are denoted $\Tcal_\star$
@@ -162,31 +159,31 @@ in the notation of Section~\ref{s:ss},
 \end{equation}
 %
 where $\lambda_\star$ controls the thinning. The choice of
-$\kappa_\star$ can be determined by plotting the log-target (either $S(b^{(t)})$ 
-or $U(\theta^{(t)})$ as a function of $t$,
+$\kappa_\star$ can be determined by plotting the log-target -- either $S(b^{(t)})$ 
+or $U(\theta^{(t)})$ -- as a function of $t$,
 and choosing $\kappa_\star$ to encompass the region where the log-target has 
 roughly reached equilibrium. As we do not leverage sample independence,
 $\lambda_\star$ can be chosen less rigorously; we often simply
 use $\lambda_b=5$ and $\lambda_\theta = 10$.
 
-By way of illustration, we can consider the primary school dataset \cite{schools}. We plot the normalised objective function $U\left( \theta^{(t)} \right) / N$ with respect to MALA iteration on Figure \ref{fig:school-U-orginal} -- using the hyperparameters given in Appendix \ref{appdx:hyperparams}. We see that the chain converges to the modal neighbourhood quickly (within about 2000 iterations of a total 10,000). Nevertheless, we pick $\kappa_\theta=0.4 > 0.2$ to be on the safe-side. $\lambda_\theta=10$ is chosen somewhat arbitrarily as we do not require neighbouring samples to be independent. However, this thinning also has the advantage of speeding up computation of quantities that require an average over all the retained samples -- as $|\Tcal_\theta| < T_\theta$.
+By way of illustration, we can consider the primary school dataset \cite{schools}. We plot the normalised objective function with respect to MALA iteration on Figure \ref{fig:school-U-orginal} -- using the hyperparameters given in Appendix \ref{appdx:hyperparams}. We see that the chain converges to the modal neighbourhood quickly (within about 2000 iterations of a total 10,000). Nevertheless, we pick $\kappa_\theta=0.4 > 0.2$ to be on the safe-side. $\lambda_\theta=10$ is chosen somewhat arbitrarily as we do not require neighbouring samples to be independent. However, this thinning also has the advantage of speeding up computation of quantities that require an average over all the retained samples -- as $|\Tcal_\theta| < T_\theta$.
 %
 \begin{figure}[!h]
 	\centering
-	\begin{subfigure}[t]{0.4\linewidth}
+	\begin{subfigure}[t]{0.42\linewidth}
 		\centering
 		\includegraphics[width=\linewidth]{school-U-original.png}
-		\caption{Original samples $t \in [T_\theta]$}
+		\caption{Original samples $t \in [T_\theta]$.}
 		\label{fig:school-U-orginal}
 	\end{subfigure}
-	\begin{subfigure}[t]{0.4\linewidth}
+	\begin{subfigure}[t]{0.42\linewidth}
 		\centering
 		\includegraphics[width=\linewidth]{school-U-thinned.png}
-		\caption{Thinned samples $t \in \Tcal_\theta$ indexed by $i$}
+		\caption{Thinned samples $t \in \Tcal_\theta$ indexed by $i$.}
 		\label{fig:school-U-thinned}
 	\end{subfigure}
 	\hspace{1cm}
-	\caption{Primary school dataset normalised objective function against sample index}
+	\caption{Primary school dataset normalised objective function against sample index.}
 \end{figure}
 
 We plot the retained samples on Figure \ref{fig:school-U-thinned}. $U(\theta^{(i)})/N$ does bounce around a small amount but this is expected as we are sampling from the posterior rather than converging to the MAP solution. There does appear to be variation over a long time-scale but this is acceptable as we do not strictly require sample independence.
@@ -208,8 +205,9 @@ when new blocks can be created and empty blocks are allowed),
 then the chain can be run until a minimum description 
 length (MDL) solution is reached. We take the number of non-empty blocks 
 in the MDL solution to be our fixed block number $B$ for subsequent analysis. 
-Indeed, it is prudent to start the $b$-chain at this MDL solution as then 
-the necessary burn-in time can be greatly reduced.
+We can then restart the $b$-chain at this MDL solution 
+but this time fixing the number of blocks $B=B^{\textrm{MDL}}$ so that all our $b$-samples have the same dimension.
+Another benefit of starting the chain at the MDL solution is that our burn-in time is reduced.
 
 \subsection{Dimensionality discussion}
 \label{appdx:dimension}
@@ -218,7 +216,7 @@ Many vertex feature often take only one of several discrete values within a set.
 
 It is not immediately obvious how to encode this for the feature-to-block classifier. Although this is technically only a single dimension, we choose to expand the data into a set of 10 binary feature flags all taking values in the set $\Xcal = \{0, 1\}$. Although only one flag will be set at a time it is the simplest method for representing discrete-valued data. The reason we choose $\Xcal=\{0, 1\}$ and not $\Xcal = \{-1, 1\}$ is that the former allows for simpler analysis of the resulting weight values; when a feature $d$ is switched off then $x_{d}=0$ given $\Xcal = \{0, 1\}$, and the feature has no impact on the softmax output. This would not be the case for $\Xcal = \{-1, 1\}$.
 
-Furthermore, it is more intuitive to only model positive relationships. In other words, we prefer to say that this block is comprised of the vertices with feature $d$ turned on rather than this block contains the vertices with feature $d$ switched off. To summarise the approach explicitly, say we have a feature encoding a pupil's gender: \{"male", "female"\}, we represent this as 2 binary feature flags "male": \{0, 1\} and "female": \{0, 1\}. This approach may seem inefficient but it is vital to ensure we can interpret the resulting parameter distributions.
+Furthermore, it is more intuitive to only model positive relationships. In other words, we prefer to say that this block is comprised of the vertices with feature $d$ turned on rather than this block contains the vertices with feature $d$ switched off. To summarise the approach explicitly, say we have a feature encoding a pupil's gender: \{``male", ``female"\}, we represent this as 2 binary feature flags ``male": \{0, 1\} and ``female": \{0, 1\}. This approach may seem inefficient but it is vital to ensure we can interpret the resulting parameter distributions.
 
 Nevertheless, this dimensionality expansion means that we should not include a bias term in our softmax as then the MAP solution is less peaked and our $\theta$-samples will have higher variance. To illustrate this point we need only look at the form of the softmax activation function with bias vector $\beta$, operating on a vector $x$ which only has one non-zero entry $x_d=1$. Component $j$ of the output is given by:
 %
@@ -232,17 +230,18 @@ The term $w_{kd} + \beta_k$ is effectively the new weight for component $k$ as t
 %
 \begin{equation}
 	\phi_j(x) = \frac{\exp(\beta_0) \cdot \exp(w_{jd})}{\sum_{k \in [B]} \exp(\beta_0) \cdot \exp(w_{kd})}
-	= \frac{\exp(w_{jd})}{\sum_{k \in [B]} \exp(w_{kd})}
+	= \frac{\exp(w_{jd})}{\sum_{k \in [B]} \exp(w_{kd})}.
 \end{equation}
 %
-This expression is independent of $\beta_0$ and so it is free to vary. This is not the whole picture as we also have the prior which introduces a regularisation term which favours weights closer to 0. This ensures the MAP solution is unique. Nevertheless, for mutually exclusive binary feature flags, the bias term does not add to the expressiveness of the model and only serves to complicate analysis. We therefore remove the bias term from the softmax.
+This expression is independent of $\beta_0$ and so it is free to vary. This is not the whole picture as we also have the prior which introduces a regularisation term, favouring weights closer to 0. This ensures the MAP solution is unique. Nevertheless, for mutually exclusive binary feature flags, the bias term does not add to the expressiveness of the model and only serves to complicate analysis. We therefore choose to remove the bias term from the softmax.
 
 Even for data comprised of several feature-classes each expanded into flags (e.g. school class and gender) we prefer to discard the bias term. The bias term only serves to decrease the objective function by leveraging information about the size of each detected block and not feature information. We do not wish to be overly confident in our block predictions when such predictions are influenced by block size and not feature information. Indeed, the approach was initially developed with a bias term but we found its removal yielded more reliable and reproducible results.
+\clearpage
 
 \subsection{Hypothesis test on feature weights}
 \label{appdx:hyp-test}
 
-We are given samples $\{\theta^{(t)}\}_{t \in \Tcal_\theta} \sim p(\theta | A, X)$ and wish to determine the statistical significance of the weights. We adopt matrix notation for simplicity by representing $\theta$ with the matrix $B \times D$ matrix of feature weights $W$. The question is to determine the significance of a particular feature $d$ by examining the value of $W_{id}$ for all the values $i \in [B]$. We know that the posterior is proportional to the prior multiplied by the likelihood,
+We are given samples $\{\theta^{(t)}\}_{t \in \Tcal_\theta} \sim p(\theta | A, X)$ and wish to determine the statistical significance of the weights. We adopt matrix notation for simplicity by representing $\theta$ with the $B \times D$ matrix of feature weights $W$. The question is to determine the significance of a particular feature $d$ from the sampled values of $W_{id}$ for all the values $i \in [B]$. We know that the posterior is proportional to the prior multiplied by the likelihood,
 %
 \begin{equation}
 	p(\theta|A, X) \propto p(\theta) \cdot p(A | \theta, X),
@@ -258,20 +257,20 @@ assuming that the feature matrix $X$ is already given. The prior term can be eva
 	\label{eqn:mc-likelihood}
 \end{align}
 %
-This could be implemented for a single value of $\theta$ but such a form cannot be used to characterise the overall form of the posterior. Nevertheless, the form in~(\ref{eqn:mc-likelihood}) highlights something interesting. The likelihood is peaked around areas of $\theta$ that generate a partition $b$ that is highly likely in the SBM sense -- high $p(A|b)$. This provides the motivation for using the Laplace approximation for modelling the posterior $p(\theta | A, X) \approx p(\theta; \hat{\mu}, \hat{\Sigma})$; we use a multivariate Gaussian to approximate the posterior. Indeed, the Laplace approximation is often used for modelling the posterior in logistic classification \cite{laplace}. This approximation is not exact but it motivates the derivation of the dimensionality reduction technique we construct by analogy with hypothesis testing. Marginalising over the other elements, the posterior for each element of the weight matrix $W$ can be approximated by,
+This could be implemented for a single value of $\theta$ but such a form cannot be used to characterise the overall form of the posterior. Nevertheless, the form in~(\ref{eqn:mc-likelihood}) highlights something interesting. The likelihood is peaked around areas of $\theta$ that generate a partition $b$ that is highly likely in the SBM sense -- high $p(A|b)$. This provides the motivation for using the Laplace approximation for the posterior $p(\theta | A, X) \approx p(\theta; \hat{\mu}, \hat{\Sigma})$. Indeed, the Laplace approximation is often used for modelling the posterior in logistic classification \cite{laplace}. Marginalising over the other elements, the posterior for each element of the weight matrix $W$ can be approximated by,
 %
 \begin{equation}
 	p(W_{ij}|A, X) \approx \Gaussian(W_{ij}|\hat{\mu}_{ij}, \hat{\sigma}_{ij}^2).
 \end{equation}
 %
-Where we have used the set of samples for $W$ drawn according to the exact posterior, to calculate unbiased estimates for the mean and standard deviation:
+We use the set of samples for $W$ drawn according to the exact posterior, to calculate unbiased estimates for the mean and standard deviation:
 %
 \begin{equation}
 	\hat{\mu}_{ij} \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} W_{ij}^{(t)} \qquad \textrm{and} \qquad
 	\hat{\sigma}_{ij}^2 \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \left( W_{ij}^{(t)} - \hat{\mu}_{ij} \right)^2.
 \end{equation}
 %
-This approximation is not exact but we can show it is accurate empirically. Indeed, if we run the primary school experiment with hyper-parameters given in Appendix \ref{appdx:hyperparams}, we can then plot histograms of the collected $W$-samples and compare these to the Laplace approximation. The results are given on Figure \ref{fig:school-histogram}. Even though the Laplace approximation is not exact, it is remarkably reliable. 
+This approximation is not exact but we can show it is accurate empirically. Indeed, if we run the primary school experiment with hyper-parameters given in Appendix \ref{appdx:hyperparams}, we can then plot histograms of the collected $W^{(t)}$-samples (for $t \in \Tcal_\theta$) and compare these to the Laplace approximation. The results are given on Figure \ref{fig:school-histogram}, which show the Laplace approximation is remarkably reliable. 
 
 \begin{figure}[!h]
 	\centering
