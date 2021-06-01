@@ -2,7 +2,7 @@
 
 In this section we propose a novel generative model for labelled networks. We call this the feature-first block model (FFBM).
 
-Let $N$ denote the number of nodes, $B$ the number of blocks in the graph,
+Let $N$ denote the number of vertices, $B$ the number of blocks in the graph,
 and ${\cal X}$ the set of values each feature can take.
 We define the vector $x_i \in \Xcal^D$ as the feature vector of vertex $i$, 
 where $D$ is the number of features associated with each vertex.
@@ -20,11 +20,13 @@ $w_k$ has dimension $D$. Specifically,
 the distribution of $b$ given $X$ and $\theta$ is,
 %
 \begin{equation}
-	p(b| X, \theta) = \prod_{i=1}^{N} p(b_i | x_i, \theta) = \prod_{i=1}^{N} \phi_{b_i} (x_i; \theta)
-	= \prod_{i=1}^{N} \frac{\exp\left(w_{b_i}^T x_i\right)}{\sum_{k=1}^{B} \exp \left( w_k^T x_i\right)}.
+	p(b| X, \theta) = \prod_{i \in [N]} p(b_i | x_i, \theta) = \prod_{i \in [N]} \phi_{b_i} (x_i; \theta)
+	= \prod_{i \in [N]} \frac{\exp\left(w_{b_i}^T x_i\right)}{\sum_{k \in [B]} \exp \left( w_k^T x_i\right)}.
 \end{equation}
 %
-$\phi_{b_i}$ is the form of a softmax activation function; we deliberately exclude a bias term to ensure that we only leverage feature information. 
+Note that $\phi_{b_i}$ has the form of a softmax activation function;
+we deliberately exclude a bias term to ensure that we only leverage feature information.
+This decision is justified in greater detail in Appendix~\ref{appdx:dimension}.
 We will later also find it convenient
 to write the parameters $\theta$ as a $B \times D$ matrix of weights $W$.
 

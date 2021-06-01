@@ -110,7 +110,7 @@ We then retrain the feature-block predictor using only the retained
 feature set $\Dcal'$, and report the log-loss over the training and 
 test sets for the reduced classifier -- 
 denoted $\bar{\Lcal}_0'$ and $\bar{\Lcal}_1'$ respectively. 
-These values are also shown in Table~\ref{tab:results}.
+These values are also given in Table~\ref{tab:results}.
 
 Based on these results, some remarks are in order.
 Firstly, the variance of the test loss $\bar{\Lcal}_1$ tends to be higher 
@@ -186,7 +186,18 @@ are very similar and both are low in magnitude. This provides further evidence
 to the claim that political affiliation is a very appropriate explanatory 
 variable for the overall network structure.
 
-However, from Figure~\ref{fig:polbooks-accuracy} we see that block 1 has low accuracy. This suggests that detected block 1 is not solely composed of ``neutral" books but also contains some ``liberal" and ``conservative" authors. Indeed, by examining Figure~\ref{fig:polbooks-graph} we see that block 1 is effectively a buffer between blocks 2 and 3 -- there are very few edges between blocks 2 and 3. It is therefore not surprising that some books from either side leak into block 1. Perhaps, the three distinct categories (``conservative", ``liberal", ``neutral") are too coarse a measure of political affiliation; it may be the case that the nominally ``conservative" books found in block 1 are in fact more centre-right. In the absence of more granular labels, we cannot test this hypothesis. Nevertheless, political affiliation encoded as 3 distinct labels remains a fantastic predictor of network structure.
+However, from Figure~\ref{fig:polbooks-accuracy} we see that block 1 has low accuracy. 
+This suggests that detected block 1 is not solely composed of ``neutral" books but also 
+contains some ``liberal" and ``conservative" authors. Indeed, by examining 
+Figure~\ref{fig:polbooks-graph} we see that block 1 is effectively a buffer between 
+blocks 2 and 3; there are very few edges between blocks 2 and 3. It is therefore not 
+surprising that some books from either side leak into block 1.
+Perhaps, the three distinct categories (``conservative", ``liberal", ``neutral") are 
+too coarse a measure of political affiliation; it may be the case that the nominally 
+``conservative" books found in block 1 are in fact more centre-right. 
+In the absence of more granular labels, we cannot test this hypothesis. 
+Nevertheless, political affiliation encoded as 3 distinct labels 
+remains a fantastic predictor of network structure.
 
 \subsection{Primary school dynamic contacts}
 
@@ -267,5 +278,14 @@ particular parameter. The regularisation term imposed by the prior goes some
 way towards alleviating this problem. Nevertheless, we see in 
 Figure~\ref{fig:fb-null} that the feature \verb*|birthday-5| has a very 
 high weight as it relates to block 1 -- but it is highly unlikely
-that birthdays determine graphical structure. This issue could have been alleviated by choosing $\Xcal=\{-1, +1\}$ such that having a feature turned off supports excluding a vertex from the block. However, Figure~\ref{fig:fb-null} demonstrates why we made the deliberate choice $\Xcal=\{0,1\}$, as argued in Appendix \ref{appdx:dimension}. Because of the choice $\Xcal=\{0,1\}$, block 1 is allowed to contain 3 distinct feature categories rather than just one. We accept this tradeoff: risking spurious high magnitude components (e.g. \verb*|birthday-5|) for the benefit of allowing a top-level block span multiple feature-groups. Nevertheless, one would have to apply a hierarchical approach to subdivide each top-level block into sub-blocks to test whether the constituent feature-groups determine structure at the lower-level.
+that birthdays determine graphical structure. This issue could have been alleviated by 
+choosing $\Xcal=\{-1, +1\}$ such that having a feature turned off supports excluding 
+a vertex from the block. However, Figure~\ref{fig:fb-null} demonstrates why we made 
+the deliberate choice $\Xcal=\{0,1\}$, as argued in Appendix \ref{appdx:dimension}. 
+Because of the choice $\Xcal=\{0,1\}$, block 1 is allowed to contain 3 distinct feature 
+categories rather than just one. We accept this trade-off: risking spurious high magnitude 
+components (e.g. \verb*|birthday-5|) for the benefit of allowing a top-level block to span 
+multiple feature-groups. Nevertheless, one would have to apply a hierarchical approach 
+to subdivide each top-level block into sub-blocks to test whether the constituent 
+feature-groups determine structure at the lower-level.
 

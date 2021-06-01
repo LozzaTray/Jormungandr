@@ -3,9 +3,9 @@
 
 The Feature-First Block Model (FFBM) introduced 
 in this paper is a new generative model for labelled networks,
-developed in order to address difficulties of other graphical models 
+developed to address difficulties of other graphical models 
 when testing how vertex features affect community structure. The idea 
-is to divide the graph into its most natural partition and test whether 
+is to divide the graph into its most natural partition and determine whether 
 the vertex features can accurately explain this partition. 
 It is relatively easy to find vertex features that are in some way 
 correlated with the graphical structure. Nonetheless, only when 
@@ -14,7 +14,7 @@ do we have a stronger case for causation.
 
 Using this new model,
 we go on to describe an efficient inference algorithm to sample 
-the parameters $\theta$ of the feature-to-block generator. 
+the parameters of the FFBM. 
 This takes the form of a two-level Markov chain,
 used to sample the block memberships $b$ and block generator 
 parameters $\theta$. These chains can either be executed

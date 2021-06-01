@@ -22,9 +22,9 @@ sample $\theta^{(t)}$:
 	\theta^{(t)} &\sim p(\theta | X, b^{(t)} ). \label{eqn:theta-samples}
 \end{align}
 %
-Both of these sampling steps can be implemented using
-Markov chain Monte Carlo via a Metropolis-Hastings 
-algorithm \cite{hastings-alg}, as a two-level Markov chain. See Appendix \ref{appdx:metropolis-hastings} for more details on this.
+Both of these sampling steps can be implemented through a
+Markov chain Monte-Carlo approach via a Metropolis-Hastings 
+algorithm \cite{hastings-alg}, as a two-level Markov chain. See Appendix \ref{appdx:metropolis-hastings} for more details on the Metropolis-Hastings algorithm.
  
 As we show in the following section, the resulting samples 
 for $\theta^{(t)}$ are unbiased in the sense that the expectation of 
@@ -62,7 +62,7 @@ is sufficient to prove that, for large enough $t$, $\theta^{(t)} \sim \Expect_{b
 		\draw[->] (b1) to node[above] {$\alpha_b (b, b' | A)$} (b2);
 		\draw[->] (b0) [out=30, in=150] to node[above] {$1-\alpha_b$} (b2);
 		
-		\draw[->] (t0) to node[above] {$\sim q_\theta(\theta, \theta' | X, b^{(t)})$} (t1);
+		\draw[->] (t0) to node[above] {$\sim q_\theta(\theta^{(t)}, \theta' | X, b^{(t)})$} (t1);
 		\draw[->] (t1) to node[above] {$\alpha_\theta (\theta, \theta' | X, b^{(t)})$} (t2);
 		\draw[->] (t0) [out=-30, in=-150] to node[below] {$1-\alpha_\theta$} (t2);
 		
@@ -147,8 +147,8 @@ We write this as,
 	\label{eq:U}
 \end{equation}
 %
-where we write $U(\theta)$ for the negative log-posterior. Let $y_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and $a_{ij} \coloneqq \phi_j(x_i; \theta)$. 
-Discarding constant terms, we can write $U(\theta)$ as,
+where we write $U(\theta)$ for the negative log-posterior. We define $y_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and $a_{ij} \coloneqq \phi_j(x_i; \theta)$. 
+Discarding constant terms, we can then write $U(\theta)$ as,
 %
 \begin{equation}
 	U(\theta) = \left( \sum_{i \in [N]} \sum_{j \in [B]} y_{ij} \log \frac{1}{a_{ij}} \right)
@@ -156,26 +156,27 @@ Discarding constant terms, we can write $U(\theta)$ as,
 	\label{eqn:U-form}
 \end{equation}
 
-See Appendix \ref{appdx:form-U} for the derivation. The function $U(\theta)$ is a typical objective function for neural network training. The first term is introduced by the likelihood. We collect it into $N \cdot \Lcal(\theta)$, which is the cross-entropy between the graph-predicted and feature-predicted block memberships summed over all vertices. 
+See Appendix \ref{appdx:form-U} for the derivation. The function $U(\theta)$ is a typical objective function for neural network training. The first term is introduced by the likelihood; we collect it into $N \cdot \Lcal(\theta)$, which is the cross-entropy between the graph-predicted and feature-predicted block memberships summed over all vertices. 
 The second, introduced by the prior, brings a form of regularisation, guarding against over-fitting. Unlike in many applications where the goal 
 is to find the minimiser of $U(\theta)$, our goal is to draw samples from the posterior $\pi_\theta(\cdot) \propto \exp(-U(\cdot))$. We can use $\nabla U$ as a useful heuristic to bias our proposal towards regions of higher target density. We therefore adopt the Metropolis-adjusted Langevin algorithm (MALA) \cite{mala-tweedie}. Given the current sample $\theta$, we generate 
 a new sample $\theta'$ as,
+%
 \begin{equation*}
 	\theta' = \theta - h \nabla U(\theta) + \sqrt{2h} \cdot \xi,
 \end{equation*}
-
+%
 where $\xi \sim \Gaussian(0, I)$ and $h$ is a step-size parameter 
-which may vary with the sample index (see Appendix \ref{appdx:step-size}).
+which may vary with the sample index (see Appendix \ref{appdx:step-size} for a discussion of step-size).
 This leads to the proposal distribution,
 \begin{equation*}
 	q_\theta(\theta, \theta') \sim \Gaussian \left( \theta' ; \theta - h \nabla U(\theta), 2h I \right).
 \end{equation*}
-
+%
 Without the injected noise term, MALA is equivalent to gradient descent. We require the noise term $\xi$ to fully explore the parameter space. 
 The term $\nabla U$ has an easy to compute analytic form (derived in Appendix \ref{appdx:gradu}). By noting that $\theta = \{w_k\}_{k=1}^{B}$, we write the derivative with respect to each $w_k$ as,
 %
 \begin{equation}
-	\frac{\partial U}{\partial w_k} = - \left( \sum_{i=1}^{N} \Big\{ \tilde{x}_i (y_{ik} - a_{ik}) \Big\} - \frac{w_k}{\sigma_\theta^2} \right).
+	\frac{\partial U}{\partial w_k} = - \left( \sum_{i \in [N]} \Big\{ x_i (y_{ik} - a_{ik}) \Big\} - \frac{w_k}{\sigma_\theta^2} \right).
 	\label{eqn:U-derivative}
 \end{equation}
 %
@@ -222,11 +223,11 @@ algorithms is given in Appendix \ref{appdx:algorithms}.
 \label{sec:dim-reduction}
 
 Once the samples $\left\{ \theta^{(t)} \right\} \sim p(\theta | A, X)$
-have been obtained, we can compute the empirical mean and standard deviation of each component of $\theta$. Switching back to matrix notation we define $\theta = W$, such that $W_{ij}$ is the weight component for block $i$ and feature $j$, we can define:
+have been obtained, we can compute the empirical mean and standard deviation of each component of $\theta$. Switching back to matrix notation we define $\theta = W$, such that $W_{ij}$ is the weight component for block $i$ and feature $j$. We can then define:
 %
 \begin{equation}
 	\hat{\mu}_{ij} \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} W_{ij}^{(t)} \qquad \textrm{and} \qquad
-	\hat{\sigma}_{ij}^2 \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \left( W_{ij}^{(t)} - \hat{\mu}_{ij} \right)^2
+	\hat{\sigma}_{ij}^2 \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \left( W_{ij}^{(t)} - \hat{\mu}_{ij} \right)^2.
 \end{equation}
 %
 A simple heuristic to discard the least important features requires specifying a cutoff $c > 0$ and a multiplier $k > 0$. We define the function $\Fcal_i(j)$ 
@@ -240,9 +241,9 @@ as in~(\ref{eqn:fij}) and only keep features with indices $d \in \Dcal'$, where 
 \end{align}
 %
 Intuitively, this means discarding any feature $j$ for which 
-$\hat{\mu}_{ij} \pm k\hat{\sigma}_{ij}$ lies outside the region
+$(\hat{\mu}_{ij} - k\hat{\sigma}_{ij}, \hat{\mu}_{ij} + k \sigma)$ overlaps with
 $(-c, c)$ for all block indices $i$. If we were to use the Laplace approximation for the posterior $p(W_{ij} | A, X) \approx \Gaussian(W_{ij}; \hat{\mu}_{ij}, \hat{\sigma}_{ij}^2)$, then this is analogous to a hypothesis test on the value of $W_{ij}$ as in~(\ref{eqn:hyp-test-discard});
-then $\Dcal'$ comprises all features $i$ for which $H_1$ is not rejected at least once for some $j \in [B]$
+then $\Dcal'$ comprises all features $j$ for which $H_1$ is accepted at least once for some $i \in [B]$.
 %
 \begin{equation}
 	H_0: |W_{ij}| \leq c \qquad
@@ -250,7 +251,9 @@ then $\Dcal'$ comprises all features $i$ for which $H_1$ is not rejected at leas
 	\label{eqn:hyp-test-discard}
 \end{equation}
 %
-The multiplier $k$ in equation \ref{eqn:fij} determines the degree of significance of the result. However, as the Laplace approximation is not exact we will only treat this dimensionality reduction method as a useful heuristic and not an exact method. Conversely, we could fix $k=k_0$ and the dimension of our reduced feature set $|\Dcal'|=D'$. We would then like to find the largest value of $c$ such that $|\Dcal'|=D'$ given $k=k_0$. This is summarised in equation \ref{eqn:c-star}.
+The multiplier $k$ in~(\ref{eqn:fij}) determines the degree of significance of the result. However, as the Laplace approximation is not exact we will only treat this dimensionality reduction method as a useful heuristic and not an exact method. Appendix~\ref{appdx:hyp-test} explores this subject at greater depth.
+
+Conversely, we could fix $k=k_0$ and the dimension of our reduced feature set $|\Dcal'|=D'$. We would then like to find the largest value of $c$ such that $|\Dcal'|=D'$ given $k=k_0$. This is summarised in equation \ref{eqn:c-star}.
 %
 \begin{equation}
 	c^* = \argmax \{c>0\; : \;|\Dcal'| = D', k=k_0\}.
