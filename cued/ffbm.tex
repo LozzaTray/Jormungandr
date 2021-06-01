@@ -4,7 +4,7 @@ In this section we propose a novel generative model for labelled networks. We ca
 
 Let $N$ denote the number of vertices, $B$ the number of blocks in the graph,
 and ${\cal X}$ the set of values each feature can take.
-We define the vector $x_i \in \Xcal^D$ as the feature vector of vertex $i$, 
+We define the vector $x_i \in \Xcal^D$ as the feature vector for vertex $i$, 
 where $D$ is the number of features associated with each vertex.
 For the datasets we analyse, we deal with binary feature flags so $\Xcal = \{0, 1\}$. We write $X$ for the $N\times D$ {\em feature matrix} containing
 the feature vectors $\{x_i\}_{i=1}^{N}$ 
@@ -61,7 +61,8 @@ $\psi = \{\psi_e, \psi_k\}$:
 	A \sim \textrm{DC-SBM}_{\textrm{MC}} (b, \psi_e, \psi_k).
 	\label{eqn:A-generation}
 \end{equation}
-
+%
+Figure~\ref{fig:ffbm} illustrates the proposed model.
 
 \subsection{Prior selection}
 

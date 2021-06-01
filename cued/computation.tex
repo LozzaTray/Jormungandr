@@ -30,8 +30,10 @@
 	\label{alg:theta-samples} % and a label for \ref{} commands later in the document
 	\begin{algorithmic} % enter the algorithmic environment
 		\Procedure{SampleFeatureWeights}{$X, \{b^{(t)}\}, \Tcal_b, \sigma_\theta, s$}
+		
+		\State $N \gets X.\textrm{shape}[0]$
 		\State $\hat{Y}_{ij} \gets \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} \one \{ b^{(t)}_i = j\} \quad \forall i,j$
-		\State $\theta^{(0)} \gets \sim \Gaussian(0, \sigma_\theta I)$
+		\State $\theta^{(0)} \gets \sim \Gaussian(0, \sigma_\theta^2 I)$
 		
 		\item[]
 		
@@ -63,7 +65,7 @@
 		
 		\State $(B, D) \gets W^{(0)}$.shape
 		\State $\hat{\mu}_{ij} \gets \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} W_{ij}^{(t)} \quad \forall i \in [B], j \in [D]$
-		\State $\hat{\sigma}_{ij} \gets \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \left( W_{ij}^{(t)} - \hat{\mu}_{ij} \right)^2 \quad \forall i \in [B], j \in [D]$
+		\State $\hat{\sigma}_{ij}^2 \gets \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \left( W_{ij}^{(t)} - \hat{\mu}_{ij} \right)^2 \quad \forall i \in [B], j \in [D]$
 		
 		\item[]
 		

@@ -3,7 +3,7 @@
 \subsection{SBM likelihood}
 \label{appdx:sbm-likelihood}
 
-For reference, we provide the likelihood and priors for the microcanonical SBM proposed by \citet{Peixoto-Bayesian-Microcanonical}. We have that the graph $A$ is drawn from the SBM,
+For reference, we provide the likelihood for the microcanonical SBM proposed by \citet{Peixoto-Bayesian-Microcanonical}. We have that the graph $A$ is drawn from the SBM,
 %
 \begin{equation}
 	A \sim \textrm{DC-SBM}_{\textrm{MC}}(b, e, k),
@@ -27,7 +27,7 @@ Note the similarity between the forms of $\Omega(e)$ and $\Xi(A)$ as $e$ is effe
 	p(A|k,e,b) = \frac{\Xi(A)}{\Omega(e)}.
 \end{equation}
 %
-Obviously, this form is only defined if $A$ respects the constraints imposed by $(k,e,b)$ else the likelihood is 0.
+Obviously, this form is only applicable if $A$ respects the constraints imposed by $(k,e,b)$ else the likelihood is 0.
 
 \subsection{SBM prior}
 \label{appdx:sbm-prior}
@@ -137,7 +137,7 @@ Since the chain will equilibrate in the vicinity of a minima in $U(\theta)$, the
 
 We see immediately that the acceptance ratio $r_\alpha$ steadily decreases with $s$. This is expected as large jumps for each proposal make it unlikely we stay in a high density region of our target distribution. A low acceptance ratio leads to wasted samples and is obviously undesirable.
 
-Nevertheless, $\bar{U}$ decreases with $s$ indicating shorter burn-in times for larger step-sizes. However, this effect plateaus for $s>0.2$ for this particular dataset. Therefore, we choose $s=0.2$ as our step-size multiplier for the primary school dataset as this yields the best trade-off between $r_\alpha$ and $\bar{U}$. The step-sizes for the other datasets were chosen following the same argument but we do not repeat the process here.
+Nevertheless, $\bar{U}$ decreases with $s$, indicating shorter burn-in times for larger step-sizes. However, this effect plateaus for $s>0.2$ for this particular dataset. Therefore, we choose $s=0.2$ as our step-size multiplier for the primary school dataset as this yields the best trade-off between $r_\alpha$ and $\bar{U}$. The step-sizes for the other datasets were chosen following the same argument but we do not repeat the process here.
 
 \FloatBarrier
 \subsection{Burn-in and thinning}
@@ -193,7 +193,7 @@ We plot the retained samples on Figure \ref{fig:school-U-thinned}. $U(\theta^{(i
 For the purposes of the FFBM model, the number of blocks $B$ is a constant 
 which must be specified. If the choice of $B$ is influenced 
 by the observed data, then the analysis is no longer ``fully Bayesian''
-and belongs to the class of methods referred to as ``empirical Bayes.''
+and belongs to the class of methods referred to as ``empirical Bayes''.
 However, as the number of blocks only specifies the coarseness of the 
 analysis, it is reasonable to allow it to vary. Indeed, 
 \citet{peixoto-determine-B} shows that for a fixed 
@@ -212,13 +212,13 @@ Another benefit of starting the chain at the MDL solution is that our burn-in ti
 \subsection{Dimensionality discussion}
 \label{appdx:dimension}
 
-Many vertex feature often take only one of several discrete values within a set. For example, with the primary school dataset \cite{schools}, a pupil's school-class can take one of 10 values from \{``1A", ``1B", ``2A", ``2B" \dots ``5A", "5B"\}.
+Many vertex features often take only one of several discrete values within a set. For example, with the primary school dataset \cite{schools}, a pupil's school-class can take one of 10 values from \{``1A", ``1B", ``2A", ``2B" \dots ``5A", "5B"\}.
 
 It is not immediately obvious how to encode this for the feature-to-block classifier. Although this is technically only a single dimension, we choose to expand the data into a set of 10 binary feature flags all taking values in the set $\Xcal = \{0, 1\}$. Although only one flag will be set at a time it is the simplest method for representing discrete-valued data. The reason we choose $\Xcal=\{0, 1\}$ and not $\Xcal = \{-1, 1\}$ is that the former allows for simpler analysis of the resulting weight values; when a feature $d$ is switched off then $x_{d}=0$ given $\Xcal = \{0, 1\}$, and the feature has no impact on the softmax output. This would not be the case for $\Xcal = \{-1, 1\}$.
 
 Furthermore, it is more intuitive to only model positive relationships. In other words, we prefer to say that this block is comprised of the vertices with feature $d$ turned on rather than this block contains the vertices with feature $d$ switched off. To summarise the approach explicitly, say we have a feature encoding a pupil's gender: \{``male", ``female"\}, we represent this as 2 binary feature flags ``male": \{0, 1\} and ``female": \{0, 1\}. This approach may seem inefficient but it is vital to ensure we can interpret the resulting parameter distributions.
 
-Nevertheless, this dimensionality expansion means that we should not include a bias term in our softmax as then the MAP solution is less peaked and our $\theta$-samples will have higher variance. To illustrate this point we need only look at the form of the softmax activation function with bias vector $\beta$, operating on a vector $x$ which only has one non-zero entry $x_d=1$. Component $j$ of the output is given by:
+Nevertheless, this dimensionality expansion means that we should not include a bias term in our softmax as then the MAP solution is less peaked and our $\theta$-samples will have higher variance. To illustrate this point, we need only look at the form of the softmax activation function with bias vector $\beta$, operating on a vector $x$ which only has one non-zero entry $x_d=1$. Component $j$ of the output is given by:
 %
 \begin{equation}
 	\phi_j(x) = \frac{\exp(w_j^T x + \beta_j)}{\sum_{k \in [B]} \exp(w_k^T x + \beta_k)} = 
@@ -226,7 +226,7 @@ Nevertheless, this dimensionality expansion means that we should not include a b
 	\label{eqn:softmax-bias}
 \end{equation}
 %
-The term $w_{kd} + \beta_k$ is effectively the new weight for component $k$ as these two terms will always appear together. The bias term $\beta_k$ is therefore an unnecessary extra degree of freedom. To illustrate this point, we set $\beta_k=\beta_0$ for all $j$. If this is the case then equation \ref{eqn:softmax-bias} can be simplified to:
+The term $w_{kd} + \beta_k$ is effectively the new weight for component $k$ as these two terms will always appear together. The bias term $\beta_k$ is therefore an unnecessary extra degree of freedom. To illustrate this point, we set $\beta_k=\beta_0$ for all $j$. If this is the case,~(\ref{eqn:softmax-bias}) can be simplified to:
 %
 \begin{equation}
 	\phi_j(x) = \frac{\exp(\beta_0) \cdot \exp(w_{jd})}{\sum_{k \in [B]} \exp(\beta_0) \cdot \exp(w_{kd})}
@@ -241,7 +241,7 @@ Even for data comprised of several feature-classes each expanded into flags (e.g
 \subsection{Hypothesis test on feature weights}
 \label{appdx:hyp-test}
 
-We are given samples $\{\theta^{(t)}\}_{t \in \Tcal_\theta} \sim p(\theta | A, X)$ and wish to determine the statistical significance of the weights. We adopt matrix notation for simplicity by representing $\theta$ with the $B \times D$ matrix of feature weights $W$. The question is to determine the significance of a particular feature $d$ from the sampled values of $W_{id}$ for all the values $i \in [B]$. We know that the posterior is proportional to the prior multiplied by the likelihood,
+We are given samples $\{\theta^{(t)}\}_{t \in \Tcal_\theta} \sim p(\theta | A, X)$ and wish to determine the statistical significance of the weights. We adopt matrix notation for simplicity, representing $\theta$ with the $B \times D$ matrix of feature weights $W$. The question is to determine the significance of a particular feature $d$ from the sampled values of $W_{id}$ for $i \in [B]$. We know that the posterior is proportional to the prior multiplied by the likelihood,
 %
 \begin{equation}
 	p(\theta|A, X) \propto p(\theta) \cdot p(A | \theta, X),
@@ -340,6 +340,6 @@ Clearly equations \ref{eqn:hyp-test-positive} and \ref{eqn:hyp-test-negative} ca
 	\label{eqn:hyp-test-empty}
 \end{equation}
 %
-This is equivalent to saying that $\hat{\mu}_{ij}$ is at least $k$ standard deviations away from the range $(-c, c)$. We choose to reject the null hypothesis $H_0$ if and only if equation \ref{eqn:hyp-test-empty} holds. We can say with probability greater than or equal to $\Phi(k)$ that either $W_{ij} < -c$ or $W_{ij} > c$ thus rejecting the null $H_0: |W_{ij}| \leq c$.
+This is equivalent to saying that $\hat{\mu}_{ij}$ is at least $k$ standard deviations away from the range $(-c, c)$. We choose to reject the null hypothesis $H_0$ if and only if equation \ref{eqn:hyp-test-empty} holds. This allows us to state with confidence greater than $\Phi(k)$ that either $W_{ij} < -c$ or $W_{ij} > c$ thus rejecting the null $H_0: |W_{ij}| \leq c$.
 
-Note that we choose to accept $H_0$ even in the case that the combined probabilities of $p(W_{ij} < -c) + p(W_{ij} > c) > \Phi(k)$, if equation \ref{eqn:hyp-test-empty} is not satisfied. This is because we wish to apply this for dimensionality reduction purposes. We only want to keep weights for which we have a confident prediction outside the range $(-c, c)$ not those that succeed by summing the two extremes of their distribution. Note that this case is very rare empirically but it nonetheless must be specified.
+Note that we choose to accept $H_0$ even in the case that the combined probabilities of $p(W_{ij} < -c) + p(W_{ij} > c) > \Phi(k)$, if equation \ref{eqn:hyp-test-empty} is not satisfied. This is because we wish to apply this for dimensionality reduction purposes. We only want to keep weights for which we have a confident prediction outside the range $(-c, c)$ not those that succeed by summing the two extremes of their distribution. This case is very rare empirically but it nonetheless must be specified.

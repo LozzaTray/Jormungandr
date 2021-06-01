@@ -76,11 +76,11 @@ To that end, we first compute,
 %
 \begin{align}
 	\frac{\partial a_{ij}}{\partial w_k} &= \frac
-	{\tilde{x}_i \exp(w_j^T \tilde{x}_i) \delta_{jk} \cdot \sum_{r \in [B]} \exp(w_r^T \tilde{x}_i) 
+	{x_i \exp(w_j^T x_i) \delta_{jk} \cdot \sum_{r \in [B]} \exp(w_r^T x_i) 
 		- 
-		\exp(w_j^T \tilde{x}_i) \cdot \tilde{x}_i \exp(w_k^T \tilde{x}_i)}
-	{\left( \sum_{r \in [B]} \exp(w_r^T \tilde{x}_i) \right)^2} \nonumber \\
-	&= \tilde{x}_i \left( a_{ij} \delta_{jk} - a_{ij}a_{ik} \right), 
+		\exp(w_j^T x_i) \cdot x_i \exp(w_k^T x_i)}
+	{\left( \sum_{r \in [B]} \exp(w_r^T x_i) \right)^2} \nonumber \\
+	&= x_i \left( a_{ij} \delta_{jk} - a_{ij}a_{ik} \right), 
 	\label{eq:dadw}
 \end{align}
 %
@@ -96,11 +96,11 @@ Using~(\ref{eq:dadw}) and~(\ref{eq:dtsdw}), we obtain,
 \begin{align}
 	\frac{\partial U}{\partial w_k} &= 
 	\sum_{i \in [N]} \sum_{j \in [B]} y_{ij} 
-	\left( -\frac{\tilde{x}_i}{a_{ij}} \left( a_{ij} \delta_{jk} - a_{ij} a_{ik} \right) \right)
+	\left( -\frac{x_i}{a_{ij}} \left( a_{ij} \delta_{jk} - a_{ij} a_{ik} \right) \right)
 	+ \frac{w_k}{\sigma_\theta^2} \nonumber \\
-	&=  - \left( \sum_{i \in [N]} \tilde{x}_i \left( y_{ik} - a_{ik} \sum_{j \in [B]} y_{ij} \right)
+	&=  - \left( \sum_{i \in [N]} x_i \left( y_{ik} - a_{ik} \sum_{j \in [B]} y_{ij} \right)
 	- \frac{w_k}{\sigma_\theta^2} \right) \nonumber \\
-	&= - \left( \sum_{i \in [N]} \Big\{ \tilde{x}_i (y_{ik} - a_{ik}) \Big\} - \frac{w_k}{\sigma_\theta^2} \right).
+	&= - \left( \sum_{i \in [N]} \Big\{ x_i (y_{ik} - a_{ik}) \Big\} - \frac{w_k}{\sigma_\theta^2} \right).
 \end{align}
 %
 This can be computed 

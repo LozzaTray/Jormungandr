@@ -127,7 +127,10 @@ We also define the microcanonical entropy of the configuration as,
 \end{equation}
 %
 This entropy can be thought of as the optimal
-``description length'' of the graph. 
+``description length'' of the graph; if we 
+constructed an optimal code for the SBM ensemble,
+this would be the minimum amount of information 
+required to store the graph and its parameters. 
 The exact form of the proposal $q_b$ is explored thoroughly in
 \cite{Peixoto-MCMC} and not repeated here. There is a widely used 
 library for Python made available under LGPL 
@@ -166,7 +169,7 @@ a new sample $\theta'$ as,
 \end{equation*}
 %
 where $\xi \sim \Gaussian(0, I)$ and $h$ is a step-size parameter 
-which may vary with the sample index (see Appendix \ref{appdx:step-size} for a discussion of step-size).
+which may vary with the sample index (see Appendix \ref{appdx:step-size} for a discussion of step-size variation).
 This leads to the proposal distribution,
 \begin{equation*}
 	q_\theta(\theta, \theta') \sim \Gaussian \left( \theta' ; \theta - h \nabla U(\theta), 2h I \right).
@@ -241,7 +244,7 @@ as in~(\ref{eqn:fij}) and only keep features with indices $d \in \Dcal'$, where 
 \end{align}
 %
 Intuitively, this means discarding any feature $j$ for which 
-$(\hat{\mu}_{ij} - k\hat{\sigma}_{ij}, \hat{\mu}_{ij} + k \sigma)$ overlaps with
+$(\hat{\mu}_{ij} - k\hat{\sigma}_{ij}, \hat{\mu}_{ij} + k \hat{\sigma}_{ij})$ overlaps with
 $(-c, c)$ for all block indices $i$. If we were to use the Laplace approximation for the posterior $p(W_{ij} | A, X) \approx \Gaussian(W_{ij}; \hat{\mu}_{ij}, \hat{\sigma}_{ij}^2)$, then this is analogous to a hypothesis test on the value of $W_{ij}$ as in~(\ref{eqn:hyp-test-discard});
 then $\Dcal'$ comprises all features $j$ for which $H_1$ is accepted at least once for some $i \in [B]$.
 %
@@ -251,7 +254,7 @@ then $\Dcal'$ comprises all features $j$ for which $H_1$ is accepted at least on
 	\label{eqn:hyp-test-discard}
 \end{equation}
 %
-The multiplier $k$ in~(\ref{eqn:fij}) determines the degree of significance of the result. However, as the Laplace approximation is not exact we will only treat this dimensionality reduction method as a useful heuristic and not an exact method. Appendix~\ref{appdx:hyp-test} explores this subject at greater depth.
+The multiplier $k$ in~(\ref{eqn:fij}) determines the degree of significance of the result. However, as the Laplace approximation is not exact, we only treat this dimensionality reduction method as a useful heuristic and not an exact method. Appendix~\ref{appdx:hyp-test} explores this subject at greater depth.
 
 Conversely, we could fix $k=k_0$ and the dimension of our reduced feature set $|\Dcal'|=D'$. We would then like to find the largest value of $c$ such that $|\Dcal'|=D'$ given $k=k_0$. This is summarised in equation \ref{eqn:c-star}.
 %
