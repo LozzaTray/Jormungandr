@@ -93,7 +93,7 @@ conditionally independent given $b$.
 \FloatBarrier
 \subsection{Sampling block memberships}
 
-We adopt the Markov chain Monte Carlo procedure of
+We adopt the Markov chain Monte-Carlo procedure of
 \cite{Peixoto-MCMC},
 which relies on writing the posterior in the following form:
 %
@@ -226,7 +226,7 @@ algorithms is given in Appendix \ref{appdx:algorithms}.
 \label{sec:dim-reduction}
 
 Once the samples $\left\{ \theta^{(t)} \right\} \sim p(\theta | A, X)$
-have been obtained, we can compute the empirical mean and standard deviation of each component of $\theta$. Switching back to matrix notation we define $\theta = W$, such that $W_{ij}$ is the weight component for block $i$ and feature $j$. We can then define:
+have been obtained, we can compute the empirical mean and standard deviation of each component of $\theta$. Switching back to matrix notation, we define $\theta = W$, such that $W_{ij}$ is the weight component for block $i$ and feature $j$. We can then define:
 %
 \begin{equation}
 	\hat{\mu}_{ij} \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} W_{ij}^{(t)} \qquad \textrm{and} \qquad

@@ -71,7 +71,7 @@ Suppose we wish to draw samples for some general $x$ from the normalised density
 \label{eqn:mh-accept}
 \end{equation}
 %
-This accept-reject step ensures the resulting Markov Chain is in detailed balance with the target distribution $\pi(\cdot)$. Therefore, the set of samples produced $\{x^{(t)}\} \sim \pi^*(x)$.
+This accept-reject step ensures the resulting Markov chain is in detailed balance with the target distribution $\pi(\cdot)$. Therefore, the set of samples produced $\{x^{(t)}\} \sim \pi^*(x)$.
 
 \subsection{Choosing the MALA step-size}
 \label{appdx:step-size}
@@ -126,7 +126,7 @@ In order to choose the exact value of the {\em step-size scaling} $s$ for each e
 	\bar{U} \coloneqq \frac{1}{T_\theta} \sum_{t \in [T_\theta]} U\left( \theta^{(t)} \right).
 \end{equation}
 %
-Since the chain will equilibrate in the vicinity of a minima in $U(\theta)$, the average over all samples is a rough indicator of the speed of burn-in. The higher the value of $\bar{U}$, the longer we infer the chain took to burn in and reach equilibrium. This method relies on the assumption that the random starting point $\theta^{(0)}$ has a high value for the objective function $U(\theta^{(0)})$; this assumption holds as the domain of $\theta$ is a high dimensional space so we are unlikely to get a low $U(\theta)$ from a lucky guess. We plot the acceptance ratio $r_\alpha$ and average objective $\bar{U}$ for $10$ values of the step-size multiplier $s$ logarithmically spaced in the range $(10^{-2}, 10^1)$ on Figure \ref{fig:step-size-tradeoff}.
+Since the chain will equilibrate in the vicinity of a minima in $U(\theta)$, the average over all samples is a rough indicator of the speed of burn-in. The higher the value of $\bar{U}$, the longer we infer the chain took to burn in and reach equilibrium. This method relies on the assumption that the random starting point $\theta^{(0)}$ has a high value for the objective function $U(\theta^{(0)})$; this assumption holds as the domain of $\theta$ is a high dimensional space so we are unlikely to get a low $U(\theta)$ from a lucky guess. We plot the acceptance ratio $r_\alpha$ and average objective $\bar{U}$ for $10$ values of the step-size multiplier $s$, logarithmically spaced in the range $(10^{-2}, 10^1)$ on Figure \ref{fig:step-size-tradeoff}.
 %
 \begin{figure}[!h]
 	\centering
@@ -212,7 +212,7 @@ Another benefit of starting the chain at the MDL solution is that our burn-in ti
 \subsection{Dimensionality discussion}
 \label{appdx:dimension}
 
-Many vertex features often take only one of several discrete values within a set. For example, with the primary school dataset \cite{schools}, a pupil's school-class can take one of 10 values from \{``1A", ``1B", ``2A", ``2B" \dots ``5A", "5B"\}.
+Many vertex features often take only one of several discrete values within a set. For example, with the primary school dataset \cite{schools}, a pupil's school-class can take one of 10 values from \{``1A", ``1B", ``2A", ``2B" \dots ``5A", ``5B"\}.
 
 It is not immediately obvious how to encode this for the feature-to-block classifier. Although this is technically only a single dimension, we choose to expand the data into a set of 10 binary feature flags all taking values in the set $\Xcal = \{0, 1\}$. Although only one flag will be set at a time it is the simplest method for representing discrete-valued data. The reason we choose $\Xcal=\{0, 1\}$ and not $\Xcal = \{-1, 1\}$ is that the former allows for simpler analysis of the resulting weight values; when a feature $d$ is switched off then $x_{d}=0$ given $\Xcal = \{0, 1\}$, and the feature has no impact on the softmax output. This would not be the case for $\Xcal = \{-1, 1\}$.
 
