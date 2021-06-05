@@ -4,9 +4,17 @@
 %packages
 \usepackage{graphicx}
 \usepackage{tikz}
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{natbib}
+\bibliographystyle{plainnat}
 
 %graphics
-\graphicspath{img}
+\graphicspath{{./img/}}
+
+%custom commands
+\newcommand{\Fcal}{\mathcal{F}}
+\newcommand{\Dcal}{\mathcal{D}}
 
 \title{Inferring community characteristics in labelled networks}
 \subtitle{IIB Project}
@@ -14,16 +22,65 @@
 \institute{Ioannis Kontoyiannis}
 \date{\today}
 
+\AtBeginSection[]{
+	\begin{frame}
+		\vfill
+		\centering
+		\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+			\usebeamerfont{title}\insertsectionhead\par%
+		\end{beamercolorbox}
+		\vfill
+	\end{frame}
+}
+
 \begin{document}
 	
 	\begin{frame}
 		\titlepage
 	\end{frame}
 
+	\begin{frame}{Overview}
+		\tableofcontents
+	\end{frame}
+
+	\section{Introduction}
+	
 	\begin{frame}{Motivation}
 
 	\end{frame}
 
+	\section{Preliminaries}
+	
+	\begin{frame}{The stochastic block model (SBM)}
+		\begin{columns}
+			\column{0.5\textwidth}
+			Initial parameters:
+			\begin{itemize}
+				\item $N$ -- number of vertices
+				\item $B$ -- number of blocks
+			\end{itemize}
+			\vspace{1em}
+			SBM parameters:
+			\begin{itemize}
+				\item $b$ -- block membership vector
+				\item $e$ -- block connectivity matrix
+				\item $k$ -- degree sequence
+			\end{itemize}
+			
+			\begin{equation}
+				A \sim \textrm{DC-SBM}_{\textrm{MC}}(b, e, k)
+			\end{equation}
+			
+			\column{0.5\textwidth}
+			
+			\begin{figure}
+				\includegraphics[width=0.8\linewidth]{polbooks-graph}
+				\caption{Typical SBM}
+			\end{figure}
+		\end{columns}
+	\end{frame}
+
+	\section{The feature-first block model}
 	\begin{frame}{The feature-first block model (FFBM)}
 		\begin{figure}[!h]
 			\centering
@@ -51,6 +108,7 @@
 		\end{align}
 	\end{frame}
 
+	\section{Inference}
 	\begin{frame}{Inference procedure}
 		We want to draw:
 		\begin{equation}
@@ -95,6 +153,26 @@
 			\caption{Sampling sequence.}
 			\label{fig:samp-sequence}
 		\end{figure}
+	\end{frame}
+
+	\begin{frame}{Speed up computation}
+		content...
+	\end{frame}
+
+	\begin{frame}{Dimensionality Reduction}
+	\end{frame}
+
+	\section{Experiments}
+	
+	\begin{frame}{Political Books}
+		\begin{figure}
+			\includegraphics[width=0.4\linewidth]{polbooks-graph.png}
+			\caption{Polbooks}
+		\end{figure}
+	\end{frame}
+
+	\begin{frame}{References}
+		\bibliography{presentation.bib}
 	\end{frame}
 
 \end{document}
