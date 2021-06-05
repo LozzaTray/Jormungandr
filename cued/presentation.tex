@@ -6,7 +6,7 @@
 \usepackage{tikz}
 \usepackage{subcaption}
 \usepackage{amsmath}
-\usepackage{natbib}
+\usepackage[numbers, compress]{natbib}
 \bibliographystyle{plainnat}
 
 %graphics
@@ -120,12 +120,25 @@
 			\theta^{(t)} &\sim p \Big( \theta| X, b^{(t)} \Big)
 		\end{align}
 	\end{frame}
+
+	\begin{frame}{Metropolis-Hastings (reference) \cite{hastings-alg}}
+		We want to draw samples for $\left\{ x^{(t)} \right\}$ from some distribution,
+		\begin{equation}
+			\pi^*(x) \propto \pi(x).
+		\end{equation}
+		Just need to be able to evaluate $\pi(x)$ point-wise and simulate from a proposal $q(x, x')$. If we accept each proposal with probability,
+		\begin{equation}
+			\alpha(x, x') = \min \left( \frac{\pi(x') q(x', x)}{\pi(x) q(x, x')} , 1 \right),
+			\label{eqn:mh-accept}
+		\end{equation}
+		then the resulting Markov chain is in detailed balance with $\pi(x)$.
+	\end{frame}
 	
 	\begin{frame}{Sampling sequence}
 		\begin{figure}[!h]
 			\centering
-			
 			\begin{tikzpicture}[
+				scale=1.0, every node/.style={transform shape},
 				roundnode/.style={circle, draw=black, minimum size=12mm},
 				squarednode/.style={rectangle, draw=black, minimum size=12mm}
 				]
