@@ -26,6 +26,7 @@
 \newcommand{\one}{\mathbbm{1}}
 \DeclareMathOperator*{\argmax}{arg\,max} % Jan Hlavacek
 \DeclareMathOperator*{\argmin}{arg\,min} % Jan Hlavacek
+\def\imagebox#1#2{\vtop to #1{\null\hbox{#2}\vfill}}
 
 \title{Inferring community characteristics in labelled networks}
 \subtitle{IIB Project}
@@ -339,24 +340,24 @@
 			\begin{subfigure}[t]{0.3\linewidth}
 				\centering
 				\includegraphics[width=\linewidth]{polbooks-graph.png}
-				\caption{Polbooks}
+				\caption{Polbooks $D=3$}
 				\label{fig:polbooks-graph}
 			\end{subfigure}
 			\hfill
 			\begin{subfigure}[t]{0.3\linewidth}
 				\centering
 				\includegraphics[width=\linewidth]{school-graph.png}
-				\caption{School}
+				\caption{school $D=13$}
 				\label{fig:school-graph}
 			\end{subfigure}
 			\hfill
 			\begin{subfigure}[t]{0.3\linewidth}
 				\centering
 				\includegraphics[width=\linewidth]{fb-graph.png}
-				\caption{Facebook egonet}
+				\caption{FB egonet $d=480$}
 				\label{fig:fb-graph}
 			\end{subfigure}
-			\begin{subfigure}[t]{0.11\linewidth}
+			\begin{subfigure}[t]{0.4\linewidth}
 				\centering
 				\includegraphics[width=0.8\linewidth]{10-horizontal-legend.png}
 				\caption{Legend}
@@ -367,29 +368,95 @@
 		\end{figure}
 	\end{frame}
 	
-	\begin{frame}{Political Books}
+	\begin{frame}{Political books \cite{polbooks}}
 		\begin{figure}[!h]
 			\centering
 			\begin{subfigure}[t]{0.452\linewidth}
 				\centering
 				\vskip 0pt
 				\includegraphics[width=\linewidth]{polbooks-null-1}
-				\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
-				\label{fig:polbooks-null}
 			\end{subfigure}
 			\begin{subfigure}[t]{0.45\linewidth}
 				\centering
 				\vskip 0pt
 				\includegraphics[width=\linewidth]{polbooks-accuracy-1}
-				\caption{Per-block accuracy $\eta(j)$.}
-				\label{fig:polbooks-accuracy}
 			\end{subfigure}
-			\caption{Political books dataset.}
-			\label{fig:polbooks}
 		\end{figure}
+		\begin{table}
+			\centering
+			\begin{tabular}{cc|cc}
+				$B$ & $D$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ \\ \hline
+				3 & 3 & $0.563 \pm 0.042$ & $0.595 \pm 0.089$
+			\end{tabular}
+		\end{table}
+	\end{frame}
+
+	\begin{frame}{Primary school dynamic contacts \cite{schools}}
+		\begin{figure}[!h]
+			\centering
+			\begin{subfigure}[t]{0.45\linewidth}
+				\centering
+				\imagebox{4.3cm}{\includegraphics[width=\linewidth]{school-null-1}}
+				\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
+			\end{subfigure}
+			\begin{subfigure}[t]{0.45\linewidth}
+				\centering
+				\imagebox{4.3cm}{\includegraphics[width=\linewidth]{school-accuracy-1}}
+			\end{subfigure}
+		\end{figure}
+	
+		\begin{table}
+			\centering
+			\resizebox{\textwidth}{!}{%
+			\begin{tabular}{ccc|cc|cc}
+				$B$ & $D$ & $D'$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$ \\ \hline
+				10 & 13 & 10 & $0.787 \pm 0.127$ & $0.885 \pm 0.129$ & $0.793 \pm 0.132$ & $0.853 \pm 0.132$
+			\end{tabular}
+			}
+			\caption{Goodness of fit}
+		\end{table}
+	\end{frame}
+
+	\begin{frame}{Facebook egonet \cite{fb-snap}}
+		\begin{figure}[!h]
+			\centering
+			\begin{subfigure}[t]{0.45\linewidth}
+				\centering
+				\imagebox{4.9cm}{\includegraphics[width=\linewidth]{fb-null-1}}
+			\end{subfigure}
+			\begin{subfigure}[t]{0.45\linewidth}
+				\centering
+				\imagebox{4.9cm}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
+			\end{subfigure}
+		\end{figure}
+	
+		\begin{table}
+			\centering
+			\resizebox{\textwidth}{!}{%
+				\begin{tabular}{ccc|cc|cc}
+					$B$ & $D$ & $D'$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$ \\ \hline
+					10  & 480 & 10 & $1.326 \pm 0.043$ & $1.538 \pm 0.069$ & $1.580 \pm 0.150$ & $1.605 \pm 0.106$
+				\end{tabular}
+			}
+			\caption{Goodness of fit}
+		\end{table}
 	\end{frame}
 
 \section{Conclusion}
+
+	\begin{frame}{Conclusion}
+		What have we achieved:
+		\begin{itemize}
+			\item Flip thinking of how we test for a feature's impact on graphical structure
+			\item Developed efficient inference algorithm
+			\item Effective way of retaining most important features
+		\end{itemize}
+		What is yet to come:
+		\begin{itemize}
+			\item FFBM can only explain macro-structure $\Rightarrow$ extend to hierarchical structure
+		\end{itemize}
+		If I could start again
+	\end{frame}
 
 	
 	\begin{frame}{Thanks for listening}
