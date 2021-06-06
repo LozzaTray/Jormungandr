@@ -7,7 +7,7 @@ We determine the form of $p(b| X)$ by integrating
 out the parameters $\theta$. From the definitions, we have:
 %
 \begin{align*}
-	p(b | X) &= \int p(b , \theta| X, \theta) d\theta = \int p(b | X, \theta) p(\theta | X) d\theta \\
+	p(b | X) &= \int p(b , \theta| X) d\theta = \int p(b | X, \theta) p(\theta | X) d\theta \\
 	&=\int p(b | X, \theta) p(\theta) d\theta = \int \prod_{i \in [N] } \phi_{b_i}(x_i; \theta) p(\theta) d\theta \\
 	&= \prod_{i \in [N]} \int \frac{\exp(w_{b_i}^T x_i) \prod_{j \in [B]} \Gaussian(w_j; 0, \sigma_\theta^2 I)}{\sum_{k \in [B]} \exp(w_{k}^T x_i)} dw_{1:B}.
 \end{align*}

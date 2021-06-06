@@ -6,6 +6,11 @@
 \usepackage{tikz}
 \usepackage{subcaption}
 \usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bbm}
+\usepackage{mathtools}
+\usepackage{parskip}
+\usepackage{xcolor}
 \usepackage[numbers, compress]{natbib}
 \bibliographystyle{plainnat}
 
@@ -15,6 +20,12 @@
 %custom commands
 \newcommand{\Fcal}{\mathcal{F}}
 \newcommand{\Dcal}{\mathcal{D}}
+\newcommand{\Gaussian}{\mathcal{N}}
+\newcommand{\Lcal}{\mathcal{L}}
+\newcommand{\Tcal}{\mathcal{T}}
+\newcommand{\one}{\mathbbm{1}}
+\DeclareMathOperator*{\argmax}{arg\,max} % Jan Hlavacek
+\DeclareMathOperator*{\argmin}{arg\,min} % Jan Hlavacek
 
 \title{Inferring community characteristics in labelled networks}
 \subtitle{IIB Project}
@@ -35,6 +46,7 @@
 
 \begin{document}
 	
+	%title
 	\begin{frame}
 		\titlepage
 	\end{frame}
@@ -43,45 +55,105 @@
 		\tableofcontents
 	\end{frame}
 
-	\section{Introduction}
+\section{Introduction}
 	
-	\begin{frame}{Motivation}
-
+	\begin{frame}{Let's define some terms}
+		\begin{block}{Inferring community characteristics in labelled networks}
+			\begin{description}
+				\item[Network] set of vertices (aka nodes) connected by edges.
+				\item[Graph] same as a network.
+				\item[Labelled] information about each vertex. We call these {\em features}.
+				\item[Community] Densely connected subset of nodes
+			\end{description}
+		\end{block}
+		\centering
+		\vspace{1cm}
+		Aim to identify what {\em features} impact graphical structure
+	\end{frame}
+	
+	\begin{frame}{How we got here}
+		\begin{itemize}
+			\item Started by performing hypothesis tests on features 
+		\end{itemize}
+		
+		\begin{figure}
+			\begin{subfigure}{0.4\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{old-presentation-0}
+			\end{subfigure}
+			\begin{subfigure}{0.4\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{old-presentation}
+			\end{subfigure}
+			\caption{Slides from Michaelmas presentation}
+		\end{figure}
+	
+		\begin{itemize}
+			\item This proved unhelpful as:
+			\begin{itemize}
+				\item Almost all features statistically significant
+				\item Hard to rank order features against one another
+				\item Often poor model fit
+			\end{itemize}
+		\end{itemize}
+	
+		\begin{block}{}
+			Instead: find most ``natural" partition and see if features can explain
+		\end{block}
 	\end{frame}
 
-	\section{Preliminaries}
+\section{Preliminaries}
 	
 	\begin{frame}{The stochastic block model (SBM)}
+		We adopt the degree-corrected (DC) microcanonical (MC) formulation \cite{Peixoto-Bayesian-Microcanonical}.				
 		\begin{columns}
+			
 			\column{0.5\textwidth}
-			Initial parameters:
+			
 			\begin{itemize}
 				\item $N$ -- number of vertices
 				\item $B$ -- number of blocks
 			\end{itemize}
-			\vspace{1em}
-			SBM parameters:
+			\vspace{0.3cm}
+			DC-SBM$_{\textrm{MC}}$ parameters:
 			\begin{itemize}
 				\item $b$ -- block membership vector
 				\item $e$ -- block connectivity matrix
 				\item $k$ -- degree sequence
 			\end{itemize}
 			
-			\begin{equation}
-				A \sim \textrm{DC-SBM}_{\textrm{MC}}(b, e, k)
-			\end{equation}
+			$$A \sim \textrm{DC-SBM}_{\textrm{MC}}(b, e, k)$$
 			
 			\column{0.5\textwidth}
-			
+		
 			\begin{figure}
-				\includegraphics[width=0.8\linewidth]{polbooks-graph}
-				\caption{Typical SBM}
+				\includegraphics[width=0.6\linewidth]{polbooks-graph}
+				\caption{Typical SBM graph}
 			\end{figure}
 		\end{columns}
+		With edges placed uniformly at random but respecting:
+		\begin{equation*}
+			e_{rs} = \sum_{i, j \in [N]} A_{ij} 
+			\one \{b_i = r\} \one \{b_j = s\} 
+			\qquad 
+			\textrm{and} \qquad
+			k_i = \sum_{j \in [N]} A_{ij}.
+			\label{eqn:sbm-constraints}
+		\end{equation*}
 	\end{frame}
 
-	\section{The feature-first block model}
+	\begin{frame}{Metropolis-Hastings \cite{hastings-alg}}
+		We want to draw samples $\left\{ z^{(t)} \right\}$ from some distribution,
+		$$\pi^*(z) \propto \pi(z).$$
+		Just need to be able to evaluate $\pi(z)$ point-wise and simulate from a proposal $q(z, z')$. If we accept each proposal with probability,
+		$$\alpha(z, z') = \min \left( \frac{\pi(z') q(z', z)}{\pi(z) q(z, z')} , 1 \right),$$
+		then the resulting Markov chain is in detailed balance with $\pi(z)$.
+	\end{frame}
+
+\section{The feature-first block model}
+
 	\begin{frame}{The feature-first block model (FFBM)}
+		Define feature matrix $X \in \{0, 1\}^{N \times D}$, this gives us that:
 		\begin{figure}[!h]
 			\centering
 			\begin{tikzpicture}[
@@ -101,37 +173,51 @@
 			\label{fig:ffbm}
 		\end{figure}
 	
-		\begin{align}
-			p(b|X; \theta) &= \prod_{i \in [N]} \phi_{b_i} (x_i; \theta)
-			= \prod_{i \in [N]} \frac{\exp (w_{b_i}^T x_i)}{\sum_{k \in [B]} \exp (w_k^T x_i) } \\ \nonumber \\
-			p(A|b; \psi) &\sim \textrm{DC-SBM}_{\textrm{MC}} (b, \psi_e, \psi_k)
-		\end{align}
+		\begin{columns}
+			\column{0.55\textwidth}
+			\begin{block}{Likelihoods}
+				$$p(b|X; \theta) = \prod_{i \in [N]} \phi_{b_i} (x_i; \theta)$$
+				$$p(A|b; \psi) \sim \textrm{DC-SBM}_{\textrm{MC}} (b, \psi_e, \psi_k)$$
+			\end{block}
+		
+			\column{0.4\textwidth}
+			\begin{block}{Priors}
+				$$p(\theta) = \Gaussian(\theta;0, \sigma_\theta^2 I)\vspace{4mm}$$
+				$$p(\psi | b) = p(\psi_e | b) p(\psi_k | \psi_e, b)$$
+			\end{block}
+		\end{columns}
+	
+		\vspace{5mm}
+		$$\phi_{j}(x; \theta) \coloneqq \frac{\exp (w_j^T x_i)}{\sum_{k \in [B]} \exp (w_k^T x_i) }$$
+	\end{frame}
+
+	\begin{frame}{Important property of the FFBM}
+		\begin{theorem}
+			Our prior choice for $p(\theta)$ gives us that,
+			$$p(b|X) = B^{-N}.$$
+		\end{theorem}
+		
+		Proof:
+		\begin{align*}
+			p(b | X) &= \int p(b | X, \theta) p(\theta) d\theta = \int \prod_{i \in [N] } \phi_{b_i}(x_i; \theta) p(\theta) d\theta \\
+			&= \prod_{i \in [N]} \int \frac{\exp(w_{b_i}^T x_i) \prod_{j \in [B]} \Gaussian(w_j; 0, \sigma_\theta^2 I)}{\sum_{k \in [B]} \exp(w_{k}^T x_i)} dw_{1:B}.
+		\end{align*}
+		Which is a constant w.r.t. $b$.
 	\end{frame}
 
 	\section{Inference}
 	\begin{frame}{Inference procedure}
 		We want to draw:
-		\begin{equation}
-			\theta^{(t)} \sim p(\theta| A, X).
-		\end{equation}
-		We achieve this by:
-		\begin{align}
+		$$\theta^{(t)} \sim p(\theta| A, X).$$
+		But computing $p(A| \theta, X)$ is $O(B^N) \Rightarrow$  split into:
+		\begin{align*}
 			b^{(t)} &\sim p \Big( b| A, X \Big) \\
 			\theta^{(t)} &\sim p \Big( \theta| X, b^{(t)} \Big)
-		\end{align}
-	\end{frame}
-
-	\begin{frame}{Metropolis-Hastings (reference) \cite{hastings-alg}}
-		We want to draw samples for $\left\{ x^{(t)} \right\}$ from some distribution,
-		\begin{equation}
-			\pi^*(x) \propto \pi(x).
-		\end{equation}
-		Just need to be able to evaluate $\pi(x)$ point-wise and simulate from a proposal $q(x, x')$. If we accept each proposal with probability,
-		\begin{equation}
-			\alpha(x, x') = \min \left( \frac{\pi(x') q(x', x)}{\pi(x) q(x, x')} , 1 \right),
-			\label{eqn:mh-accept}
-		\end{equation}
-		then the resulting Markov chain is in detailed balance with $\pi(x)$.
+		\end{align*}
+		Both steps implemented through Metropolis-Hastings, with:
+		$$\pi_z(z) \textrm{ -- target } \qquad q_z(z, z') \textrm{ -- proposal } \qquad \alpha_z(z, z') \textrm{ -- accept prob}$$		
+		This is a pseudo-marginal approach. \citet{pseudo-marginal} show that:
+		$$\theta^{(t)} \sim \mathbb{E}_{b^{(t)}}\left[ p(\theta| X, b^{(t)})\right] = p(\theta | A, X)$$
 	\end{frame}
 	
 	\begin{frame}{Sampling sequence}
@@ -168,23 +254,154 @@
 		\end{figure}
 	\end{frame}
 
-	\begin{frame}{Speed up computation}
-		content...
+	
+	\begin{frame}{$b$-step}
+		Our target,
+		$$p(b | A, X) \propto p(b | X) p(A | b) = \pi_b(b),$$
+		can be evaluated as,
+		\begin{align*}
+			\pi_b(b) &= p(b|X) \sum_{\psi} p(A, \psi|b) \\
+			&= p(b|X) p(A, \psi^* | b) \\
+			&= p(A|\psi^*, b) p(\psi^*|b) p(b | X),
+		\end{align*}
+		where $\psi^*$ is the only value compatible with $(A,b)$. Big win for the microcanonical formulation.
+		
+		We borrow $q_b(b, b')$ from \citet{Peixoto-Bayesian-Microcanonical}.
+	\end{frame}
+
+	\begin{frame}{$\theta$-step}
+		Our target can be written as:
+		$$p(\theta | X, b) \propto
+		{\color{blue} p(b |X, \theta)} 
+		{\color{red}p(\theta)}
+		= \pi_\theta(\theta) \propto \exp(-U(\theta)).$$
+		$\therefore$ can write -ve log target as:
+		$$U(\theta) 
+		= {\color{blue} \sum_{i,j} y_{ij} \log \frac{1}{a_{ij}} } + 
+		{\color{red} \frac{1}{2\sigma_\theta^2} || \theta ||^2} 
+		= {\color{blue} N \Lcal(\theta)} 
+		+ {\color{red} \frac{1}{2\sigma_\theta^2} ||\theta||^2 },$$
+		
+		where $y_{ij} \coloneqq \one \{b_i = j\}$ and $a_{ij} = \phi_{j}(x_i; \theta)$. This form looks very familiar? We can use $\nabla U$ to bias our proposal:
+		$$\theta' = \theta^{(t)} - h_t \nabla U \left(\theta^{(t)} \right) + \sqrt{2h_t} \cdot \xi$$
+		This is now called the Metropolis-adjusted Langevin algorithm (MALA).
+	\end{frame}
+
+	\begin{frame}{Serialise the chains}
+		The $b^{(t)}$ does not use $\theta^{(t)}$.
+		
+		The $\theta^{(t)}$ update uses $b^{(t)}$ through $y^{(t)}_{ij} \coloneqq \one\{b^{(t)}_i = j\}$.
+		
+		Why not use empirical mean of this quantity:		
+		$$\hat{y}_{ij} \coloneqq \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} y_{ij}^{(t)}.$$
+		This is an unbiased estimate of $p(b_i=j|A,X)$.
+		
+		Using $\hat{y}$ instead of $y^{(t)}$ for the $\theta$-step:
+		\begin{itemize}
+			\item Reduced variance in evaluation of $U$ and $\nabla U$
+			\item Can run $b$ and $\theta$-chains sequentially rather than in parallel $\Rightarrow$ different lengths.
+		\end{itemize}
 	\end{frame}
 
 	\begin{frame}{Dimensionality Reduction}
+		\begin{columns}
+			\column{0.7\linewidth}
+			Want to know which features we can discard:
+			\begin{itemize}
+				\item Write $\theta$ as matrix $W$, so that $W_{ij}$ is weight for block $i$ and feature $j$.
+				\item Compute mean $\hat{\mu}_{ij}$ and std dev $\hat{\sigma}_{ij}$ of the $W_{ij}^{(t)}$-samples
+			\end{itemize}
+			Imagine a test on $W_{ij}$ such that:
+			$$H_0: |W_{ij}| \leq c \qquad H_1: |W_{ij}| > c$$
+			If we use Laplace approximation can come up with simple decision rule:
+			$$h_{ij} = H_1 \iff \left(\hat{\mu}_{ij} - k \hat{\sigma}_{ij}, \hat{\mu}_{ij} + k \hat{\sigma}_{ij}\right)
+			\cap (-c, +c) = \emptyset$$
+			With $k>0$ controlling degree of significance of result
+			\column{0.3\linewidth}
+			\begin{figure}
+				\includegraphics[width=\linewidth]{significance-test.png}
+			\end{figure}
+		\end{columns}		
 	\end{frame}
 
-	\section{Experiments}
+	\begin{frame}{Dimensionality Reduction cont...}
+		If we specify cut-off $c>0$ and multiplier $k>0$ can only retain features $d$ such that:
+		$$\Dcal' \coloneqq \left\{ d \in [D] : \exists i \in [B] \textrm{ s.t. } h_{id} = H_1\right\}$$
+		Instead it is often more practical to fix $|\Dcal'| = D'$ and $k=k_0$, then find the maximal cut-off:
+		$$c^* = \argmax_{c>0}\{c: |\Dcal'|=D', k=k_0\}$$
+	\end{frame}
+
+\section{Experiments}
+
+	\begin{frame}{The datasets}
+		\begin{figure}[!h]
+			\centering
+			\begin{subfigure}[t]{0.3\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{polbooks-graph.png}
+				\caption{Polbooks}
+				\label{fig:polbooks-graph}
+			\end{subfigure}
+			\hfill
+			\begin{subfigure}[t]{0.3\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{school-graph.png}
+				\caption{School}
+				\label{fig:school-graph}
+			\end{subfigure}
+			\hfill
+			\begin{subfigure}[t]{0.3\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{fb-graph.png}
+				\caption{Facebook egonet}
+				\label{fig:fb-graph}
+			\end{subfigure}
+			\begin{subfigure}[t]{0.11\linewidth}
+				\centering
+				\includegraphics[width=0.8\linewidth]{10-horizontal-legend.png}
+				\caption{Legend}
+				\label{fig:10-legend}
+			\end{subfigure}
+			\caption{Networks laid out and coloured according to inferred block memberships $\hat{y}$ for a given experiment iteration. Visualisation performed using \textit{graph-tool} \cite{peixoto_graph-tool_2014}.}
+			\label{fig:graphs-all}
+		\end{figure}
+	\end{frame}
 	
 	\begin{frame}{Political Books}
-		\begin{figure}
-			\includegraphics[width=0.4\linewidth]{polbooks-graph.png}
-			\caption{Polbooks}
+		\begin{figure}[!h]
+			\centering
+			\begin{subfigure}[t]{0.452\linewidth}
+				\centering
+				\vskip 0pt
+				\includegraphics[width=\linewidth]{polbooks-null-1}
+				\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
+				\label{fig:polbooks-null}
+			\end{subfigure}
+			\begin{subfigure}[t]{0.45\linewidth}
+				\centering
+				\vskip 0pt
+				\includegraphics[width=\linewidth]{polbooks-accuracy-1}
+				\caption{Per-block accuracy $\eta(j)$.}
+				\label{fig:polbooks-accuracy}
+			\end{subfigure}
+			\caption{Political books dataset.}
+			\label{fig:polbooks}
 		\end{figure}
 	\end{frame}
 
+\section{Conclusion}
+
+	
+	\begin{frame}{Thanks for listening}
+		\begin{figure}
+			\includegraphics[width=0.6\linewidth]{any-questions.jpg}
+			\caption{Source, \citet{any-Qs}}
+		\end{figure}
+
+	\end{frame}
+
 	\begin{frame}{References}
+		\tiny
 		\bibliography{presentation.bib}
 	\end{frame}
 
