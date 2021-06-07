@@ -34,16 +34,16 @@
 \institute{Ioannis Kontoyiannis}
 \date{\today}
 
-\AtBeginSection[]{
-	\begin{frame}
-		\vfill
-		\centering
-		\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
-			\usebeamerfont{title}\insertsectionhead\par%
-		\end{beamercolorbox}
-		\vfill
-	\end{frame}
-}
+%\AtBeginSection[]{
+%	\begin{frame}
+%		\vfill
+%		\centering
+%		\begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+%			\usebeamerfont{title}\insertsectionhead\par%
+%		\end{beamercolorbox}
+%		\vfill
+%	\end{frame}
+%}
 
 \begin{document}
 	
@@ -64,12 +64,13 @@
 				\item[Network] set of vertices (aka nodes) connected by edges.
 				\item[Graph] same as a network.
 				\item[Labelled] information about each vertex. We call these {\em features}.
-				\item[Community] Densely connected subset of nodes
+				\item[Community] densely connected subset of nodes.
+				\item[Block] same as a community.
 			\end{description}
 		\end{block}
 		\centering
 		\vspace{1cm}
-		Aim to identify what {\em features} impact graphical structure
+		Aim to identify how {\em features} impact graphical structure
 	\end{frame}
 	
 	\begin{frame}{How we got here}
@@ -184,20 +185,6 @@
 		$$\phi_{j}(x; \theta) \coloneqq \frac{\exp (w_j^T x_i)}{\sum_{k \in [B]} \exp (w_k^T x_i) }$$
 	\end{frame}
 
-	\begin{frame}{Important property of the FFBM}
-		\begin{theorem}
-			Our prior choice for $p(\theta)$ gives us that,
-			$$p(b|X) = B^{-N}.$$
-		\end{theorem}
-		
-		Proof:
-		\begin{align*}
-			p(b | X) &= \int p(b | X, \theta) p(\theta) d\theta = \int \prod_{i \in [N] } \phi_{b_i}(x_i; \theta) p(\theta) d\theta \\
-			&= \prod_{i \in [N]} \int \frac{\exp(w_{b_i}^T x_i) \prod_{j \in [B]} \Gaussian(w_j; 0, \sigma_\theta^2 I)}{\sum_{k \in [B]} \exp(w_{k}^T x_i)} dw_{1:B}.
-		\end{align*}
-		Which is a constant w.r.t. $b$.
-	\end{frame}
-
 	\section{Inference}
 	\begin{frame}{Inference procedure}
 		We want to draw:
@@ -209,8 +196,6 @@
 		\end{align*}
 		Both steps implemented through Metropolis-Hastings, with:
 		$$\pi_z(z) \textrm{ -- target } \qquad q_z(z, z') \textrm{ -- proposal } \qquad \alpha_z(z, z') \textrm{ -- accept prob}$$		
-		This is a pseudo-marginal approach. \citet{pseudo-marginal} show that:
-		$$\theta^{(t)} \sim \mathbb{E}_{b^{(t)}}\left[ p(\theta| X, b^{(t)})\right] = p(\theta | A, X)$$
 	\end{frame}
 	
 	\begin{frame}{Sampling sequence}
@@ -336,6 +321,20 @@
 	\end{frame}
 
 \section*{Additional slides}
+
+	\begin{frame}{Important property of the FFBM}
+		\begin{theorem}
+			Our prior choice for $p(\theta)$ gives us that,
+			$$p(b|X) = B^{-N}.$$
+		\end{theorem}
+		
+		Proof:
+		\begin{align*}
+			p(b | X) &= \int p(b | X, \theta) p(\theta) d\theta = \int \prod_{i \in [N] } \phi_{b_i}(x_i; \theta) p(\theta) d\theta \\
+			&= \prod_{i \in [N]} \int \frac{\exp(w_{b_i}^T x_i) \prod_{j \in [B]} \Gaussian(w_j; 0, \sigma_\theta^2 I)}{\sum_{k \in [B]} \exp(w_{k}^T x_i)} dw_{1:B}.
+		\end{align*}
+		Which is a constant w.r.t. $b$.
+	\end{frame}
 
 	\begin{frame}{Metropolis-Hastings \cite{hastings-alg}}
 		We want to draw samples $\left\{ z^{(t)} \right\}$ from some distribution,
