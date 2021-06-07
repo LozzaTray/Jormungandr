@@ -143,14 +143,6 @@
 		\end{equation*}
 	\end{frame}
 
-	\begin{frame}{Metropolis-Hastings \cite{hastings-alg}}
-		We want to draw samples $\left\{ z^{(t)} \right\}$ from some distribution,
-		$$\pi^*(z) \propto \pi(z).$$
-		Just need to be able to evaluate $\pi(z)$ point-wise and simulate from a proposal $q(z, z')$. If we accept each proposal with probability,
-		$$\alpha(z, z') = \min \left( \frac{\pi(z') q(z', z)}{\pi(z) q(z, z')} , 1 \right),$$
-		then the resulting Markov chain is in detailed balance with $\pi(z)$.
-	\end{frame}
-
 \section{The feature-first block model}
 
 	\begin{frame}{The feature-first block model (FFBM)}
@@ -255,83 +247,6 @@
 		\end{figure}
 	\end{frame}
 
-	
-	\begin{frame}{$b$-step}
-		Our target,
-		$$p(b | A, X) \propto p(b | X) p(A | b) = \pi_b(b),$$
-		can be evaluated as,
-		\begin{align*}
-			\pi_b(b) &= p(b|X) \sum_{\psi} p(A, \psi|b) \\
-			&= p(b|X) p(A, \psi^* | b) \\
-			&= p(A|\psi^*, b) p(\psi^*|b) p(b | X),
-		\end{align*}
-		where $\psi^*$ is the only value compatible with $(A,b)$. Big win for the microcanonical formulation.
-		
-		We borrow $q_b(b, b')$ from \citet{Peixoto-Bayesian-Microcanonical}.
-	\end{frame}
-
-	\begin{frame}{$\theta$-step}
-		Our target can be written as:
-		$$p(\theta | X, b) \propto
-		{\color{blue} p(b |X, \theta)} 
-		{\color{red}p(\theta)}
-		= \pi_\theta(\theta) \propto \exp(-U(\theta)).$$
-		$\therefore$ can write -ve log target as:
-		$$U(\theta) 
-		= {\color{blue} \sum_{i,j} y_{ij} \log \frac{1}{a_{ij}} } + 
-		{\color{red} \frac{1}{2\sigma_\theta^2} || \theta ||^2} 
-		= {\color{blue} N \Lcal(\theta)} 
-		+ {\color{red} \frac{1}{2\sigma_\theta^2} ||\theta||^2 },$$
-		
-		where $y_{ij} \coloneqq \one \{b_i = j\}$ and $a_{ij} = \phi_{j}(x_i; \theta)$. This form looks very familiar? We can use $\nabla U$ to bias our proposal:
-		$$\theta' = \theta^{(t)} - h_t \nabla U \left(\theta^{(t)} \right) + \sqrt{2h_t} \cdot \xi$$
-		This is now called the Metropolis-adjusted Langevin algorithm (MALA).
-	\end{frame}
-
-	\begin{frame}{Serialise the chains}
-		The $b^{(t)}$ does not use $\theta^{(t)}$.
-		
-		The $\theta^{(t)}$ update uses $b^{(t)}$ through $y^{(t)}_{ij} \coloneqq \one\{b^{(t)}_i = j\}$.
-		
-		Why not use empirical mean of this quantity:		
-		$$\hat{y}_{ij} \coloneqq \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} y_{ij}^{(t)}.$$
-		This is an unbiased estimate of $p(b_i=j|A,X)$.
-		
-		Using $\hat{y}$ instead of $y^{(t)}$ for the $\theta$-step:
-		\begin{itemize}
-			\item Reduced variance in evaluation of $U$ and $\nabla U$
-			\item Can run $b$ and $\theta$-chains sequentially rather than in parallel $\Rightarrow$ different lengths.
-		\end{itemize}
-	\end{frame}
-
-	\begin{frame}{Dimensionality Reduction}
-		\begin{columns}
-			\column{0.7\linewidth}
-			Want to know which features we can discard:
-			\begin{itemize}
-				\item Write $\theta$ as matrix $W$, so that $W_{ij}$ is weight for block $i$ and feature $j$.
-				\item Compute mean $\hat{\mu}_{ij}$ and std dev $\hat{\sigma}_{ij}$ of the $W_{ij}^{(t)}$-samples
-			\end{itemize}
-			Imagine a test on $W_{ij}$ such that:
-			$$H_0: |W_{ij}| \leq c \qquad H_1: |W_{ij}| > c$$
-			If we use Laplace approximation can come up with simple decision rule:
-			$$h_{ij} = H_1 \iff \left(\hat{\mu}_{ij} - k \hat{\sigma}_{ij}, \hat{\mu}_{ij} + k \hat{\sigma}_{ij}\right)
-			\cap (-c, +c) = \emptyset$$
-			With $k>0$ controlling degree of significance of result
-			\column{0.3\linewidth}
-			\begin{figure}
-				\includegraphics[width=\linewidth]{significance-test.png}
-			\end{figure}
-		\end{columns}		
-	\end{frame}
-
-	\begin{frame}{Dimensionality Reduction cont...}
-		If we specify cut-off $c>0$ and multiplier $k>0$ can only retain features $d$ such that:
-		$$\Dcal' \coloneqq \left\{ d \in [D] : \exists i \in [B] \textrm{ s.t. } h_{id} = H_1\right\}$$
-		Instead it is often more practical to fix $|\Dcal'| = D'$ and $k=k_0$, then find the maximal cut-off:
-		$$c^* = \argmax_{c>0}\{c: |\Dcal'|=D', k=k_0\}$$
-	\end{frame}
-
 \section{Experiments}
 
 	\begin{frame}{The datasets}
@@ -391,57 +306,6 @@
 		\end{table}
 	\end{frame}
 
-	\begin{frame}{Primary school dynamic contacts \cite{schools}}
-		\begin{figure}[!h]
-			\centering
-			\begin{subfigure}[t]{0.45\linewidth}
-				\centering
-				\imagebox{4.3cm}{\includegraphics[width=\linewidth]{school-null-1}}
-				\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
-			\end{subfigure}
-			\begin{subfigure}[t]{0.45\linewidth}
-				\centering
-				\imagebox{4.3cm}{\includegraphics[width=\linewidth]{school-accuracy-1}}
-			\end{subfigure}
-		\end{figure}
-	
-		\begin{table}
-			\centering
-			\resizebox{\textwidth}{!}{%
-			\begin{tabular}{ccc|cc|cc}
-				$B$ & $D$ & $D'$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$ \\ \hline
-				10 & 13 & 10 & $0.787 \pm 0.127$ & $0.885 \pm 0.129$ & $0.793 \pm 0.132$ & $0.853 \pm 0.132$
-			\end{tabular}
-			}
-			\caption{Goodness of fit}
-		\end{table}
-	\end{frame}
-
-	\begin{frame}{Facebook egonet \cite{fb-snap}}
-		\begin{figure}[!h]
-			\centering
-			\begin{subfigure}[t]{0.45\linewidth}
-				\centering
-				\imagebox{4.9cm}{\includegraphics[width=\linewidth]{fb-null-1}}
-			\end{subfigure}
-			\begin{subfigure}[t]{0.45\linewidth}
-				\centering
-				\imagebox{4.9cm}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
-			\end{subfigure}
-		\end{figure}
-	
-		\begin{table}
-			\centering
-			\resizebox{\textwidth}{!}{%
-				\begin{tabular}{ccc|cc|cc}
-					$B$ & $D$ & $D'$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$ \\ \hline
-					10  & 480 & 10 & $1.326 \pm 0.043$ & $1.538 \pm 0.069$ & $1.580 \pm 0.150$ & $1.605 \pm 0.106$
-				\end{tabular}
-			}
-			\caption{Goodness of fit}
-		\end{table}
-	\end{frame}
-
 \section{Conclusion}
 
 	\begin{frame}{Conclusion}
@@ -449,7 +313,6 @@
 		\begin{itemize}
 			\item Flip thinking of how we test for a feature's impact on graphical structure
 			\item Developed efficient inference algorithm
-			\item Effective way of retaining most important features
 		\end{itemize}
 		What is yet to come:
 		\begin{itemize}
@@ -470,6 +333,143 @@
 	\begin{frame}{References}
 		\tiny
 		\bibliography{presentation.bib}
+	\end{frame}
+
+\section*{Additional slides}
+
+	\begin{frame}{Metropolis-Hastings \cite{hastings-alg}}
+		We want to draw samples $\left\{ z^{(t)} \right\}$ from some distribution,
+		$$\pi^*(z) \propto \pi(z).$$
+		Just need to be able to evaluate $\pi(z)$ point-wise and simulate from a proposal $q(z, z')$. If we accept each proposal with probability,
+		$$\alpha(z, z') = \min \left( \frac{\pi(z') q(z', z)}{\pi(z) q(z, z')} , 1 \right),$$
+		then the resulting Markov chain is in detailed balance with $\pi(z)$.
+	\end{frame}
+	
+	\begin{frame}{$b$-step}
+		Our target,
+		$$p(b | A, X) \propto p(b | X) p(A | b) = \pi_b(b),$$
+		can be evaluated as,
+		\begin{align*}
+			\pi_b(b) &= p(b|X) \sum_{\psi} p(A, \psi|b) \\
+			&= p(b|X) p(A, \psi^* | b) \\
+			&= p(A|\psi^*, b) p(\psi^*|b) p(b | X),
+		\end{align*}
+		where $\psi^*$ is the only value compatible with $(A,b)$. Big win for the microcanonical formulation.
+		
+		We borrow $q_b(b, b')$ from \citet{Peixoto-Bayesian-Microcanonical}.
+	\end{frame}
+	
+	\begin{frame}{$\theta$-step}
+		Our target can be written as:
+		$$p(\theta | X, b) \propto
+		{\color{blue} p(b |X, \theta)} 
+		{\color{red}p(\theta)}
+		= \pi_\theta(\theta) \propto \exp(-U(\theta)).$$
+		$\therefore$ can write -ve log target as:
+		$$U(\theta) 
+		= {\color{blue} \sum_{i,j} y_{ij} \log \frac{1}{a_{ij}} } + 
+		{\color{red} \frac{1}{2\sigma_\theta^2} || \theta ||^2} 
+		= {\color{blue} N \Lcal(\theta)} 
+		+ {\color{red} \frac{1}{2\sigma_\theta^2} ||\theta||^2 },$$
+		
+		where $y_{ij} \coloneqq \one \{b_i = j\}$ and $a_{ij} = \phi_{j}(x_i; \theta)$. This form looks very familiar? We can use $\nabla U$ to bias our proposal:
+		$$\theta' = \theta^{(t)} - h_t \nabla U \left(\theta^{(t)} \right) + \sqrt{2h_t} \cdot \xi$$
+		This is now called the Metropolis-adjusted Langevin algorithm (MALA).
+	\end{frame}
+	
+	\begin{frame}{Serialise the chains}
+		The $b^{(t)}$ does not use $\theta^{(t)}$.
+		
+		The $\theta^{(t)}$ update uses $b^{(t)}$ through $y^{(t)}_{ij} \coloneqq \one\{b^{(t)}_i = j\}$.
+		
+		Why not use empirical mean of this quantity:		
+		$$\hat{y}_{ij} \coloneqq \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} y_{ij}^{(t)}.$$
+		This is an unbiased estimate of $p(b_i=j|A,X)$.
+		
+		Using $\hat{y}$ instead of $y^{(t)}$ for the $\theta$-step:
+		\begin{itemize}
+			\item Reduced variance in evaluation of $U$ and $\nabla U$
+			\item Can run $b$ and $\theta$-chains sequentially rather than in parallel $\Rightarrow$ different lengths.
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}{Dimensionality Reduction}
+		\begin{columns}
+			\column{0.7\linewidth}
+			Want to know which features we can discard:
+			\begin{itemize}
+				\item Write $\theta$ as matrix $W$, so that $W_{ij}$ is weight for block $i$ and feature $j$.
+				\item Compute mean $\hat{\mu}_{ij}$ and std dev $\hat{\sigma}_{ij}$ of the $W_{ij}^{(t)}$-samples
+			\end{itemize}
+			Imagine a test on $W_{ij}$ such that:
+			$$H_0: |W_{ij}| \leq c \qquad H_1: |W_{ij}| > c$$
+			If we use Laplace approximation can come up with simple decision rule:
+			$$h_{ij} = H_1 \iff \left(\hat{\mu}_{ij} - k \hat{\sigma}_{ij}, \hat{\mu}_{ij} + k \hat{\sigma}_{ij}\right)
+			\cap (-c, +c) = \emptyset$$
+			With $k>0$ controlling degree of significance of result
+			\column{0.3\linewidth}
+			\begin{figure}
+				\includegraphics[width=\linewidth]{significance-test.png}
+			\end{figure}
+		\end{columns}		
+	\end{frame}
+
+	\begin{frame}{Dimensionality Reduction cont...}
+		If we specify cut-off $c>0$ and multiplier $k>0$ can only retain features $d$ such that:
+		$$\Dcal' \coloneqq \left\{ d \in [D] : \exists i \in [B] \textrm{ s.t. } h_{id} = H_1\right\}$$
+		Instead it is often more practical to fix $|\Dcal'| = D'$ and $k=k_0$, then find the maximal cut-off:
+		$$c^* = \argmax_{c>0}\{c: |\Dcal'|=D', k=k_0\}$$
+	\end{frame}
+
+	\begin{frame}{Primary school dynamic contacts \cite{schools}}
+		\begin{figure}[!h]
+			\centering
+			\begin{subfigure}[t]{0.45\linewidth}
+				\centering
+				\imagebox{4.3cm}{\includegraphics[width=\linewidth]{school-null-1}}
+				\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
+			\end{subfigure}
+			\begin{subfigure}[t]{0.45\linewidth}
+				\centering
+				\imagebox{4.3cm}{\includegraphics[width=\linewidth]{school-accuracy-1}}
+			\end{subfigure}
+		\end{figure}
+		
+		\begin{table}
+			\centering
+			\resizebox{\textwidth}{!}{%
+				\begin{tabular}{ccc|cc|cc}
+					$B$ & $D$ & $D'$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$ \\ \hline
+					10 & 13 & 10 & $0.787 \pm 0.127$ & $0.885 \pm 0.129$ & $0.793 \pm 0.132$ & $0.853 \pm 0.132$
+				\end{tabular}
+			}
+			\caption{Goodness of fit}
+		\end{table}
+	\end{frame}
+	
+	\begin{frame}{Facebook egonet \cite{fb-snap}}
+		\begin{figure}[!h]
+			\centering
+			\begin{subfigure}[t]{0.45\linewidth}
+				\centering
+				\imagebox{4.9cm}{\includegraphics[width=\linewidth]{fb-null-1}}
+			\end{subfigure}
+			\begin{subfigure}[t]{0.45\linewidth}
+				\centering
+				\imagebox{4.9cm}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
+			\end{subfigure}
+		\end{figure}
+		
+		\begin{table}
+			\centering
+			\resizebox{\textwidth}{!}{%
+				\begin{tabular}{ccc|cc|cc}
+					$B$ & $D$ & $D'$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$ \\ \hline
+					10  & 480 & 10 & $1.326 \pm 0.043$ & $1.538 \pm 0.069$ & $1.580 \pm 0.150$ & $1.605 \pm 0.106$
+				\end{tabular}
+			}
+			\caption{Goodness of fit}
+		\end{table}
 	\end{frame}
 
 \end{document}
