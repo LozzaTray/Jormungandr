@@ -28,7 +28,7 @@
 \DeclareMathOperator*{\argmin}{arg\,min} % Jan Hlavacek
 \def\imagebox#1#2{\vtop to #1{\null\hbox{#2}\vfill}}
 
-\title{Inferring community characteristics in labelled networks}
+\title[Labelled network inference]{Inferring community characteristics in labelled networks}
 \subtitle{IIB Project}
 \author{Lawrence Tray}
 \institute{Ioannis Kontoyiannis}
@@ -233,58 +233,27 @@
 	\end{frame}
 
 \section{Experiments}
-
-	\begin{frame}{The datasets}
-		\begin{figure}[!h]
-			\centering
-			\begin{subfigure}[t]{0.3\linewidth}
-				\centering
-				\includegraphics[width=\linewidth]{polbooks-graph.png}
-				\caption{Polbooks $D=3$}
-				\label{fig:polbooks-graph}
-			\end{subfigure}
-			\hfill
-			\begin{subfigure}[t]{0.3\linewidth}
-				\centering
-				\includegraphics[width=\linewidth]{school-graph.png}
-				\caption{School $D=13$}
-				\label{fig:school-graph}
-			\end{subfigure}
-			\hfill
-			\begin{subfigure}[t]{0.3\linewidth}
-				\centering
-				\includegraphics[width=\linewidth]{fb-graph.png}
-				\caption{FB egonet $d=480$}
-				\label{fig:fb-graph}
-			\end{subfigure}
-			\begin{subfigure}[t]{0.4\linewidth}
-				\centering
-				\includegraphics[width=0.8\linewidth]{10-horizontal-legend.png}
-				\caption{Legend}
-				\label{fig:10-legend}
-			\end{subfigure}
-			\caption{Networks laid out and coloured according to inferred block memberships $\hat{y}$ for a given experiment iteration. Visualisation performed using \textit{graph-tool} \cite{peixoto_graph-tool_2014}.}
-			\label{fig:graphs-all}
-		\end{figure}
-	\end{frame}
 	
 	\begin{frame}{Political books \cite{polbooks}}
 		\begin{figure}[!h]
 			\centering
+			\begin{subfigure}[t]{0.3\linewidth}
+				\centering
+				\vskip 0pt
+				\includegraphics[width=\linewidth]{polbooks-graph}
+				\includegraphics[width=0.6\linewidth]{3-horizontal-legend}
+				\caption{Inferred blocks}
+			\end{subfigure}
+			\hspace{1cm}
 			\begin{subfigure}[t]{0.452\linewidth}
 				\centering
 				\vskip 0pt
 				\includegraphics[width=\linewidth]{polbooks-null-1}
 			\end{subfigure}
-			\begin{subfigure}[t]{0.45\linewidth}
-				\centering
-				\vskip 0pt
-				\includegraphics[width=\linewidth]{polbooks-accuracy-1}
-			\end{subfigure}
 		\end{figure}
 		\begin{table}
 			\centering
-			\caption{Cross-entropy between graph and feature-based block predictions averaged over 10 experiment iterations (mean $\pm$ std dev)}
+			\caption{\tiny Cross-entropy between graph and feature-based block predictions averaged over 10 experiments (mean $\pm$ std dev)}
 			\begin{tabular}{cc|cc}
 				$B$ & $D$ & Training $\bar{\Lcal}_0$ & Test $\bar{\Lcal}_1$ \\ \hline
 				3 & 3 & $0.563 \pm 0.042$ & $0.595 \pm 0.089$
@@ -421,6 +390,40 @@
 		$$\Dcal' \coloneqq \left\{ d \in [D] : \exists i \in [B] \textrm{ s.t. } h_{id} = H_1\right\}$$
 		Instead it is often more practical to fix $|\Dcal'| = D'$ and $k=k_0$, then find the maximal cut-off:
 		$$c^* = \argmax_{c>0}\{c: |\Dcal'|=D', k=k_0\}$$
+	\end{frame}
+
+	\begin{frame}{The datasets}
+		\begin{figure}[!h]
+			\centering
+			\begin{subfigure}[t]{0.3\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{polbooks-graph.png}
+				\caption{Polbooks $D=3$}
+				\label{fig:polbooks-graph}
+			\end{subfigure}
+			\hfill
+			\begin{subfigure}[t]{0.3\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{school-graph.png}
+				\caption{School $D=13$}
+				\label{fig:school-graph}
+			\end{subfigure}
+			\hfill
+			\begin{subfigure}[t]{0.3\linewidth}
+				\centering
+				\includegraphics[width=\linewidth]{fb-graph.png}
+				\caption{FB egonet $d=480$}
+				\label{fig:fb-graph}
+			\end{subfigure}
+			\begin{subfigure}[t]{0.4\linewidth}
+				\centering
+				\includegraphics[width=0.8\linewidth]{10-horizontal-legend.png}
+				\caption{Legend}
+				\label{fig:10-legend}
+			\end{subfigure}
+			\caption{Networks laid out and coloured according to inferred block memberships $\hat{y}$ for a given experiment iteration. Visualisation performed using \textit{graph-tool} \cite{peixoto_graph-tool_2014}.}
+			\label{fig:graphs-all}
+		\end{figure}
 	\end{frame}
 
 	\begin{frame}{Primary school dynamic contacts \cite{schools}}
