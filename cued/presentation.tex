@@ -104,7 +104,7 @@
 		\end{block}
 	\end{frame}
 
-\section{Preliminaries}
+\section{The stochastic block model}
 	
 	\begin{frame}{The stochastic block model (SBM)}
 		We adopt the degree-corrected (DC) microcanonical (MC) formulation \cite{Peixoto-Bayesian-Microcanonical}.				
@@ -175,10 +175,10 @@
 			\end{block}
 		
 			\column{0.4\textwidth}
-			\begin{block}{Priors}
+			\begin{alertblock}{Priors}
 				$$p(\theta) = \Gaussian(\theta;0, \sigma_\theta^2 I)\vspace{4mm}$$
 				$$p(\psi | b) = p(\psi_e | b) p(\psi_k | \psi_e, b)$$
-			\end{block}
+			\end{alertblock}
 		\end{columns}
 	
 		\vspace{5mm}
@@ -247,7 +247,7 @@
 			\begin{subfigure}[t]{0.3\linewidth}
 				\centering
 				\includegraphics[width=\linewidth]{school-graph.png}
-				\caption{school $D=13$}
+				\caption{School $D=13$}
 				\label{fig:school-graph}
 			\end{subfigure}
 			\hfill
@@ -284,8 +284,9 @@
 		\end{figure}
 		\begin{table}
 			\centering
+			\caption{Cross-entropy between graph and feature-based block predictions averaged over 10 experiment iterations (mean $\pm$ std dev)}
 			\begin{tabular}{cc|cc}
-				$B$ & $D$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ \\ \hline
+				$B$ & $D$ & Training $\bar{\Lcal}_0$ & Test $\bar{\Lcal}_1$ \\ \hline
 				3 & 3 & $0.563 \pm 0.042$ & $0.595 \pm 0.089$
 			\end{tabular}
 		\end{table}
@@ -294,16 +295,18 @@
 \section{Conclusion}
 
 	\begin{frame}{Conclusion}
-		What have we achieved:
-		\begin{itemize}
-			\item Flip thinking of how we test for a feature's impact on graphical structure
-			\item Developed efficient inference algorithm
-		\end{itemize}
-		What is yet to come:
-		\begin{itemize}
-			\item FFBM can only explain macro-structure $\Rightarrow$ extend to hierarchical structure
-		\end{itemize}
-		If I could start again
+		\begin{block}{Achievements:}
+			\begin{itemize}
+				\item Flip thinking of how we test for a feature's impact on graphical structure
+				\item Developed efficient inference algorithm
+			\end{itemize}
+		\end{block}
+		
+		\begin{alertblock}{The future:}
+			\begin{itemize}
+				\item FFBM can only explain macro-structure $\Rightarrow$ extend to hierarchical structure
+			\end{itemize}
+		\end{alertblock}		
 	\end{frame}
 
 	
