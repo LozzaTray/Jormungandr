@@ -1,0 +1,291 @@
+\section{Experimental results}
+\label{sec:experiments}
+
+We apply the developed methods to a variety of datasets. These are chosen to span a range of node counts $N$, edge counts $E$ and feature space dimension $D$. We consider the following:
+
+\begin{itemize}
+	\item \textbf{Political books} \cite{polbooks} ($N=105, E=441, D=3$) -- network of Amazon book sales about U.S. politics, published close to the presidential election in 2004. Two books are connected if they were frequently co-purchased by customers. Vertex features encode the political affiliation of the author (liberal, conservative, or neutral).
+		
+	\item \textbf{Primary school dynamic contacts} \cite{schools} ($N=238, E=5539, D=13$) -- network of face-to-face contacts amongst students and teachers at a primary school in Lyon, France. Two nodes are connected if the two parties shared a face-to-face interaction over the school-day. Vertex features include class membership (one of 10 values: 1A-5B), gender (male, female) and teacher status encoded as an 11th school-class. No further identifiable information is retained. We choose to analyse just the second day of results.
+	
+	\item \textbf{Facebook egonet} \cite{fb-snap} ($N=747, E=30025, D=480$) -- an assortment of Facebook users' friends lists. Vertex features are extracted from each user's profile and are fully anonymised. They include information about education history, languages spoken, gender, home-town, birthday etc. We focus on the egonet with id 1912.
+
+\end{itemize}
+
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}[t]{0.28\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{polbooks-graph.png}
+		\caption{Polbooks}
+		\label{fig:polbooks-graph}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.28\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{school-graph.png}
+		\caption{School}
+		\label{fig:school-graph}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[t]{0.28\linewidth}
+		\centering
+		\includegraphics[width=\linewidth]{fb-graph.png}
+		\caption{Facebook egonet}
+		\label{fig:fb-graph}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.11\linewidth}
+		\centering
+		\includegraphics[width=0.8\linewidth]{10-vertical-legend.png}
+		\caption{Legend}
+		\label{fig:10-legend}
+	\end{subfigure}
+	\caption{Networks laid out and coloured according to inferred block memberships $\hat{y}$ for a given experiment iteration. Visualisation performed using \textit{graph-tool} \cite{peixoto_graph-tool_2014}.}
+	\label{fig:graphs-all}
+\end{figure}
+\begin{table}[!h]
+	\centering
+	\caption{Experimental results averaged over $n=10$ iterations (mean $\pm$ standard deviation).}
+	\label{tab:results}
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{c|ccc|c|cc|ccc}
+			Dataset  & $B$ & $D$ & $D'$ & $\bar{S}_e$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $c^*$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$  \\ \hline
+			Polbooks & 3 & 3 & -- & $2.250 \pm 0.000$ & $0.563 \pm 0.042$ & $0.595 \pm 0.089$ & -- & -- & -- \\
+			School & 10 & 13 & 10 & $1.894 \pm 0.004$ & $0.787 \pm 0.127$ & $0.885 \pm 0.129$ & $1.198 \pm 0.249$ & $0.793 \pm 0.132$ & $0.853 \pm 0.132$ \\
+			FB egonet & 10  & 480 & 10 & $1.626 \pm 0.003$ & $1.326 \pm 0.043$ & $1.538 \pm 0.069$ & $0.94 \pm 0.019$ & $1.580 \pm 0.150$ & $1.605 \pm 0.106$
+		\end{tabular}
+	}
+\end{table}
+%
+We require metrics to assess performance. This can be split into two separate 
+components: the microcanonical SBM fit (concerned with the $b$-samples) and 
+the fit of the feature-to-block generator (concerned with the $\theta$-samples). 
+
+Starting with the SBM, recall that the quantity $S(b)$ in~(\ref{eqn:dl-form}) 
+can be interpreted as an ideal ``description length'' of the partition 
+imposed by $b$. We define a simple
+metric $\bar{S}_e$ to gauge the fit of the SBM,
+as the description length per entity 
+(i.e., divided by the total number $N+E$ of 
+nodes plus edges),
+averaged over the $b$-samples:
+%
+\begin{equation}
+	\bar{S}_e \coloneqq \frac{1}{(N+E) |\Tcal_b|} \sum_{t\in \Tcal_b} S \left( b^{(t)} \right).
+	\label{eqn:mean-dl}
+\end{equation}
+%
+
+Next, to assess the performance of the feature-to-block predictor, 
+we partition the vertex set $[N]$ into training and test sets. We choose to 
+randomly partition the vertices on each experiment run,
+so that a constant fraction $f$ of the available vertices go to form 
+the training set $\Gcal_0$ and the remainder are held out to form the
+test set $\Gcal_1$.
+The $b$-chain is run using the whole network but we only use vertices $v \in \Gcal_0$ to train the $\theta$-chain. Because $|\Gcal_0| \neq |\Gcal_1|$ in general, we cannot use the un-normalised log-target $U$ from~(\ref{eqn:U-form}) for comparison,
+as the total cross-entropy loss scales with the size of each data set but 
+the prior term stays constant. We therefore use the average cross-entropy loss 
+over each set,
+%
+\begin{equation}
+	\bar{\Lcal}_\star \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \Lcal_\star \left( \theta^{(t)} \right),
+	\quad \textrm{where} \quad
+	\Lcal_\star \left( \theta^{(t)} \right) \coloneqq \frac{1}{|\Gcal_\star|} \sum_{i \in \Gcal_\star}\sum_{j \in [B]} \hat{y}_{ij} \log \frac{1}{\phi_j \left(x_i; \theta^{(t)} \right)},
+	\label{eqn:cross-entropy-loss}
+\end{equation}
+%
+where $\star \in \{0, 1\}$ indicates whether the training or test
+set is being considered.
+
+Table~\ref{tab:results} summarises the results for each experiment;
+a complete list of all the hyperparameters used 
+is given in Appendix \ref{appdx:hyperparams}. We also apply the 
+dimensionality reduction method 
+of Section~\ref{sec:dim-reduction}
+to the two higher dimensional datasets (the school and FB egonet). 
+For this we use equation~(\ref{eqn:c-star}) with $k=1$,
+in order to reduce the dimension from 
+$D$ to a desired $D'$. 
+We then retrain the feature-block predictor using only the retained 
+feature set $\Dcal'$, and report the log-loss over the training and 
+test sets for the reduced classifier -- 
+denoted $\bar{\Lcal}_0'$ and $\bar{\Lcal}_1'$ respectively. 
+These values are also given in Table~\ref{tab:results}.
+
+Based on these results, some remarks are in order.
+Firstly, the variance of the test loss $\bar{\Lcal}_1$ tends to be higher 
+than the training loss $\bar{\Lcal}_0$. This is expected,
+as the test set is smaller than the training set and hence 
+more susceptible to variability in its construction. Indeed, 
+most of the variance in the evaluation of $\bar{\Lcal}_0$ and $\bar{\Lcal}_1$ 
+comes from the random partitioning of the graph into training and test sets. 
+Secondly, it can be seen that the dimensionality reduction procedure 
+brings the training and test losses closer together. This implies that 
+the features we keep are indeed correlated with the underlying graphical 
+partition and that the approach generalises correctly.
+
+The average description length per entity,
+$\bar{S}_e$, of the graph, 
+has very small variance, suggesting that
+the detected communities can be found reliably (to within an arbitrary 
+relabelling of blocks). For reference, we plot an inferred partition for each 
+of the graphs in Figure~\ref{fig:graphs-all}. The polbooks graph yields the cleanest separation between blocks but nonetheless the inferred partitions for the other datasets do succeed at dividing the graph into densely connected clusters.
+
+Nevertheless, the cross-entropy loss over the whole training set may be too coarse a measure of model fit. It is often the case that we have good feature-based explanations for some but not all of the detected blocks. We wish to define a new measure of fit specific to each detected block. This requires defining the set of all vertices associated with block $j$, as,
+%
+\begin{equation}
+	\Bcal_\star(j) \coloneqq \{i \in \Gcal_\star : \hat{b}_i = j\} \quad \textrm{where} 
+	\quad \hat{b}_i \coloneqq \argmax_j \hat{y}_{ij}.
+\end{equation}
+%
+Recall that $\hat{y}_{ij}$ is our estimate for the block membership posterior~(\ref{eqn:y-hat}) using only information from the adjacency matrix $A$. Again, $\star \in \{0, 1\}$ toggles between training and test sets. Now $\Bcal_\star(j)$ is the set of all vertices within the training or test set that have maximum a posteriori probability of belonging to set $j$. We choose to resolve ties consistently by picking the lower index. We now define the accuracy for block $j$ as,
+%
+\begin{equation}
+	\eta_\star(j) \coloneqq \frac{1}{|\Bcal_\star (j)| \cdot 
+	|\Tcal_\theta| } 
+	\sum_{i \in \Bcal_\star (j)}  \sum_{t \in \Tcal_\theta}
+	\one \left\{\hat{b}_i = \argmax_j \phi_j \left( x_i; \theta^{(t)} \right) \right\}.
+	\label{eqn:accuracy}
+\end{equation}
+%
+This is effectively testing whether the feature-to-block predictions and the graph-based predictions agree in their largest component. We call this metric, $\eta_\star(j)$, the {\em block-accuracy} for block $j$. It is clearly bounded $0 \leq \eta_\star(j) \leq 1$, with an accuracy of 1 meaning perfect agreement for the vertices in detected block $j$.
+
+For each of the experiments, we plot the collected $\theta$-samples for the features that survive the dimensionality reduction procedure. We also plot the per-block accuracy for the original-dimension classifiers. We discuss the results specific to each dataset in turn.
+
+\subsection{Political books}
+
+The goal here is to 
+determine whether the authors' political affiliations are a good predictor 
+of the overall network structure. We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral).
+%
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}[t]{0.452\linewidth}
+		\centering
+		\vskip 0pt
+		\includegraphics[width=\linewidth]{polbooks-null-1}
+		\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
+		\label{fig:polbooks-null}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\vskip 0pt
+		\includegraphics[width=\linewidth]{polbooks-accuracy-1}
+		\caption{Per-block accuracy $\eta(j)$.}
+		\label{fig:polbooks-accuracy}
+	\end{subfigure}
+	\caption{Political books dataset.}
+	\label{fig:polbooks}
+\end{figure}
+
+From Figure~\ref{fig:polbooks-null} we see that all 3 blocks have a distinct political affiliation as their largest positive component. 
+This strongly indicates that political affiliation is indeed the axis 
+which best predicts the 3-way natural partition of the graph into blocks. 
+Furthermore, in Table~\ref{tab:results} we see that the training and test losses 
+are very similar and both are low in magnitude. This provides further evidence 
+to the claim that political affiliation is a very appropriate explanatory 
+variable for the overall network structure.
+
+However, from Figure~\ref{fig:polbooks-accuracy} we see that block 1 has low accuracy. 
+This suggests that detected block 1 is not solely composed of ``neutral" books but also 
+contains some ``liberal" and ``conservative" authors. Indeed, by examining 
+Figure~\ref{fig:polbooks-graph} we see that block 1 is effectively a buffer between 
+blocks 2 and 3; there are very few edges between blocks 2 and 3. It is therefore not 
+surprising that some books from either side leak into block 1.
+Perhaps, the three distinct categories (``conservative", ``liberal", ``neutral") are 
+too coarse a measure of political affiliation; it may be the case that the nominally 
+``conservative" books found in block 1 are in fact more centre-right. 
+In the absence of more granular labels, we cannot test this hypothesis. 
+Nevertheless, political affiliation encoded as 3 distinct labels 
+remains a fantastic predictor of network structure.
+
+\subsection{Primary school dynamic contacts}
+
+We choose the number of communities $B=10$, in line with the total number of 
+school classes. As before, we sample the block-generator parameters $\theta$ and 
+employ the dimensionality reduction technique 
+of Section~\ref{sec:dim-reduction},
+with standard deviation multiplier $k=1$ to pick out the top $D'=10$ features. 
+We then plot the weights for the resulting features $d \in \Dcal'$ 
+in Figure~\ref{fig:school-null}. It is rather obvious
+that only the pupils' class memberships (1A-5B) have remained
+significant;
+gender and teacher/student status have been discarded,
+meaning that these are not good predictors of overall macro-structure.
+%
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\imagebox{6.2cm}{\includegraphics[width=\linewidth]{school-null-1}}
+		\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
+		\label{fig:school-null}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\imagebox{6.2cm}{\includegraphics[width=\linewidth]{school-accuracy-1}}
+		\caption{Per-block accuracy $\eta(j)$.}
+		\label{fig:school-accuracy}
+	\end{subfigure}
+	\caption{Primary school dynamic contacts dataset.}
+	\label{fig:school}
+\end{figure}
+
+The vast majority of blocks are composed of a single class. 
+However, some blocks have two comparably strong classes as their predictors. 
+For example, blocks 2 and 5 both contain classes 3A and 3B as their 2 best predictors. 
+This suggests that the social divide between classes is less pronounced 
+for pupils in year 3. Conversely, some classes are found to extend over two 
+detected blocks (class 2B spans blocks 8 and 9) but we do 
+not have a feature which explains the division. The most surprising block 
+is number 7, which has comparable weightings for classes 5A and 1B. 
+Perhaps there was a joint event between those two classes on the day 
+the data were collected.
+
+Figure~\ref{fig:school-accuracy} shows excellent accuracy for the majority of blocks. In fact the only blocks with low accuracy are those that have a school-class span two blocks such that we cannot reliably distinguish between the two. This is much more pronounced when we apply hard classification rather than the soft cross-entropy loss. Indeed block 1 has low accuracy because class 1A has a higher weight component for block 3 than it does for block 1. As we use hard classification to compute accuracy, vertices belonging to class 1A are predicted to belong to block 3. A similar effect is seen in block 5 which often loses out to block 2. The same can be said of blocks 8 and 9. However, in this case the weights for class 2B are very similar -- thus explaining the roughly evenly split accuracy for blocks 8 and 9.
+
+\subsection{Facebook egonet}
+
+We choose $B=10$ and $D'=10$ for this experiment. The selected features 
+(Figure~\ref{fig:fb-null}) are those that best explain the high-level 
+community structure. The majority of them are education related. 
+Nevertheless, for $D'=10$ we only have good explanations for the makeup 
+of some of the detected blocks; several blocks in 
+Figure~\ref{fig:fb-null} do not have high-magnitude components for $D'=10$. This is further emphasised by the disparate accuracies in Figure~\ref{fig:fb-accuracy}. Nevertheless, observe that the accuracy is only high for blocks that contain high magnitude weights. The only exception to this rule is block 9 which nonetheless may have high magnitude weights just below the cut-off $c^*$.
+%
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\imagebox{7cm}{\includegraphics[width=\linewidth]{fb-null-1}}
+		\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
+		\label{fig:fb-null}
+	\end{subfigure}
+	\begin{subfigure}[t]{0.45\linewidth}
+		\centering
+		\imagebox{7cm}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
+		\caption{Per-block accuracy $\eta(j)$.}
+		\label{fig:fb-accuracy}
+	\end{subfigure}
+	\caption{Facebook egonet dataset.}
+	\label{fig:fb}
+\end{figure}
+
+When the feature dimension is very large, it becomes increasingly likely that 
+a particular feature may uniquely identify a small set of nodes. If these nodes 
+are all part of the same community, then the classifier may overfit for that 
+particular parameter. The regularisation term imposed by the prior goes some 
+way towards alleviating this problem. Nevertheless, we see in 
+Figure~\ref{fig:fb-null} that the feature \verb*|birthday-5| has a very 
+high weight as it relates to block 1 -- but it is highly unlikely
+that birthdays determine graphical structure. This issue could have been alleviated by 
+choosing $\Xcal=\{-1, +1\}$ such that having a feature turned off supports excluding 
+a vertex from the block. However, Figure~\ref{fig:fb-null} demonstrates why we made 
+the deliberate choice $\Xcal=\{0,1\}$, as argued in Appendix \ref{appdx:dimension}. 
+Because of the choice $\Xcal=\{0,1\}$, block 1 is allowed to contain 3 distinct feature 
+categories rather than just one. We accept this trade-off: risking spurious high magnitude 
+components (e.g. \verb*|birthday-5|) for the benefit of allowing a top-level block to span 
+multiple feature-groups. Nevertheless, one would have to apply a hierarchical approach 
+to subdivide each top-level block into sub-blocks to test whether the constituent 
+feature-groups determine structure at the lower-level.
+

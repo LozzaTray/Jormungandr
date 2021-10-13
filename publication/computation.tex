@@ -1,0 +1,159 @@
+\section{Implementation details}
+
+\subsection{Algorithms}
+\label{appdx:algorithms}
+
+\begin{algorithm} % enter the algorithm environment
+	\caption{Block membership sample generation} % give the algorithm a caption
+	\label{alg:b-samples} % and a label for \ref{} commands later in the document
+	\begin{algorithmic} % enter the algorithmic environment
+		\Procedure{SampleBlockMemberships}{$A, T_b$}
+		\State $b^{(0)} \gets \argmin_b S(b|A)$ \Comment{Implemented as greedy heuristic in \textit{graph-tool} library}
+		\For{$t \in \{0, 1 \dots T_b - 1\}$}
+		\State $b' \gets \sim q_b(b^{(t)}, b' | A)$
+		\State $\log \alpha_b \gets \log \alpha_b(b^{(t)}, b' | A)$
+		\State $\eta \gets \sim \textrm{Unif}(0,1)$
+		\If{$\log \eta < \log \alpha_b$}
+		\State $b^{(t+1)} \gets b'$
+		\Else
+		\State $b^{(t+1)} \gets b^{(t)}$
+		\EndIf
+		\EndFor
+		
+		\State \textbf{return} $\{b^{(t)}\}_{t=1}^{T_b}$
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm} % enter the algorithm environment
+	\caption{FFBM parameter pseudo-marginal inference} % give the algorithm a caption
+	\label{alg:theta-samples} % and a label for \ref{} commands later in the document
+	\begin{algorithmic} % enter the algorithmic environment
+		\Procedure{SampleFeatureWeights}{$X, \{b^{(t)}\}, \Tcal_b, \sigma_\theta, s$}
+		
+		\State $N \gets X.\textrm{shape}[0]$
+		\State $\hat{Y}_{ij} \gets \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} \one \{ b^{(t)}_i = j\} \quad \forall i,j$
+		\State $\theta^{(0)} \gets \sim \Gaussian(0, \sigma_\theta^2 I)$
+		
+		\item[]
+		
+		\For{$t \in \{0, 1 \dots T_\theta - 1\}$}
+		\State $\xi \gets \sim \Gaussian(0, I)$
+		\State $h_t \gets \frac{s}{N} \cdot 250(1000 + t)^{-0.8}$
+		\State $g_t \gets \nabla U(\theta^{(t)}| X, \hat{Y})$
+		\item[]
+		\State $\theta' \gets \theta^{(t)} - h_t \cdot g_t + \sqrt{2h_t} \cdot \xi$
+		\State $\log \alpha_\theta \gets \log \alpha_\theta(\theta^{(t)}, \theta' | A, \hat{Y})$
+		\State $\eta \gets \sim \textrm{Unif}(0,1)$
+		\If{$\log \eta < \log \alpha_\theta$}
+		\State $\theta^{(t+1)} \gets \theta'$
+		\Else
+		\State $\theta^{(t+1)} \gets \theta^{(t)}$
+		\EndIf
+		\EndFor
+		
+		\State \textbf{return} $\{\theta^{(t)}\}_{t=1}^{T_\theta}$
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm} % enter the algorithm environment
+	\caption{Dimensionality reduction} % give the algorithm a caption
+	\label{alg:retained-set} % and a label for \ref{} commands later in the document
+	\begin{algorithmic} % enter the algorithmic environment
+		\Procedure{ReduceDimension}{$\{W^{(t)}\}, \Tcal_\theta, k, D'$}
+		
+		\State $(B, D) \gets W^{(0)}$.shape
+		\State $\hat{\mu}_{ij} \gets \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} W_{ij}^{(t)} \quad \forall i \in [B], j \in [D]$
+		\State $\hat{\sigma}_{ij}^2 \gets \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \left( W_{ij}^{(t)} - \hat{\mu}_{ij} \right)^2 \quad \forall i \in [B], j \in [D]$
+		
+		\item[]
+		
+		\For{$d \in [D]$}
+			\For{$i \in [B]$}
+				\State $l_i \gets \hat{\mu}_{id} - k \cdot \hat{\sigma}_{id}$
+				\State $u_i \gets \hat{\mu}_{id} + k \cdot \hat{\sigma}_{id}$
+				\If{$l_i \leq 0$ and $u_i \geq 0$}
+					\State $l_i, u_i \gets 0$
+				\EndIf
+			\EndFor
+			\State $c_d \gets \max_i \min\left(|l_i|, |u_i| \right)$
+		\EndFor
+		
+		\item[]
+		
+		\State indexArray $\gets$ indexSort($c$, descending=True)[$0:D'$]
+		\State $d^* \gets$ indexArray[-1]
+		\State $\Dcal' \gets $ Set(indexArray)
+		\State $c^* \gets c_{d^*}$
+		\State \textbf{return} $\Dcal', c^*$
+		\EndProcedure
+	\end{algorithmic}
+\end{algorithm}
+
+\FloatBarrier
+\subsection{Hyperparameter values}
+\label{appdx:hyperparams}
+
+\begin{table}[!h]
+	\centering
+	\caption{Hyper-parameter values for each experiment}
+	\label{tab:hyperparams}
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{c|ccc|ccc|cccc|cc|cccc}
+			Dataset & 
+			$B$ & $f$ & $\sigma_\theta$ & 
+			$T_b$ & $\kappa_b$ & $\lambda_b$ & 
+			$T_\theta$ & $\kappa_\theta$ & $\lambda_\theta$ & $s$ &
+			$k$ & $D'$ &
+			$T_\theta'$ & $\kappa_\theta'$ & $\lambda_\theta'$ & $s'$
+			\\ \hline
+			Polbooks &
+			3 & 0.7 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.4 & 10 & 0.05 &
+			-- & -- & 
+			-- & -- & -- & -- \\
+			School &
+			10 & 0.7 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.4 & 10 & 0.2 &
+			1 & 10 & 
+			10,000 & 0.4 & 10 & 0.2 \\
+			FB Egonet &
+			10 & 0.7 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.4 & 10 & 0.017 &
+			1 & 10 & 
+			10,000 & 0.4 & 10 & 0.5 \\
+		\end{tabular}
+	}
+\end{table}
+
+\subsection{Hardware specification}
+\label{appdx:imp-details}
+
+All data analysis and visualisation was implemented in Python. Full source code is available at:
+\url{https://github.com/LozzaTray/Jormungandr-code}. A logbook was generated from the git commit history using the tool \href{https://github.com/Hugoagogo/pyGitBook}{pyGitBook} and is available as a separate file.
+The scripts were run using a standard PC using the Windows Subsystem for Linux (WSL) environment. Specs are:
+
+\begin{itemize}
+	\item \textbf{CPU}: Intel(R) Core(TM) i7-1065G7
+	\item \textbf{RAM}: 8GB
+	\item \textbf{GPU}: Intel(R) Iris(R) Plus Graphics
+\end{itemize}
+
+On this hardware each experiment iteration took the following amount of time to execute:
+
+\begin{table}[!h]
+	\centering
+	\caption{Compute-time for each experiment}
+	\label{tab:compute-time}
+	\begin{tabular}{c|ccc|c}
+		Dataset & $b$-chain & $\theta$-chain & Reduced $\theta$-chain & Overall compute time \\ \hline
+		Polbooks & $\sim$1s & $\sim$10s & -- & $\sim$11s \\
+		School & $\sim$1s & $\sim$7s & $\sim$7s & $\sim$15s \\
+		FB Egonet & $\sim$2s & $\sim$50s & $\sim$8s & $\sim$60s
+	\end{tabular}
+\end{table}
+
