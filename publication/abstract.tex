@@ -1,6 +1,5 @@
 \begin{abstract}
-Labelled networks form a very common and important class of data,
-naturally appearing in numerous applications in science and engineering.
+Labelled networks are a very common and important class of data.
 A typical inference goal is to determine how the vertex labels
 (or {\em features}) affect the network's structure.
 
@@ -12,27 +11,17 @@ feature-based communities. Nevertheless, the resulting communities
 often do not produce a natural partition of the graph.
 
 In this work, we introduce a new generative model, the feature-first block model (FFBM),
-which is more effective at describing vertex-labelled undirected
-graphs and also facilitates the use of richer queries on labelled networks.
+which facilitates the use of richer queries on labelled network structure.
 We develop a Bayesian framework for inference with this model,
 and we present a method to efficiently sample from the posterior
-distribution of the FFBM parameters. The FFBM's structure is kept
-deliberately simple to retain easy interpretability of the parameter
-values.
+distribution of the FFBM parameters.
 
 We apply the proposed methods to a variety of network data
 to extract the most important features along which the vertices
 are partitioned. The main advantages of the proposed approach are
 that the whole feature-space is used automatically and that features
-can be rank-ordered implicitly according to impact. Any features
-that do not significantly impact the high-level structure can be
-discarded to reduce the problem dimension. In cases where the vertex
-features available do not readily explain the community structure
-in the resulting network, the approach detects this and is protected
-against over-fitting.
+can be rank-ordered implicitly according to impact.
 
-Future work on this topic could benefit from extending the FFBM to be hierarchical in nature. 
-Such a modification would be relatively natural and would increase the descriptive power of the model. 
-The current FFBM formulation is limited in that it can only explain structure at the macro-scale. 
-Nevertheless, a hierarchical formulation would allow explanations of structure at any arbitrary length-scale.
+\keywords{Stochastic Block Models \and Bayesian Inference.}
+
 \end{abstract}

@@ -1,4 +1,4 @@
-\documentclass{llncs}
+\documentclass[runningheads]{llncs}
 
 \usepackage[numbers, compress]{natbib}
 \usepackage[utf8]{inputenc} % allow utf-8 input
@@ -23,19 +23,13 @@
 \usepackage{float}
 \usepackage{placeins}
 \usepackage{enumitem}
-\usepackage[margin=1in]{geometry}
-\usepackage{pdfpages}
-\usepackage{setspace}
-\onehalfspacing
-\setlength\parskip{0.8em plus 0.1em minus 0.1em}
-\setlength\parindent{0pt}
 
 %images
 \graphicspath{{./img/}}
 
 
 %bibliography
-\bibliographystyle{plainnat}
+\bibliographystyle{splncs04}
 
 
 \title{Inferring community characteristics in labelled networks}
@@ -43,8 +37,8 @@
 \author{Lawrence Tray \inst{1} \and
 	Ioannis Kontoyiannis \inst{2}}
 
-\institute{Department of Engineering, University of Cambridge \and 
-Statistical Laboratory, DPMMS, University of Cambridge}
+\institute{Department of Engineering, University of Cambridge, \email{lpt30@cantab.ac.uk} \and 
+Statistical Laboratory, DPMMS, University of Cambridge, \email{ik355@cam.ac.uk}}
 
 %custom commands
 \newcommand{\Xcal}{\mathcal{X}}
@@ -81,21 +75,11 @@ Statistical Laboratory, DPMMS, University of Cambridge}
 	\input{extensions}
 	\input{conclusion}
 	
-	\clearpage
-	
-	%references
-	\bibliography{sources.bib}
-	
-	\clearpage
 	\appendix
-	
-	\section*{Appendices}
 	\input{additional}
-	\clearpage
-	
 	\input{derivations}
-	\clearpage
-	
 	\input{computation}
 	
+	\bibliography{sources.bib}
+		
 \end{document}
