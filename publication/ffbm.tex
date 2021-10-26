@@ -26,7 +26,6 @@ the distribution of $b$ given $X$ and $\theta$ is,
 %
 Note that $\phi_{b_i}$ has the form of a softmax activation function;
 we deliberately exclude a bias term to ensure that we only leverage feature information.
-This decision is justified in greater detail in Appendix~\ref{appdx:dimension}.
 We will later also find it convenient
 to write the parameters $\theta$ as a $B \times D$ matrix of weights $W$.
 
@@ -102,7 +101,6 @@ In our case, conditioning on $X$ is also necessary, leading to,
 \end{equation}
 %
 where we used the fact $\psi$ and $X$ are conditionally 
-independent given $b$.  The exact form of the prior
-$p(\psi|b)$ is described in Appendix \ref{appdx:sbm-prior}.
+independent given $b$.
 All that concerns the main argument is that it has
 an easily computable form.

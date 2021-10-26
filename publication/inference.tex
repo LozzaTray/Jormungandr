@@ -24,7 +24,7 @@ sample $\theta^{(t)}$:
 %
 Both of these sampling steps can be implemented through a
 Markov chain Monte-Carlo approach via a Metropolis-Hastings 
-algorithm \cite{hastings-alg}, as a two-level Markov chain. See Appendix \ref{appdx:metropolis-hastings} for more details on the Metropolis-Hastings algorithm.
+algorithm \cite{hastings-alg}, as a two-level Markov chain.
  
 As we show in the following section, the resulting samples 
 for $\theta^{(t)}$ are unbiased in the sense that the expectation of 
@@ -45,7 +45,7 @@ is sufficient to prove that, for large enough $t$, $\theta^{(t)} \sim \Expect_{b
 	\centering
 
 	\begin{tikzpicture}[
-		scale=0.95, every node/.style={transform shape},
+		scale=0.8, every node/.style={transform shape},
 		roundnode/.style={circle, draw=black, minimum size=12mm},
 		squarednode/.style={rectangle, draw=black, minimum size=12mm}
 		]
@@ -169,7 +169,7 @@ a new sample $\theta'$ as,
 \end{equation*}
 %
 where $\xi \sim \Gaussian(0, I)$ and $h$ is a step-size parameter 
-which may vary with the sample index (see Appendix \ref{appdx:step-size} for a discussion of step-size variation).
+which may vary with the sample index.
 This leads to the proposal distribution,
 \begin{equation*}
 	q_\theta(\theta, \theta') \sim \Gaussian \left( \theta' ; \theta - h \nabla U(\theta), 2h I \right).
@@ -198,9 +198,7 @@ Up to this point, each $\theta^{(t)}$ update uses its corresponding $b^{(t)}$ sa
 \end{equation}
 %
 We can obtain an unbiased estimate for this quantity using 
-the thinned $b$-samples after burn-in; the length of the
-burn-in and the details of the thinning are described
-in Appendix \ref{appdx:burn-in-thinning}.
+the thinned $b$-samples after burn-in.
 Let $\Tcal_b$  denote the retained set of indices 
 for the $b$-samples and $\Tcal_\theta$ similarly for the $\theta$-chain. 
 The unbiased estimate for $y_{ij}^{(t)}$ using the 
@@ -219,8 +217,7 @@ to generate $\hat{y}$. This affords us the flexibility to vary the
 lengths of the $b$ and $\theta$-chains. Furthermore, the changeover 
 from $y^{(t)}$ to $\hat{y}$ reduces the burn-in time for 
 the $\theta$-chain by reducing the variance in the evaluation 
-of $U$ and $\nabla U$. A detailed description of the overall 
-algorithms is given in Appendix \ref{appdx:algorithms}.
+of $U$ and $\nabla U$.
 
 \subsection{Dimensionality reduction}
 \label{sec:dim-reduction}
@@ -254,7 +251,7 @@ then $\Dcal'$ comprises all features $j$ for which $H_1$ is accepted at least on
 	\label{eqn:hyp-test-discard}
 \end{equation}
 %
-The multiplier $k$ in~(\ref{eqn:fij}) determines the degree of significance of the result. However, as the Laplace approximation is not exact, we only treat this dimensionality reduction method as a useful heuristic and not an exact method. Appendix~\ref{appdx:hyp-test} explores this subject at greater depth.
+The multiplier $k$ in~(\ref{eqn:fij}) determines the degree of significance of the result. However, as the Laplace approximation is not exact, we only treat this dimensionality reduction method as a useful heuristic and not an exact method.
 
 Conversely, we could fix $k=k_0$ and the dimension of our reduced feature set $|\Dcal'|=D'$. We would then like to find the largest value of $c$ such that $|\Dcal'|=D'$ given $k=k_0$. This is summarised in equation \ref{eqn:c-star}.
 %
@@ -263,4 +260,4 @@ Conversely, we could fix $k=k_0$ and the dimension of our reduced feature set $|
 	\label{eqn:c-star}
 \end{equation}
 %
-For an algorithmic implementation of this method refer to appendix \ref{appdx:algorithms}. This approach has the advantage that it fixes the number of reduced dimensions.
+This approach has the advantage that it fixes the number of reduced dimensions.

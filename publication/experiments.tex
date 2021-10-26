@@ -6,7 +6,7 @@ We apply the developed methods to a variety of datasets. These are chosen to spa
 \begin{itemize}
 	\item \textbf{Political books} \cite{polbooks} ($N=105, E=441, D=3$) -- network of Amazon book sales about U.S. politics, published close to the presidential election in 2004. Two books are connected if they were frequently co-purchased by customers. Vertex features encode the political affiliation of the author (liberal, conservative, or neutral).
 		
-	\item \textbf{Primary school dynamic contacts} \cite{schools} ($N=238, E=5539, D=13$) -- network of face-to-face contacts amongst students and teachers at a primary school in Lyon, France. Two nodes are connected if the two parties shared a face-to-face interaction over the school-day. Vertex features include class membership (one of 10 values: 1A-5B), gender (male, female) and teacher status encoded as an 11th school-class. No further identifiable information is retained. We choose to analyse just the second day of results.
+	\item \textbf{Primary school dynamic contacts} \cite{schools} ($N=238, E=5539, D=13$) -- network of face-to-face contacts amongst students and teachers at a primary school in Lyon, France. Two nodes are connected if the two parties shared a face-to-face interaction over the school-day. Vertex features include class membership (one of 10 values: 1A-5B), gender (male, female) and teacher status encoded as an 11th school-class. We choose to analyse just the second day of results.
 	
 	\item \textbf{Facebook egonet} \cite{fb-snap} ($N=747, E=30025, D=480$) -- an assortment of Facebook users' friends lists. Vertex features are extracted from each user's profile and are fully anonymised. They include information about education history, languages spoken, gender, home-town, birthday etc. We focus on the egonet with id 1912.
 
@@ -37,7 +37,7 @@ We apply the developed methods to a variety of datasets. These are chosen to spa
 	\begin{subfigure}[t]{0.11\linewidth}
 		\centering
 		\includegraphics[width=0.8\linewidth]{10-vertical-legend.png}
-		\caption{Legend}
+		\caption{Block Legend}
 		\label{fig:10-legend}
 	\end{subfigure}
 	\caption{Networks laid out and coloured according to inferred block memberships $\hat{y}$ for a given experiment iteration. Visualisation performed using \textit{graph-tool} \cite{peixoto_graph-tool_2014}.}
@@ -45,7 +45,7 @@ We apply the developed methods to a variety of datasets. These are chosen to spa
 \end{figure}
 \begin{table}[!h]
 	\centering
-	\caption{Experimental results averaged over $n=10$ iterations (mean $\pm$ standard deviation).}
+	\caption{Experimental results averaged over $n=10$ iterations (mean $\pm$ std. dev.).}
 	\label{tab:results}
 	\resizebox{\textwidth}{!}{%
 		\begin{tabular}{c|ccc|c|cc|ccc}
@@ -97,9 +97,7 @@ over each set,
 where $\star \in \{0, 1\}$ indicates whether the training or test
 set is being considered.
 
-Table~\ref{tab:results} summarises the results for each experiment;
-a complete list of all the hyperparameters used 
-is given in Appendix \ref{appdx:hyperparams}. We also apply the 
+Table~\ref{tab:results} summarises the results for each experiment. We also apply the 
 dimensionality reduction method 
 of Section~\ref{sec:dim-reduction}
 to the two higher dimensional datasets (the school and FB egonet). 
@@ -217,13 +215,13 @@ meaning that these are not good predictors of overall macro-structure.
 	\centering
 	\begin{subfigure}[t]{0.45\linewidth}
 		\centering
-		\imagebox{6.2cm}{\includegraphics[width=\linewidth]{school-null-1}}
+		\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{school-null-1}}
 		\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
 		\label{fig:school-null}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.45\linewidth}
 		\centering
-		\imagebox{6.2cm}{\includegraphics[width=\linewidth]{school-accuracy-1}}
+		\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{school-accuracy-1}}
 		\caption{Per-block accuracy $\eta(j)$.}
 		\label{fig:school-accuracy}
 	\end{subfigure}
@@ -257,13 +255,13 @@ Figure~\ref{fig:fb-null} do not have high-magnitude components for $D'=10$. This
 	\centering
 	\begin{subfigure}[t]{0.45\linewidth}
 		\centering
-		\imagebox{7cm}{\includegraphics[width=\linewidth]{fb-null-1}}
+		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-null-1}}
 		\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
 		\label{fig:fb-null}
 	\end{subfigure}
 	\begin{subfigure}[t]{0.45\linewidth}
 		\centering
-		\imagebox{7cm}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
+		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
 		\caption{Per-block accuracy $\eta(j)$.}
 		\label{fig:fb-accuracy}
 	\end{subfigure}
@@ -281,7 +279,7 @@ high weight as it relates to block 1 -- but it is highly unlikely
 that birthdays determine graphical structure. This issue could have been alleviated by 
 choosing $\Xcal=\{-1, +1\}$ such that having a feature turned off supports excluding 
 a vertex from the block. However, Figure~\ref{fig:fb-null} demonstrates why we made 
-the deliberate choice $\Xcal=\{0,1\}$, as argued in Appendix \ref{appdx:dimension}. 
+the deliberate choice $\Xcal=\{0,1\}$. 
 Because of the choice $\Xcal=\{0,1\}$, block 1 is allowed to contain 3 distinct feature 
 categories rather than just one. We accept this trade-off: risking spurious high magnitude 
 components (e.g. \verb*|birthday-5|) for the benefit of allowing a top-level block to span 
