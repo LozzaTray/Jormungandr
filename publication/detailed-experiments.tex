@@ -1,3 +1,49 @@
+%\begin{figure}[!h]
+%	\centering
+%	\begin{subfigure}[t]{0.32\linewidth}
+%		\centering
+%		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{polbooks-null-1}}
+%		\caption{Political Books.}
+%		\label{fig:polbooks-null}
+%	\end{subfigure}
+%	\begin{subfigure}[t]{0.32\linewidth}
+%		\centering
+%		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{school-null-1}}
+%		\caption{Primary School.}
+%		\label{fig:school-null}
+%	\end{subfigure}
+%	\begin{subfigure}[t]{0.32\linewidth}
+%		\centering
+%		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-null-1}}
+%		\caption{Facebook Egonet.}
+%		\label{fig:fb-null}
+%	\end{subfigure}
+%	\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
+%\end{figure}
+%%
+%\begin{figure}[!h]
+%	\centering
+%	\begin{subfigure}[t]{0.32\linewidth}
+%		\centering
+%		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{polbooks-accuracy-1}}
+%		\caption{Political Books.}
+%		\label{fig:polbooks-null}
+%	\end{subfigure}
+%	\begin{subfigure}[t]{0.32\linewidth}
+%		\centering
+%		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{school-accuracy-1}}
+%		\caption{Primary School.}
+%		\label{fig:school-null}
+%	\end{subfigure}
+%	\begin{subfigure}[t]{0.32\linewidth}
+%		\centering
+%		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
+%		\caption{Facebook Egonet.}
+%		\label{fig:fb-null}
+%	\end{subfigure}
+%	\caption{Per-block accuracy $\eta(j)$.}
+%\end{figure}
+
 \subsection{Political books}
 
 The goal here is to 
@@ -6,7 +52,7 @@ of the overall network structure. We choose to partition the network into $B=3$ 
 %
 \begin{figure}[!h]
 	\centering
-	\begin{subfigure}[t]{0.452\linewidth}
+	\begin{subfigure}[t]{0.45\linewidth}
 		\centering
 		\vskip 0pt
 		\includegraphics[width=\linewidth]{polbooks-null-1}
@@ -24,12 +70,10 @@ of the overall network structure. We choose to partition the network into $B=3$ 
 	\label{fig:polbooks}
 \end{figure}
 
-From Figure~\ref{fig:polbooks-null} we see that all 3 blocks have a distinct political affiliation as their largest positive component. 
-This strongly indicates that political affiliation is indeed the axis 
-which best predicts the 3-way natural partition of the graph into blocks. 
+From Figure~\ref{fig:polbooks-null} we see that all 3 blocks have a distinct political affiliation as their largest positive component.  
 Furthermore, in Table~\ref{tab:results} we see that the training and test losses 
-are very similar and both are low in magnitude. This provides further evidence 
-to the claim that political affiliation is a very appropriate explanatory 
+are very similar and both are low in magnitude. This is strong evidence 
+that political affiliation is a very appropriate explanatory 
 variable for the overall network structure.
 
 However, from Figure~\ref{fig:polbooks-accuracy} we see that block 1 has low accuracy. 
@@ -38,9 +82,9 @@ contains some ``liberal" and ``conservative" authors. Indeed, by examining
 Figure~\ref{fig:polbooks-graph} we see that block 1 is effectively a buffer between 
 blocks 2 and 3; there are very few edges between blocks 2 and 3. It is therefore not 
 surprising that some books from either side leak into block 1.
-Perhaps, the three distinct categories (``conservative", ``liberal", ``neutral") are 
-too coarse a measure of political affiliation; it may be the case that the nominally 
-``conservative" books found in block 1 are in fact more centre-right. 
+The three distinct categories may be 
+too coarse a measure of political affiliation; perhaps the nominally 
+``conservative" books found in block 1 are closer to the centre. 
 In the absence of more granular labels, we cannot test this hypothesis. 
 Nevertheless, political affiliation encoded as 3 distinct labels 
 remains a fantastic predictor of network structure.
@@ -48,10 +92,8 @@ remains a fantastic predictor of network structure.
 \subsection{Primary school dynamic contacts}
 
 We choose the number of communities $B=10$, in line with the total number of 
-school classes. As before, we sample the block-generator parameters $\theta$ and 
-employ the dimensionality reduction technique 
-of Section~\ref{sec:dim-reduction},
-with standard deviation multiplier $k=1$ to pick out the top $D'=10$ features. 
+school classes. We 
+employ the dimensionality reduction technique to pick out the top $D'=10$ features. 
 We then plot the weights for the resulting features $d \in \Dcal'$ 
 in Figure~\ref{fig:school-null}. It is rather obvious
 that only the pupils' class memberships (1A-5B) have remained
