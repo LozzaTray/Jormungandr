@@ -1,8 +1,8 @@
 \section{Feature-first block model}
 
-In this section we propose a novel generative model for labelled networks. We call this the feature-first block model (FFBM).
+In this section we propose a novel generative model for labelled networks. We call this the feature-first block model (FFBM -- illustrated in figure~\ref{fig:ffbm}).
 
-Let $N$ denote the number of vertices, $B$ the number of blocks in the graph,
+Let $N$ denote the number of vertices, $B$ the number of blocks
 and ${\cal X}$ the set of values each feature can take.
 We define the vector $x_i \in \Xcal^D$ as the feature vector for vertex $i$, 
 where $D$ is the number of features associated with each vertex.
@@ -28,12 +28,11 @@ Note that $\phi_{b_i}$ has the form of a softmax activation function;
 we deliberately exclude a bias term to ensure that we only leverage feature information.
 We will later also find it convenient
 to write the parameters $\theta$ as a $B \times D$ matrix of weights $W$.
-
 More complex models based on different choices for the distributions
 $\phi_{b_i}$ above are also possible, but then deriving meaning from 
 the inferred parameter distributions is more difficult. 
-
-\begin{figure}[!h]
+%
+\begin{figure}
 	\centering
 	\begin{tikzpicture}[
 		roundnode/.style={circle, draw=black, minimum size=7mm},
@@ -60,8 +59,6 @@ $\psi = \{\psi_e, \psi_k\}$:
 	A \sim \textrm{DC-SBM}_{\textrm{MC}} (b, \psi_e, \psi_k).
 	\label{eqn:A-generation}
 \end{equation}
-%
-Figure~\ref{fig:ffbm} illustrates the proposed model.
 
 \subsection{Prior selection}
 
@@ -77,18 +74,17 @@ prior, with hyperparameter $\sigma_\theta^2$:
 	\label{eqn:theta-prior}
 \end{equation}
 %
-Interestingly, this choice of prior leads to a particularly
-simple distribution on the block membership vector $b$ given $X$.
-We show in Appendix~\ref{appdx:b|x} that,
-after integrating out $\theta$,
-$b$ is uniformly distributed given $X$:
+This choice of prior gives a very
+simple form for the conditional distribution of the block membership vector $b$ given $X$. 
+It is a uniform distribution (\ref{eqn:b-pseudo-prior})
+ -- proof in Appendix~\ref{appdx:b|x}. This an important simplification as evaluating $p(b | X)$ does not require an expensive  integration over $\theta$ nor does it require the exact value of $X$.
 %
 \begin{equation}
 	p(b | X) = \int p(b | X, \theta) p(\theta) d\theta = B^{-N}.
 	\label{eqn:b-pseudo-prior}
 \end{equation}
 %
-This is an important simplification as evaluating $p(b | X)$ does not require an expensive Monte Carlo integration over $\theta$ nor does it require the exact value of $X$. 
+ 
 \citet{Peixoto-Bayesian-Microcanonical} proposes careful choices for 
 the priors on the additional microcanonical SBM parameters $\psi$, which we adopt. 
 The idea is to write the joint distribution on $(b, e, k)$ as a product of 

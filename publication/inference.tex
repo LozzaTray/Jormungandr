@@ -19,27 +19,24 @@ sample $\theta^{(t)}$:
 %
 \begin{align}
 	b^{(t)} &\sim p ( b | A, X )  \label{eqn:b-samples},\\
-	\theta^{(t)} &\sim p(\theta | X, b^{(t)} ). \label{eqn:theta-samples}
+	\theta^{(t)} &\sim p\left(\theta | X, b^{(t)} \right). \label{eqn:theta-samples}
 \end{align}
 %
 Both of these sampling steps can be implemented through a
 Markov chain Monte-Carlo approach via a Metropolis-Hastings 
 algorithm \cite{hastings-alg}, as a two-level Markov chain.
- 
-As we show in the following section, the resulting samples 
+The resulting samples 
 for $\theta^{(t)}$ are unbiased in the sense that the expectation of 
 their distribution is the target posterior distribution:
 %
 \begin{equation}
-\Expect_{b^{(t)}} \left[p \left( \theta | X, b^{(t)} \right) \right] = \sum_{b \in [B]^N} p(\theta | X, b) p(b | A, X) = \sum_{b \in [B]^N} p(\theta, b | A, X) = p(\theta | A, X).
+\Expect_{b^{(t)}} \left[p \left( \theta | X, b^{(t)} \right) \right] = \sum_{b \in [B]^N} p(\theta | X, b) p(b | A, X) = p(\theta | A, X).
 \label{eqn:theta-unbiased}
 \end{equation}
 %
 This is an example of a pseudo-marginal approach. Indeed, \citet{pseudo-marginal} show that~(\ref{eqn:theta-unbiased})
 % the unbiased result in equation 
-is sufficient to prove that, for large enough $t$, $\theta^{(t)} \sim \Expect_{b^{(i)}} \left[ p(\theta | X, b^{(t)})\right] = p(\theta 
-| A, X)$, as required.
-%  which is exactly the distribution we are targetting (equation \ref{eqn:theta-target}).
+is sufficient to prove that, for large enough $t$, $\theta^{(t)} \sim p(\theta | A, X)$, as required.
 
 \begin{figure}[!h]
 	\centering
@@ -76,10 +73,7 @@ is sufficient to prove that, for large enough $t$, $\theta^{(t)} \sim \Expect_{b
 
 The reason for splitting the Markov chain into two levels is that the summation over all latent states $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$, is intractable, as the sum involves $B^N$ terms. 
 Figure \ref{fig:samp-sequence} shows an overview of the proposed method. 
-The Metropolis-Hastings accept/reject probabilities 
-for the proposed $b$ and $\theta$ samples are denoted $\alpha_b$ and
-$\alpha_\theta$, respectively.
-% We have introduced subscripts and conditionings to make explicit what variables each step utilises. 
+The Metropolis-Hastings proposal distribution is denoted $q$ and the acceptance probability denoted $\alpha$.
 
 Note the importance of the simplification in~(\ref{eqn:b-pseudo-prior}). 
 As $p(b| X)$ in fact does not depend on $X$, 
