@@ -197,10 +197,7 @@ For each of the experiments, we plot the collected $\theta$-samples for the feat
 
 \subsection{Political books}
 
-The goal here is to 
-determine whether the authors' political affiliations are a good predictor 
-of the overall network structure. We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral).
-
+We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral).
 From Figure~\ref{fig:polbooks-null} we see that all 3 blocks have a distinct political affiliation as their largest positive component.  
 Furthermore, in Table~\ref{tab:results} we see that the training and test losses 
 are very similar and both are low in magnitude. This is strong evidence 
@@ -209,16 +206,9 @@ variable for the overall network structure.
 
 However, from Figure~\ref{fig:polbooks-accuracy} we see that block 1 has low accuracy. 
 This suggests that detected block 1 is not solely composed of ``neutral" books but also 
-contains some ``liberal" and ``conservative" authors. Indeed, by examining 
-Figure~\ref{fig:polbooks-graph} we see that block 1 is effectively a buffer between 
-blocks 2 and 3; there are very few edges between blocks 2 and 3. It is therefore not 
-surprising that some books from either side leak into block 1.
-The three distinct categories may be 
-too coarse a measure of political affiliation; perhaps the nominally 
-``conservative" books found in block 1 are closer to the centre. 
-In the absence of more granular labels, we cannot test this hypothesis. 
-Nevertheless, political affiliation encoded as 3 distinct labels 
-remains a fantastic predictor of network structure.
+contains some ``liberal" and ``conservative" authors. Examining 
+Figure~\ref{fig:polbooks-graph}, we see the majority of paths between blocks 2 and 3 go through block 1.
+Block 1 is in effect a bridge between the ``conservative'' and ``liberal'' blocks so it is unsurprising that some books from either side leak into block 1.
 
 \subsection{Primary school dynamic contacts}
 
