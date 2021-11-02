@@ -149,53 +149,61 @@ This is effectively testing whether the feature-to-block and the graph-to=block 
 
 For each of the experiments, we plot the collected $\theta$-samples for the features that survive the dimensionality reduction procedure. We also plot the per-block accuracy for the original-dimension classifiers. We discuss the results specific to each dataset in turn.
 
-\begin{figure}[!h]
+\begin{figure}
 	\centering
-	\begin{subfigure}[t]{0.32\linewidth}
+	\begin{minipage}{0.42\linewidth}
+		\centering
+		\begin{subfigure}{\linewidth}
 			\centering
-			\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{polbooks-null-1}}
+			\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{polbooks-null-1}}
 			\caption{Political Books.}
 			\label{fig:polbooks-null}
 		\end{subfigure}
-	\begin{subfigure}[t]{0.32\linewidth}
+		
+		\begin{subfigure}{\linewidth}
 			\centering
-			\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{school-null-1}}
+			\imagebox{0.85\linewidth}{\includegraphics[width=\linewidth]{school-null-1}}
 			\caption{Primary School.}
 			\label{fig:school-null}
 		\end{subfigure}
-	\begin{subfigure}[t]{0.32\linewidth}
+		
+		\begin{subfigure}{\linewidth}
 			\centering
 			\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-null-1}}
 			\caption{Facebook Egonet.}
 			\label{fig:fb-null}
 		\end{subfigure}
-	\caption{$\theta$-samples. Dotted line is $\pm c^*$.}
-\end{figure}
-%
-\begin{figure}[!h]
-	\centering
-	\begin{subfigure}[t]{0.32\linewidth}
+		\caption{$\theta$-samples. Dotted line $\pm c^*$.}
+	\end{minipage}
+	%
+	\begin{minipage}{0.42\linewidth}
+		\centering
+		\begin{subfigure}[t]{\linewidth}
 			\centering
-			\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{polbooks-accuracy-2}}
+			\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{polbooks-accuracy-2}}
 			\caption{Political Books.}
 			\label{fig:polbooks-accuracy}
 		\end{subfigure}
-	\begin{subfigure}[t]{0.32\linewidth}
+		
+		\begin{subfigure}{\linewidth}
 			\centering
-			\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{school-accuracy-1}}
+			\imagebox{0.85\linewidth}{\includegraphics[width=\linewidth]{school-accuracy-1}}
 			\caption{Primary School.}
 			\label{fig:school-accuracy}
 		\end{subfigure}
-	\begin{subfigure}[t]{0.32\linewidth}
+		
+		\begin{subfigure}{\linewidth}
 			\centering
 			\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
 			\caption{Facebook Egonet.}
 			\label{fig:fb-accuracy}
 		\end{subfigure}
-	\caption{Per-block accuracy $\eta(j)$.}
+		\caption{Per-block accuracy $\eta(j)$.}
+	\end{minipage}
 \end{figure}
 
-\subsection{Political books}
+
+\subsubsection{Political books.}
 
 We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral).
 From Figure~\ref{fig:polbooks-null} we see that all 3 blocks have a distinct political affiliation as their largest positive component.  
@@ -210,17 +218,13 @@ contains some ``liberal" and ``conservative" authors. Examining
 Figure~\ref{fig:polbooks-graph}, we see the majority of paths between blocks 2 and 3 go through block 1.
 Block 1 is in effect a bridge between the ``conservative'' and ``liberal'' blocks so it is unsurprising that some books from either side leak into block 1.
 
-\subsection{Primary school dynamic contacts}
+\subsubsection{Primary school dynamic contacts.}
 
 We choose the number of communities $B=10$, in line with the total number of 
-school classes. We 
-employ the dimensionality reduction technique to pick out the top $D'=10$ features. 
-We then plot the weights for the resulting features $d \in \Dcal'$ 
-in Figure~\ref{fig:school-null}. It is rather obvious
-that only the pupils' class memberships (1A-5B) have remained
-significant;
+school classes. From Figure~\ref{fig:school-null}, we see only the pupils' class memberships (1A-5B) have survived
+the dimensionality-reduction process for $D'=10$;
 gender and teacher/student status have been discarded,
-meaning that these are not good predictors of overall macro-structure.
+meaning these are poor predictors of overall macro-structure.
 
 The vast majority of blocks are composed of a single class. 
 However, some blocks have two comparably strong classes as their predictors. 
@@ -228,20 +232,16 @@ For example, blocks 2 and 5 both contain classes 3A and 3B as their 2 best predi
 This suggests that the social divide between classes is less pronounced 
 for pupils in year 3. Conversely, some classes are found to extend over two 
 detected blocks (class 2B spans blocks 8 and 9) but we do 
-not have a feature which explains the division. The most surprising block 
-is number 7, which has comparable weightings for classes 5A and 1B. 
-Perhaps there was a joint event between those two classes on the day 
-the data were collected.
+not have a feature which explains the division.
 
-Figure~\ref{fig:school-accuracy} shows excellent accuracy for the majority of blocks. In fact the only blocks with low accuracy are those that have a school-class span two blocks such that we cannot reliably distinguish between the two. This is much more pronounced when we apply hard classification rather than the soft cross-entropy loss. Indeed block 1 has low accuracy because class 1A has a higher weight component for block 3 than it does for block 1. As we use hard classification to compute accuracy, vertices belonging to class 1A are predicted to belong to block 3. A similar effect is seen in block 5 which often loses out to block 2. The same can be said of blocks 8 and 9. However, in this case the weights for class 2B are very similar -- thus explaining the roughly evenly split accuracy for blocks 8 and 9.
+Figure~\ref{fig:school-accuracy} shows excellent accuracy for the majority of blocks. In fact the only blocks with low accuracy are those that have a school-class span two blocks such that we cannot reliably distinguish between the two. This is more pronounced when we apply hard classification rather than the soft cross-entropy loss. Indeed block 1 has low accuracy because class 1A has a higher weight component for block 3 than it does for block 1. As we use hard classification to compute accuracy, vertices belonging to class 1A are predicted to belong to block 3. A similar effect is seen in block 5 which often loses out to block 2. The same can be said of blocks 8 and 9. However, in this case the weights for class 2B are very similar -- thus explaining the roughly evenly split accuracy for blocks 8 and 9.
 
-\subsection{Facebook egonet}
+\subsubsection{Facebook egonet.}
 
 We choose $B=10$ and $D'=10$ for this experiment. The selected features 
 (Figure~\ref{fig:fb-null}) are those that best explain the high-level 
 community structure. The majority of them are education related. 
-Nevertheless, for $D'=10$ we only have good explanations for the makeup 
-of some of the detected blocks; several blocks in 
+Nevertheless, for $D'=10$ we only have good explanations for some of the detected blocks; several blocks in 
 Figure~\ref{fig:fb-null} do not have high-magnitude components for $D'=10$. This is further emphasised by the disparate accuracies in Figure~\ref{fig:fb-accuracy}. Nevertheless, observe that the accuracy is only high for blocks that contain high magnitude weights. The only exception to this rule is block 9 which nonetheless may have high magnitude weights just below the cut-off $c^*$.
 
 When the feature dimension is very large, it becomes increasingly likely that 
@@ -251,13 +251,4 @@ particular parameter. The regularisation term imposed by the prior goes some
 way towards alleviating this problem. Nevertheless, we see in 
 Figure~\ref{fig:fb-null} that the feature \verb*|birthday-5| has a very 
 high weight as it relates to block 1 -- but it is highly unlikely
-that birthdays determine graphical structure. This issue could have been alleviated by 
-choosing $\Xcal=\{-1, +1\}$ such that having a feature turned off supports excluding 
-a vertex from the block. However, Figure~\ref{fig:fb-null} demonstrates why we made 
-the deliberate choice $\Xcal=\{0,1\}$. 
-Because of the choice $\Xcal=\{0,1\}$, block 1 is allowed to contain 3 distinct feature 
-categories rather than just one. We accept this trade-off: risking spurious high magnitude 
-components (e.g. \verb*|birthday-5|) for the benefit of allowing a top-level block to span 
-multiple feature-groups. Nevertheless, one would have to apply a hierarchical approach 
-to subdivide each top-level block into sub-blocks to test whether the constituent 
-feature-groups determine structure at the lower-level.
+that birthdays determine graphical structure.
