@@ -2,33 +2,19 @@
 \label{sec:conclusion}
 
 The Feature-First Block Model (FFBM) introduced 
-in this paper is a new generative model for labelled networks,
-developed to address difficulties of other graphical models 
-when testing how vertex features affect community structure. The idea 
-is to divide the graph into its most natural partition and determine whether 
+in this paper is a new generative model for labelled networks well-suited for describing how features
+affect structure. The idea is to divide the graph into its most natural partition and determine whether 
 the vertex features can accurately explain this partition. 
-It is relatively easy to find vertex features that are in some way 
-correlated with the graphical structure. Nonetheless, only when 
-we find the feature that best describes the most pronounced partition 
+It is easy to find vertex features that are in some way 
+correlated with the graphical structure; only when 
+we find the feature that best describes the most pronounced partition,
 do we have a stronger case for causation.
 
 Using this new model,
 we go on to describe an efficient inference algorithm to sample 
 the parameters of the FFBM. 
-This takes the form of a two-level Markov chain,
-used to sample the block memberships $b$ and block generator 
-parameters $\theta$. These chains can either be executed
-in parallel or 
-the empirical mean of the $b$-samples can be used
-as the input to the $\theta$-chain. The latter option
-reduces the variance in our evaluation of the target distribution 
-and thus shortens burn-in.
-
-The overall method is shown to be effective at extracting and describing 
+This is shown to be effective at extracting and describing 
 the most natural communities in a labelled network. Nevertheless, the approach 
-can only currently explain the structure at the macro-scale. We cannot 
-explain structure within each block. Future work will benefit from extending 
+can only currently explain the structure at the macro-scale. Future work will benefit from extending 
 the FFBM to be hierarchical in nature. That way, the structure of the network 
 can be explained at all length-scales of interest.
-
-
