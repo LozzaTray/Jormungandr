@@ -26,8 +26,6 @@ the distribution of $b$ given $X$ and $\theta$ is,
 %
 Note that $\phi_{b_i}$ has the form of a softmax activation function;
 we deliberately exclude a bias term to ensure that we only leverage feature information.
-We will later also find it convenient
-to write the parameters $\theta$ as a $B \times D$ matrix of weights $W$.
 More complex models based on different choices for the distributions
 $\phi_{b_i}$ above are also possible, but then deriving meaning from 
 the inferred parameter distributions is more difficult. 
@@ -47,7 +45,7 @@ the inferred parameter distributions is more difficult.
 		\draw[->] (X.east) -- node[above] {$\theta$} (b.west);
 		\draw[->] (b.east) -- node[above] {$\psi$}(A.west);
 	\end{tikzpicture}
-	\caption{The feature-first block model (FFBM)}
+	\caption{The Feature-First Block Model (FFBM)}
 	\label{fig:ffbm}
 \end{figure}
 
