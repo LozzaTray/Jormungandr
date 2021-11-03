@@ -56,6 +56,40 @@ We apply the developed methods to a variety of datasets. These are chosen to spa
 		\end{tabular}
 	}
 \end{table}
+\begin{table}[!h]
+	\centering
+	\caption{Hyper-parameter values for each experiment}
+	\label{tab:hyperparams}
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{c|ccc|ccc|cccc|cc|cccc}
+			Dataset & 
+			$B$ & $f$ & $\sigma_\theta$ & 
+			$T_b$ & $\kappa_b$ & $\lambda_b$ & 
+			$T_\theta$ & $\kappa_\theta$ & $\lambda_\theta$ & $s$ &
+			$k$ & $D'$ &
+			$T_\theta'$ & $\kappa_\theta'$ & $\lambda_\theta'$ & $s'$
+			\\ \hline
+			Polbooks &
+			3 & 0.7 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.4 & 10 & 0.05 &
+			-- & -- & 
+			-- & -- & -- & -- \\
+			School &
+			10 & 0.7 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.4 & 10 & 0.2 &
+			1 & 10 & 
+			10,000 & 0.4 & 10 & 0.2 \\
+			FB Egonet &
+			10 & 0.7 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.4 & 10 & 0.017 &
+			1 & 10 & 
+			10,000 & 0.4 & 10 & 0.5 \\
+		\end{tabular}
+	}
+\end{table}
 %
 We require metrics to assess performance. This can be split into two separate 
 components: the microcanonical SBM fit (concerned with the $b$-samples) and 
