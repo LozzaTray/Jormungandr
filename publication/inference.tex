@@ -12,22 +12,21 @@ of $\theta$:
 \end{equation}
 %
 We propose an iterative approach to obtain samples
-$\theta^{(t)}$ from $p(\theta|A,X)$. We first draw samples $b^{(t)}$ 
-from the block membership posterior distribution,
-and then use each $b^{(t)}$ to obtain a corresponding
+$\theta^{(t)}$ from $p(\theta|A,X)$. We first draw a sample $b^{(t)}$ 
+from the block membership posterior,
+and then use $b^{(t)}$ to obtain a corresponding
 sample $\theta^{(t)}$:
 %
-\begin{align}
-	b^{(t)} &\sim p ( b | A, X )  \label{eqn:b-samples},\\
-	\theta^{(t)} &\sim p\left(\theta | X, b^{(t)} \right). \label{eqn:theta-samples}
-\end{align}
+\begin{equation}
+	b^{(t)} \sim p \Big( b | A, X \Big) \quad \textrm{then} \quad
+	\theta^{(t)} \sim p\left(\theta | X, b^{(t)} \right).
+\end{equation}
 %
-Both of these sampling steps can be implemented through a
-Markov chain Monte-Carlo approach via a Metropolis-Hastings 
-algorithm \cite{hastings-alg}, as a two-level Markov chain.
-The resulting samples 
-for $\theta^{(t)}$ are unbiased in the sense that the expectation of 
-their distribution is the target posterior distribution:
+This can be achieved through a two-tiered
+Markov chain Monte-Carlo approach via the Metropolis-Hastings (MH) 
+algorithm \cite{hastings-alg}.
+The resulting $\theta^{(t)}$ samples are unbiased in that the expectation of 
+their distribution is the true posterior:
 %
 \begin{equation}
 \Expect_{b^{(t)}} \left[p \left( \theta | X, b^{(t)} \right) \right] = \sum_{b \in [B]^N} p(\theta | X, b) p(b | A, X) = p(\theta | A, X).
@@ -37,7 +36,7 @@ their distribution is the target posterior distribution:
 This is an example of a pseudo-marginal approach. Indeed, Andrieu and Roberts \cite{pseudo-marginal} show that~(\ref{eqn:theta-unbiased})
 % the unbiased result in equation 
 is sufficient to prove that, for large enough $t$, $\theta^{(t)} \sim p(\theta | A, X)$, as required.
-
+%
 \begin{figure}[!h]
 	\centering
 
@@ -71,23 +70,20 @@ is sufficient to prove that, for large enough $t$, $\theta^{(t)} \sim p(\theta |
 	\label{fig:samp-sequence}
 \end{figure}
 
-The reason for splitting the Markov chain into two levels is that the summation over all latent states $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$, is intractable, as the sum involves $B^N$ terms. 
-Figure \ref{fig:samp-sequence} shows an overview of the proposed method. 
-The Metropolis-Hastings proposal distribution is denoted $q$ and the acceptance probability denoted $\alpha$.
+We have split the Markov chain into two levels as the summation over all latent $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$, is intractable. 
+Figure \ref{fig:samp-sequence} shows an overview of the proposed method, with $q$ and $\alpha$ denoting the MH proposal distribution and acceptance probability respectively.
 
 Note the importance of the simplification in~(\ref{eqn:b-pseudo-prior}). 
-As $p(b| X)$ in fact does not depend on $X$, 
-knowing $X$ is not necessary in order to obtain samples
-of the block membership vector $b$.
+As evaluating $p(b| X)$ does not depend on $X$, 
+we do not need $X$ to sample $b$.
 And on the other level, in order to obtain 
-samples of the parameter vector $\theta$
-we use only $b$ but not $A$, as $\theta$ and $A$ are
-conditionally independent given $b$. 
+samples for $\theta$
+we use only $b$ but not $A$, as $(\theta \indep A )| b$. 
 
 \FloatBarrier
 \subsection{Sampling block memberships}
 
-We adopt the Markov chain Monte-Carlo procedure of
+To generate our $b$-samples, we adopt the Markov chain Monte-Carlo procedure of
 \cite{Peixoto-MCMC},
 which relies on writing the posterior in the following form:
 %
@@ -109,19 +105,19 @@ We also define the microcanonical entropy of the configuration as,
 	\label{eqn:dl-form}
 \end{equation}
 %
-This entropy can be thought of as the optimal
+This can be thought of as the optimal
 ``description length'' of the graph. 
 The exact form of the proposal $q_b$ is explored thoroughly in
-\cite{Peixoto-MCMC} and not repeated here. The \verb*|graph-tool| \cite{peixoto_graph-tool_2014}
-library for Python available under LGPL implements this algorithm.
-The only modification we make is in 
-the block membership prior $p(b)$ that we replace with $p(b|X)=B^{-N}$, 
+\cite{Peixoto-MCMC} and not repeated here. We use the \verb*|graph-tool| \cite{peixoto_graph-tool_2014}
+library for Python, which implements this algorithm.
+The only modification is in 
+the prior $p(b)$ that we replace with $p(b|X)=B^{-N}$, 
 which cancels out in the MH accept-reject step as it is independent of $b$.
 
 \subsection{Sampling feature-to-block generator parameters}
 \label{s:sfb}
 
-The invariant distribution we wish to target for the $\theta$ samples is the posterior of $\theta$ given the values of the pair $(X, b)$. 
+The invariant distribution we wish to target for the $\theta$-samples is the posterior of $\theta$ given the values of the pair $(X, b)$. 
 We write this as,
 %
 \begin{equation}
@@ -134,23 +130,21 @@ Discarding constant terms, we can then write $U(\theta)$ as,
 %
 \begin{equation}
 	U(\theta) = \left( \sum_{i \in [N]} \sum_{j \in [B]} y_{ij} \log \frac{1}{a_{ij}} \right)
-	+ \frac{1}{2\sigma_\theta^2} \|\theta\|^2 = N \cdot \Lcal(\theta) + \frac{1}{2\sigma_\theta^2} \|\theta\|^2;
+	+ \frac{1}{2\sigma_\theta^2} \|\theta\|^2 = N \cdot \Lcal(\theta) + \frac{1}{2\sigma_\theta^2} \|\theta\|^2.
 	\label{eqn:U-form}
 \end{equation}
-
-See Appendix \ref{appdx:form-U} for the derivation. The function $U(\theta)$ is a typical objective function for neural network training. The first term is introduced by the likelihood; we collect it into $N \cdot \Lcal(\theta)$, which is the cross-entropy between the graph-predicted and feature-predicted block memberships summed over all vertices. 
-The second, introduced by the prior, brings a form of regularisation, guarding against over-fitting. Unlike in many applications where the goal 
-is to find the minimiser of $U(\theta)$, our goal is to draw samples from the posterior $\pi_\theta(\cdot) \propto \exp(-U(\cdot))$. We can use $\nabla U$ as a useful heuristic to bias our proposal towards regions of higher target density. We therefore adopt the Metropolis-adjusted Langevin algorithm (MALA) \cite{mala-tweedie}. Given the current sample $\theta$, we generate 
+%
+See Appendix \ref{appdx:form-U} for the derivation. The function $U(\theta)$ is a typical objective function for neural network training. The first term $N \cdot \Lcal(\theta)$ is introduced by the likelihood and represents the cross-entropy between the graph-predicted and feature-predicted block memberships. 
+The second term, introduced by the prior, brings a form of regularisation, guarding against over-fitting. Our goal is to draw samples from the posterior $\pi_\theta(\cdot) \propto \exp(-U(\cdot))$. We choose to adopt the Metropolis-adjusted Langevin algorithm (MALA) \cite{mala-tweedie}, which uses $\nabla U$ to bias the proposal towards regions of higher density. Given the current sample $\theta$, we generate 
 a new sample $\theta'$ as,
 %
 \begin{equation*}
-	\theta' = \theta - h \nabla U(\theta) + \sqrt{2h} \cdot \xi,
+	\theta' \sim q_\theta\big(\theta, \theta'\big) 
+	= \Gaussian \big( \theta' ; \theta - h \nabla U(\theta), 2h I \big),
 \end{equation*}
 %
 where $\xi \sim \Gaussian(0, I)$ and $h$ is a step-size parameter 
 which may vary with the sample index.
-This leads to the proposal distribution,
-$q_\theta(\theta, \theta') \sim \Gaussian \left( \theta' ; \theta - h \nabla U(\theta), 2h I \right).$
 Without the injected noise term $\xi$, MALA is equivalent to gradient descent. We require $\xi$ to fully explore the parameter space. 
 The term $\nabla U$ has an easy to compute analytic form (derived in Appendix \ref{appdx:gradu}).
 
