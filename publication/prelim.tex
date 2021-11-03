@@ -1,6 +1,6 @@
 \section{Preliminaries}
 
-We first need a model for community-like structure in a network. For this we adopt the widely-used stochastic block model (SBM).
+We first need a model for community-like structure in a network. For this we adopt the widely-used stochastic block model (SBM). This is a latent variable model where each vertex belongs to a single block and the probability two nodes are connected depends only on the block memberships of each.
 Specifically, we will use the microcanonical variant of the SBM, proposed by Peixoto \cite{Peixoto-Bayesian-Microcanonical}. To allow for degree-variability between members of the same block, we adopt the degree-corrected formulation (DC-SBM), defined in~(\ref{defn:microcan-dc-sbm}).
 
 \begin{definition}[Microcanonical DC-SBM]
@@ -14,8 +14,8 @@ block $s$.
 
 The graph's adjacency matrix $A \in \{0,1\}^{N \times N}$ is generated 
 by placing edges uniformly at random, but respecting the constraints 
-imposed by $e$, $b$ and $k$ (hence the qualification `microcanonical').
-Specifically, $A$ must satisfy the following, for all $r,s\in[B]$
+imposed by $e$, $b$ and $k$.
+Specifically, if $A \sim \mbox{\rm DC-SBM}_{\rm MC} (b, e, k)$ then it must satisfy the following, for all $r,s\in[B]$
 and all $i\in[N]$:
 	%
 	\begin{equation}
@@ -25,9 +25,5 @@ and all $i\in[N]$:
 		\textrm{and} \qquad
 		k_i = \sum_{j \in [N]} A_{ij}.
 		\label{eqn:sbm-constraints}
-	\end{equation}
-We use the following notation to indicate this distribution:
-\begin{equation}
-		A \sim \mbox{\rm DC-SBM}_{\rm MC} (b, e, k).
 	\end{equation}
 \end{definition}
