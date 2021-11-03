@@ -151,7 +151,7 @@ The term $\nabla U$ has an easy to compute analytic form (derived in Appendix \r
 \subsection{Sampling sequence}
 \label{s:ss}
 
-So far, each $\theta^{(t)}$ update has used its corresponding $b^{(t)}$ sample. This means the evaluation of $U(\theta)$ and $\nabla U(\theta)$ has high variance, leading to longer burn-in. The only link between $b^{(t)}$ and $\theta^{(t)}$ is in the evaluation of $U(\theta)$ and $\nabla U(\theta)$ which depends only on the matrix $y^{(t)}$ with entries $y_{ij}^{(t)} \coloneqq \one\{b_i^{(t)} = j\}$. We would rather deal with the expectation of each $y_{ij}^{(t)}$:
+So far, each $\theta^{(t)}$ update has used its corresponding $b^{(t)}$ sample. This means the evaluation of $U^{(t)}$ and $\nabla U^{(t)}$ has high variance, leading to longer burn-in. The only link between $b^{(t)}$ and $\theta^{(t)}$ is in the evaluation of $U^{(t)}$ and $\nabla U^{(t)}$ which depends only on the matrix $y^{(t)}$ with entries $y_{ij}^{(t)} \coloneqq \one\{b_i^{(t)} = j\}$. We would rather deal with the expectation of each $y_{ij}^{(t)}$:
 %
 \begin{equation}
 	\Expect \left[ y_{ij}^{(t)} \right] = \Expect_{b^{(t)}} \left[ \one \left( b_{i}^{(t)} = j \right) \right]
@@ -162,8 +162,7 @@ We can obtain an unbiased estimate for this quantity using
 the thinned $b$-samples after burn-in.
 Let $\Tcal_b$  denote the retained set of indices 
 for the $b$-samples and $\Tcal_\theta$ similarly for the $\theta$-chain. 
-The unbiased estimate for $y_{ij}^{(t)}$ using the 
-restricted sample set $\Tcal_b$ is denoted $\hat{y}_{ij}$:
+The unbiased estimate for $y_{ij}^{(t)}$ is then:
 %
 \begin{equation}
 	\hat{y}_{ij} \coloneqq \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} y_{ij}^{(t)} = \frac{1}{|\Tcal_b|} \sum_{t \in \Tcal_b} \one\{b_i^{(t)} = j\}.
