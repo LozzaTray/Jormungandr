@@ -42,12 +42,12 @@ Writing,
 $y_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and 
 $a_{ij} \coloneqq \phi_j(x_i; \theta)$, we have that,
 %
-\begin{equation}
+\begin{equation*}
 	\log p(b | X, \theta) = \sum_{i \in [N]} \sum_{j \in [B]} y_{ij} \log a_{ij}  \quad \textrm{and} \quad
 	\log p(\theta) = -\frac{D B}{2} \log 2\pi - \frac{1}{2 \sigma_\theta^2} 
 	\|\theta \|^2,
 	\label{eqn:U-constituent-terms}
-\end{equation}
+\end{equation*}
 %
 where
 $\|\theta\|^2 = \sum_{i} \theta_{i}^2 = \sum_{j \in [B]} \|w_j\|^2$ 
