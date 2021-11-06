@@ -1,4 +1,34 @@
-\subsubsection{Political books.}
+Table~\ref{tab:results} summarises the results for each experiment. We also apply the 
+dimensionality reduction method 
+of Section~\ref{sec:dim-reduction}
+to the two higher dimensional datasets (the school and FB egonet). 
+For this we use equation~(\ref{eqn:c-star}) with $k=1$,
+in order to reduce the dimension from 
+$D$ to a desired $D'$. 
+We then retrain the feature-block predictor using only the retained 
+feature set $\Dcal'$, and report the log-loss over the training and 
+test sets for the reduced classifier -- 
+denoted $\bar{\Lcal}_0'$ and $\bar{\Lcal}_1'$ respectively. 
+These values are also given in Table~\ref{tab:results}.
+
+Based on these results, some remarks are in order.
+Firstly, the variance of the test loss $\bar{\Lcal}_1$ tends to be higher 
+than the training loss $\bar{\Lcal}_0$. This is expected,
+as the test set is smaller than the training set and hence 
+more susceptible to variability in its construction. 
+Secondly, it can be seen that the dimensionality reduction procedure 
+brings the training and test losses closer together. This implies that 
+the features we keep are indeed correlated with the underlying graphical 
+partition and that the approach generalises correctly.
+
+The average description length per entity,
+$\bar{S}_e$, of the graph, 
+has very small variance, suggesting that
+the detected communities can be found reliably (to within an arbitrary 
+relabelling of blocks). For reference, we plot an inferred partition for each 
+of the graphs in Figure~\ref{fig:graphs-all}. The polbooks graph yields the cleanest separation between blocks but nonetheless the inferred partitions for the other datasets do succeed at dividing the graph into densely connected clusters.
+
+\subsubsection{Political books}
 
 \cite{polbooks} ($N=105, E=441, D=3$) -- network of Amazon political book sales, published close to the 2004 presidential election. Two books are connected if they were frequently co-purchased. Vertex features encode the political affiliation of the author (liberal, conservative, or neutral).
 
@@ -15,7 +45,7 @@ contains some ``liberal" and ``conservative" authors. Examining
 Figure~\ref{fig:polbooks-graph}, we see the majority of paths between blocks 2 and 3 go through block 1.
 Block 1 is in effect a bridge between the ``conservative'' and ``liberal'' blocks so it is unsurprising that some books from either side leak into block 1.
 
-\subsubsection{Primary school dynamic contacts.}
+\subsubsection{Primary school dynamic contacts}
 
 \cite{schools} ($N=238, E=5539, D=13$) -- network of face-to-face contacts amongst students and teachers at a primary school in Lyon, France. Vertex features include class membership (one of 10 values: 1A-5B), gender (male, female) and teacher status encoded as an 11th school-class. We choose to analyse just the second day of results.
 
@@ -35,7 +65,7 @@ not have a feature which explains the division.
 
 Figure~\ref{fig:school-accuracy} shows excellent accuracy for the majority of blocks. In fact the only blocks with low accuracy are those that have a school-class span two blocks such that we cannot reliably distinguish between the two. This is more pronounced when we apply hard classification rather than the soft cross-entropy loss. Indeed block 1 has low accuracy because class 1A has a higher weight component for block 3 than it does for block 1. As we use hard classification to compute accuracy, vertices belonging to class 1A are predicted to belong to block 3. A similar effect is seen in block 5 which often loses out to block 2. The same can be said of blocks 8 and 9. However, in this case the weights for class 2B are very similar -- thus explaining the roughly evenly split accuracy for blocks 8 and 9.
 
-\subsubsection{Facebook egonet.}
+\subsubsection{Facebook egonet}
 
 \cite{fb-snap} ($N=747, E=30025, D=480$) -- an assortment of Facebook users' friends lists. Vertex features are fully anonymised and encode information about each user's education history, languages spoken, gender, home-town, birthday etc. We focus on the egonet with id 1912.
 

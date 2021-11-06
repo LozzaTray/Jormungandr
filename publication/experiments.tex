@@ -1,34 +1,27 @@
-\section{Experimental results}
+\section{Experiments}
 \label{sec:experiments}
 
-We apply the developed methods to a variety of datasets. These are chosen to span a range of node counts $N$, edge counts $E$ and feature space dimension $D$.
-%
-We require metrics to assess performance. This can be split into two separate 
+We apply the developed methods to a vareity of datasets chosen to span a range of edge counts $E$ and feature-space dimension $D$. 
+However, we first require metrics to assess model performance. This can be split into two separate 
 components: the microcanonical SBM fit (concerned with the $b$-samples) and 
 the fit of the feature-to-block generator (concerned with the $\theta$-samples). 
 
 Starting with the SBM, recall that the quantity $S(b)$ in~(\ref{eqn:dl-form}) 
 can be interpreted as an ideal ``description length'' of the partition 
-imposed by $b$. We define a simple
-metric $\bar{S}_e$ to gauge the fit of the SBM,
-as the description length per entity 
-(i.e., divided by the total number $N+E$ of 
-nodes plus edges),
-averaged over the $b$-samples:
+imposed by $b$. We define the average
+description length per entity (nodes and edges) $\bar{S}_e$ to gauge the SBM fit:
 %
 \begin{equation}
 	\bar{S}_e \coloneqq \frac{1}{(N+E) |\Tcal_b|} \sum_{t\in \Tcal_b} S \left( b^{(t)} \right).
 	\label{eqn:mean-dl}
 \end{equation}
-%
 
 Next, to assess the performance of the feature-to-block predictor, 
-we partition the vertex set $[N]$ into training and test sets. We choose to 
-randomly partition the vertices on each experiment run,
-so that a constant fraction $f$ of the available vertices go to form 
+we partition the vertex set $[N]$ into training and test sets. On each experiment run,
+a constant fraction $f$ of the available vertices go to form 
 the training set $\Gcal_0$ and the remainder are held out to form the
-test set $\Gcal_1$.
-The $b$-chain is run using the whole network but we only use vertices $v \in \Gcal_0$ to train the $\theta$-chain. Because $|\Gcal_0| \neq |\Gcal_1|$ in general, we cannot use the un-normalised log-target $U$ from~(\ref{eqn:U-form}) for comparison,
+test set $\Gcal_1$. These sets are chosen randomly.
+The $b$-chain is run using the whole network but we only use vertices $v \in \Gcal_0$ to train the $\theta$-chain. Because $|\Gcal_0| \neq |\Gcal_1|$ in general, we cannot use the un-normalised log-target $U$ from~(\ref{eqn:U-form}) for benchmarking,
 as the total cross-entropy loss scales with the size of each data set but 
 the prior term stays constant. We therefore use the average cross-entropy loss 
 over each set,
@@ -42,36 +35,6 @@ over each set,
 %
 where $\star \in \{0, 1\}$ indicates whether the training or test
 set is being considered.
-
-Table~\ref{tab:results} summarises the results for each experiment. We also apply the 
-dimensionality reduction method 
-of Section~\ref{sec:dim-reduction}
-to the two higher dimensional datasets (the school and FB egonet). 
-For this we use equation~(\ref{eqn:c-star}) with $k=1$,
-in order to reduce the dimension from 
-$D$ to a desired $D'$. 
-We then retrain the feature-block predictor using only the retained 
-feature set $\Dcal'$, and report the log-loss over the training and 
-test sets for the reduced classifier -- 
-denoted $\bar{\Lcal}_0'$ and $\bar{\Lcal}_1'$ respectively. 
-These values are also given in Table~\ref{tab:results}.
-
-Based on these results, some remarks are in order.
-Firstly, the variance of the test loss $\bar{\Lcal}_1$ tends to be higher 
-than the training loss $\bar{\Lcal}_0$. This is expected,
-as the test set is smaller than the training set and hence 
-more susceptible to variability in its construction. 
-Secondly, it can be seen that the dimensionality reduction procedure 
-brings the training and test losses closer together. This implies that 
-the features we keep are indeed correlated with the underlying graphical 
-partition and that the approach generalises correctly.
-
-The average description length per entity,
-$\bar{S}_e$, of the graph, 
-has very small variance, suggesting that
-the detected communities can be found reliably (to within an arbitrary 
-relabelling of blocks). For reference, we plot an inferred partition for each 
-of the graphs in Figure~\ref{fig:graphs-all}. The polbooks graph yields the cleanest separation between blocks but nonetheless the inferred partitions for the other datasets do succeed at dividing the graph into densely connected clusters.
 
 Nevertheless, the cross-entropy loss over the whole training set may be too coarse a measure of model fit. It is often the case that we have good feature-based explanations for some but not all of the detected blocks. We wish to define a new measure of fit specific to each detected block. This requires defining the set of all vertices associated with block $j$ as,
 $
