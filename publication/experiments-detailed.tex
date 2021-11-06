@@ -30,8 +30,6 @@ of the graphs in Figure~\ref{fig:graphs-all}. The polbooks graph yields the clea
 
 \subsubsection{Political books}
 
-\cite{polbooks} ($N=105, E=441, D=3$) -- network of Amazon political book sales, published close to the 2004 presidential election. Two books are connected if they were frequently co-purchased. Vertex features encode the political affiliation of the author (liberal, conservative, or neutral).
-
 We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral).
 From Figure~\ref{fig:polbooks-null} we see that all 3 blocks have a distinct political affiliation as their largest positive component.  
 Furthermore, in Table~\ref{tab:results} we see that the training and test losses 
@@ -46,8 +44,6 @@ Figure~\ref{fig:polbooks-graph}, we see the majority of paths between blocks 2 a
 Block 1 is in effect a bridge between the ``conservative'' and ``liberal'' blocks so it is unsurprising that some books from either side leak into block 1.
 
 \subsubsection{Primary school dynamic contacts}
-
-\cite{schools} ($N=238, E=5539, D=13$) -- network of face-to-face contacts amongst students and teachers at a primary school in Lyon, France. Vertex features include class membership (one of 10 values: 1A-5B), gender (male, female) and teacher status encoded as an 11th school-class. We choose to analyse just the second day of results.
 
 We choose the number of communities $B=10$, in line with the total number of 
 school classes. From Figure~\ref{fig:school-null}, we see only the pupils' class memberships (1A-5B) have survived
@@ -66,8 +62,6 @@ not have a feature which explains the division.
 Figure~\ref{fig:school-accuracy} shows excellent accuracy for the majority of blocks. In fact the only blocks with low accuracy are those that have a school-class span two blocks such that we cannot reliably distinguish between the two. This is more pronounced when we apply hard classification rather than the soft cross-entropy loss. Indeed block 1 has low accuracy because class 1A has a higher weight component for block 3 than it does for block 1. As we use hard classification to compute accuracy, vertices belonging to class 1A are predicted to belong to block 3. A similar effect is seen in block 5 which often loses out to block 2. The same can be said of blocks 8 and 9. However, in this case the weights for class 2B are very similar -- thus explaining the roughly evenly split accuracy for blocks 8 and 9.
 
 \subsubsection{Facebook egonet}
-
-\cite{fb-snap} ($N=747, E=30025, D=480$) -- an assortment of Facebook users' friends lists. Vertex features are fully anonymised and encode information about each user's education history, languages spoken, gender, home-town, birthday etc. We focus on the egonet with id 1912.
 
 We choose $B=10$ and $D'=10$ for this experiment. The selected features 
 (Figure~\ref{fig:fb-null}) are those that best explain the high-level 

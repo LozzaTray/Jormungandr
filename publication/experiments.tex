@@ -1,15 +1,16 @@
 \section{Experiments}
 \label{sec:experiments}
 
-We apply the developed methods to a vareity of datasets chosen to span a range of edge counts $E$ and feature-space dimension $D$. 
-However, we first require metrics to assess model performance. This can be split into two separate 
-components: the microcanonical SBM fit (concerned with the $b$-samples) and 
-the fit of the feature-to-block generator (concerned with the $\theta$-samples). 
+We apply the outlined methods to a variety of datasets:
 
-Starting with the SBM, recall that the quantity $S(b)$ in~(\ref{eqn:dl-form}) 
-can be interpreted as an ideal ``description length'' of the partition 
-imposed by $b$. We define the average
-description length per entity (nodes and edges) $\bar{S}_e$ to gauge the SBM fit:
+\begin{itemize}
+	\item \textbf{Political books} \cite{polbooks} ($N=105, E=441, D=3$) -- network of Amazon political book sales, published close to the 2004 presidential election. Two books are connected if they were frequently co-purchased. Vertex features encode the political affiliation of the author (liberal, conservative, or neutral).
+	\item \textbf{Primary school dynamic contacts} \cite{schools} ($N=238, E=5539, D=13$) -- network of face-to-face contacts amongst students and teachers at a primary school in Lyon, France. Vertex features include class membership (one of 10 values: 1A-5B), gender (male, female) and teacher status encoded as an 11th school-class. We choose to analyse just the second day of results.
+	\item \textbf{Facebook egonet} \cite{fb-snap} ($N=747, E=30025, D=480$) -- an assortment of Facebook users' friends lists. Vertex features are fully anonymised and encode information about each user's education history, languages spoken, gender, home-town, birthday etc. We focus on the egonet with id 1912.
+\end{itemize}
+%
+We first require metrics to assess model performance. We define the average
+description length per entity (nodes and edges) $\bar{S}_e$ as a suitable metric to gauge the SBM fit:
 %
 \begin{equation}
 	\bar{S}_e \coloneqq \frac{1}{(N+E) |\Tcal_b|} \sum_{t\in \Tcal_b} S \left( b^{(t)} \right).
@@ -17,14 +18,9 @@ description length per entity (nodes and edges) $\bar{S}_e$ to gauge the SBM fit
 \end{equation}
 
 Next, to assess the performance of the feature-to-block predictor, 
-we partition the vertex set $[N]$ into training and test sets. On each experiment run,
-a constant fraction $f$ of the available vertices go to form 
-the training set $\Gcal_0$ and the remainder are held out to form the
-test set $\Gcal_1$. These sets are chosen randomly.
-The $b$-chain is run using the whole network but we only use vertices $v \in \Gcal_0$ to train the $\theta$-chain. Because $|\Gcal_0| \neq |\Gcal_1|$ in general, we cannot use the un-normalised log-target $U$ from~(\ref{eqn:U-form}) for benchmarking,
-as the total cross-entropy loss scales with the size of each data set but 
-the prior term stays constant. We therefore use the average cross-entropy loss 
-over each set,
+we randomly partition the vertex set $[N]$ into training and test sets: $\Gcal_0$ and $\Gcal_1$.
+The $b$-chain is run using the whole network but we only use vertices $v \in \Gcal_0$ to train the $\theta$-chain. As $|\Gcal_0| \neq |\Gcal_1|$ in general, we use the average cross-entropy loss 
+over each set to gauge fit,
 %
 \begin{equation}
 	\bar{\Lcal}_\star \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} \Lcal_\star^{(t)},
@@ -33,18 +29,17 @@ over each set,
 	\label{eqn:cross-entropy-loss}
 \end{equation}
 %
-where $\star \in \{0, 1\}$ indicates whether the training or test
-set is being considered.
-
-Nevertheless, the cross-entropy loss over the whole training set may be too coarse a measure of model fit. It is often the case that we have good feature-based explanations for some but not all of the detected blocks. We wish to define a new measure of fit specific to each detected block. This requires defining the set of all vertices associated with block $j$ as,
+where $\star \in \{0, 1\}$ toggles between the training and test sets.
+%
+Nevertheless, the cross-entropy loss is a coarse measure of fit. We wish to define a new measure of fit specific to each detected block. Let us define
 $
 	\Bcal_\star(j) \coloneqq \{i \in \Gcal_\star : \hat{b}_i = j\}
 $
 where
 $ 
-	\quad \hat{b}_i \coloneqq \argmax_j \hat{y}_{ij}.
+	\hat{b}_i \coloneqq \argmax_j \hat{y}_{ij}.
 $
-Recall that $\hat{y}_{ij}$ is our estimate for the block membership posterior~(\ref{eqn:y-hat}) using only information from the adjacency matrix $A$. Again, $\star \in \{0, 1\}$ toggles between training and test sets. Now $\Bcal_\star(j)$ is the set of vertices that have maximum a posteriori probability of belonging to block $j$. We choose to resolve ties consistently by picking the lower index. We now define the accuracy for block $j$ as,
+Now $\Bcal_\star(j)$ is the set of vertices that have maximum a posteriori probability of belonging to block $j$. We now define the accuracy for block $j$ as,
 %
 \begin{equation}
 	\eta_\star(j) \coloneqq \frac{1}{|\Bcal_\star (j)| \cdot 
@@ -53,11 +48,8 @@ Recall that $\hat{y}_{ij}$ is our estimate for the block membership posterior~(\
 	\one \left\{\hat{b}_i = \argmax_j \phi_j \left( x_i; \theta^{(t)} \right) \right\}.
 	\label{eqn:accuracy}
 \end{equation}
-%
-This is effectively testing whether the feature-to-block and the graph-to=block predictions agree in their largest component. We call this metric, $\eta_\star(j)$, the {\em block-accuracy} for block $j$. It is clearly bounded $0 \leq \eta_\star(j) \leq 1$, with an accuracy of 1 meaning perfect agreement for the vertices in detected block $j$.
 
-For each of the experiments, we plot the collected $\theta$-samples for the features that survive the dimensionality reduction procedure. We also plot the per-block accuracy for the original-dimension classifiers. We discuss the results specific to each dataset in turn.
+This effectively tests whether the feature-to-block and the graph-to-block predictions agree in their largest component. We call this metric, $\eta_\star(j)$, the {\em block-accuracy} for block $j$. It is clearly bounded $0 \leq \eta_\star(j) \leq 1$, with an accuracy of 1 meaning perfect agreement for the vertices in detected block $j$.
 
 \input{experiments-detailed}
 \input{experiments-figures}
-\clearpage
