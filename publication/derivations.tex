@@ -7,8 +7,10 @@ We determine the form of $p(b| X)$ by integrating
 out the parameters $\theta$. From the definitions, we have:
 %
 \begin{align*}
-	p(b | X) &= \int p(b , \theta| X) d\theta = \int p(b | X, \theta) p(\theta | X) d\theta \\
-	&=\int p(b | X, \theta) p(\theta) d\theta = \int \prod_{i \in [N] } \phi_{b_i}(x_i; \theta) p(\theta) d\theta \\
+	p(b | X) 
+	&= \int p(b , \theta| X) d\theta 
+	= \int p(b | X, \theta) p(\theta | X) d\theta
+	= \int \prod_{i \in [N] } \phi_{b_i}(x_i; \theta) p(\theta) d\theta \\
 	&= \prod_{i \in [N]} \int \frac{\exp(w_{b_i}^T x_i) \prod_{j \in [B]} \Gaussian(w_j; 0, \sigma_\theta^2 I)}{\sum_{k \in [B]} \exp(w_{k}^T x_i)} dw_{1:B}.
 \end{align*}
 %
@@ -51,23 +53,20 @@ where
 $\|\theta\|^2 = \sum_{i} \theta_{i}^2 = \sum_{j \in [B]} \|w_j\|^2$ 
 is the Euclidean norm of the vector of parameters $\theta$.
 Therefore, discarding constant terms, we 
-obtain:
+obtain,
 %
 \begin{equation}
 	U(\theta) = \left( \sum_{i \in [N]} \sum_{j \in [B]} y_{ij} \log \frac{1}{a_{ij}} \right)
 	+ \frac{1}{2\sigma_\theta^2} \|\theta\|^2.
 \end{equation}
-%
-This is exactly the representation~(\ref{eqn:U-form}), as claimed.
 
 \subsection{Derivation of {\boldmath $\;\nabla U(\theta)$}}
 \label{appdx:gradu}
 Here we show how the gradient 
 $\nabla U(\theta)$ can be computed explicitly.
-Recall the expression for $U(\theta)$ in~(\ref{eqn:U-form}).
-Writing $\theta$ as
-$\theta = \left[w_1^T, w_2^T \dots w_B^T  \right]^T$,
-in order to compute the gradient
+As
+$\theta = \{ w_k \}_{k=1}^{B}$,
+to compute the gradient
 $\nabla U(\theta)$ we need to compute
 each of its components,
 $\nicefrac{\partial U}{\partial w_k}$,
@@ -92,7 +91,7 @@ and we also easily find,
 	\label{eq:dtsdw}
 \end{equation}
 %
-Using~(\ref{eq:dadw}) and~(\ref{eq:dtsdw}), we obtain,
+Recall the expression for $U(\theta)$ in~(\ref{eqn:U-form}). Using~(\ref{eq:dadw}) and~(\ref{eq:dtsdw}), we obtain,
 \begin{align}
 	\frac{\partial U}{\partial w_k} &= 
 	\sum_{i \in [N]} \sum_{j \in [B]} y_{ij} 
