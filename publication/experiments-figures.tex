@@ -44,56 +44,102 @@
 	\label{fig:graphs-all}
 \end{figure}
 
+\begin{figure}[!h]
+	\centering
+	\begin{subfigure}{0.32\linewidth}
+		\centering
+		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{polbooks-null-1}}
+		\caption{Political Books.}
+		\label{fig:polbooks-null}
+	\end{subfigure}
+	\begin{subfigure}{0.32\linewidth}
+		\centering
+		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{school-null-1}}
+		\caption{Primary School.}
+		\label{fig:school-null}
+	\end{subfigure}
+	\begin{subfigure}{0.32\linewidth}
+		\centering
+		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-null-1}}
+		\caption{Facebook Egonet.}
+		\label{fig:fb-null}
+	\end{subfigure}
+	\caption{$\theta$-samples. Dotted line $\pm c^*$.}
+\end{figure}
 
 \begin{figure}[!h]
 	\centering
-	\begin{minipage}{0.42\linewidth}
+	\begin{subfigure}{0.32\linewidth}
 		\centering
-		\begin{subfigure}{\linewidth}
-			\centering
-			\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{polbooks-null-1}}
-			\caption{Political Books.}
-			\label{fig:polbooks-null}
-		\end{subfigure}
-		
-		\begin{subfigure}{\linewidth}
-			\centering
-			\imagebox{0.85\linewidth}{\includegraphics[width=\linewidth]{school-null-1}}
-			\caption{Primary School.}
-			\label{fig:school-null}
-		\end{subfigure}
-		
-		\begin{subfigure}{\linewidth}
-			\centering
-			\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-null-1}}
-			\caption{Facebook Egonet.}
-			\label{fig:fb-null}
-		\end{subfigure}
-		\caption{$\theta$-samples. Dotted line $\pm c^*$.}
-	\end{minipage}
-	%
-	\begin{minipage}{0.42\linewidth}
+		\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{polbooks-accuracy-2}}
+		\caption{Political Books.}
+		\label{fig:polbooks-accuracy}
+	\end{subfigure}
+	\begin{subfigure}{0.32\linewidth}
 		\centering
-		\begin{subfigure}[t]{\linewidth}
-			\centering
-			\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{polbooks-accuracy-2}}
-			\caption{Political Books.}
-			\label{fig:polbooks-accuracy}
-		\end{subfigure}
-		
-		\begin{subfigure}{\linewidth}
-			\centering
-			\imagebox{0.85\linewidth}{\includegraphics[width=\linewidth]{school-accuracy-1}}
-			\caption{Primary School.}
-			\label{fig:school-accuracy}
-		\end{subfigure}
-		
-		\begin{subfigure}{\linewidth}
-			\centering
-			\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
-			\caption{Facebook Egonet.}
-			\label{fig:fb-accuracy}
-		\end{subfigure}
-		\caption{Per-block accuracy $\eta(j)$.}
-	\end{minipage}
+		\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{school-accuracy-1}}
+		\caption{Primary School.}
+		\label{fig:school-accuracy}
+	\end{subfigure}
+	\begin{subfigure}{0.32\linewidth}
+		\centering
+		\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
+		\caption{Facebook Egonet.}
+		\label{fig:fb-accuracy}
+	\end{subfigure}
+	\caption{Per-block accuracy $\eta(j)$.}
 \end{figure}
+
+% vertical layout takes up too much space
+%\begin{figure}[!h]
+%	\centering
+%	\begin{minipage}{0.42\linewidth}
+%		\centering
+%		\begin{subfigure}{\linewidth}
+%			\centering
+%			\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{polbooks-null-1}}
+%			\caption{Political Books.}
+%			\label{fig:polbooks-null}
+%		\end{subfigure}
+%		
+%		\begin{subfigure}{\linewidth}
+%			\centering
+%			\imagebox{0.85\linewidth}{\includegraphics[width=\linewidth]{school-null-1}}
+%			\caption{Primary School.}
+%			\label{fig:school-null}
+%		\end{subfigure}
+%		
+%		\begin{subfigure}{\linewidth}
+%			\centering
+%			\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-null-1}}
+%			\caption{Facebook Egonet.}
+%			\label{fig:fb-null}
+%		\end{subfigure}
+%		\caption{$\theta$-samples. Dotted line $\pm c^*$.}
+%	\end{minipage}
+%	%
+%	\begin{minipage}{0.42\linewidth}
+%		\centering
+%		\begin{subfigure}[t]{\linewidth}
+%			\centering
+%			\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{polbooks-accuracy-2}}
+%			\caption{Political Books.}
+%			\label{fig:polbooks-accuracy}
+%		\end{subfigure}
+%		
+%		\begin{subfigure}{\linewidth}
+%			\centering
+%			\imagebox{0.85\linewidth}{\includegraphics[width=\linewidth]{school-accuracy-1}}
+%			\caption{Primary School.}
+%			\label{fig:school-accuracy}
+%		\end{subfigure}
+%		
+%		\begin{subfigure}{\linewidth}
+%			\centering
+%			\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
+%			\caption{Facebook Egonet.}
+%			\label{fig:fb-accuracy}
+%		\end{subfigure}
+%		\caption{Per-block accuracy $\eta(j)$.}
+%	\end{minipage}
+%\end{figure}

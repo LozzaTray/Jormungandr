@@ -1,4 +1,4 @@
-\section{Derivations}
+\section{Appendix: Derivations}
 
 \subsection{Derivation of {\boldmath $p(b|X)$}}
 \label{appdx:b|x}
@@ -97,8 +97,6 @@ Recall the expression for $U(\theta)$ in~(\ref{eqn:U-form}). Using~(\ref{eq:dadw
 	\sum_{i \in [N]} \sum_{j \in [B]} y_{ij} 
 	\left( -\frac{x_i}{a_{ij}} \left( a_{ij} \delta_{jk} - a_{ij} a_{ik} \right) \right)
 	+ \frac{w_k}{\sigma_\theta^2} \nonumber \\
-	&=  - \left( \sum_{i \in [N]} x_i \left( y_{ik} - a_{ik} \sum_{j \in [B]} y_{ij} \right)
-	- \frac{w_k}{\sigma_\theta^2} \right) \nonumber \\
 	&= - \left( \sum_{i \in [N]} \Big\{ x_i (y_{ik} - a_{ik}) \Big\} - \frac{w_k}{\sigma_\theta^2} \right).
 \end{align}
 %
