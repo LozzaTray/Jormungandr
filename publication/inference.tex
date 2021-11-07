@@ -2,17 +2,20 @@
 \label{sec:inference}
 
 Having completed the definition of the FFBM, we wish to leverage it 
-to perform inference. Given a vertex-labelled graph $(A, X)$,
-the goal is to sample from the posterior distribution
-of $\theta$:
+to perform inference. Specifically, given a labelled network $(A, X)$, we wish to infer if and how the observed features $(X)$ impact graphical structure $(A)$. Formally,
+this means characterising the posterior distribution:
+$
+p(\theta|A, X) \propto p(\theta) \cdot p(A | X, \theta).
+$
+Although the prior is easily computable, computing the likelihood would require a summation over all latent block-states, $p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$, and is therefore intractable. This approach is made doubly intractable as we would also need to compute the normalising constant $p(A|X) = \int p(\theta) \cdot p(A | X, \theta) d\theta$. Clearly we cannot directly compute the form of the posterior, so instead we aim to draw samples from it,
 %
 \begin{equation}
 	\label{eqn:theta-target}
-	\theta \sim p(\theta | A, X).
+	\theta^{(t)} \sim p(\theta | A, X).
 \end{equation}
-%
-We propose an iterative approach to obtain samples
-$\theta^{(t)}$ from $p(\theta|A,X)$. We first draw a sample $b^{(t)}$ 
+
+We propose an iterative approach to obtain these samples
+$\{\theta^{(t)}\}_t$. We first draw a sample $b^{(t)}$ 
 from the block membership posterior,
 and then use $b^{(t)}$ to obtain a corresponding
 sample $\theta^{(t)}$:
@@ -21,10 +24,12 @@ sample $\theta^{(t)}$:
 	b^{(t)} \sim p \Big( b | A, X \Big) \quad \textrm{then} \quad
 	\theta^{(t)} \sim p\left(\theta | X, b^{(t)} \right).
 \end{equation}
-%
-This can be achieved through a two-tiered
-Markov chain Monte-Carlo approach via the Metropolis-Hastings (MH) 
+
+This can be implemented through a two-level
+Markov-Chain via the Metropolis-Hastings (MH) 
 algorithm \cite{hastings-alg}.
+The splitting of the Markov-Chain into two levels allows us to side-step the summation over
+all latent $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta)$.
 The resulting $\theta^{(t)}$ samples are unbiased in that the expectation of 
 their distribution is the true posterior:
 %
@@ -32,9 +37,8 @@ their distribution is the true posterior:
 \Expect_{b^{(t)}} \left[p \left( \theta | X, b^{(t)} \right) \right] = \sum_{b \in [B]^N} p(\theta | X, b) p(b | A, X) = p(\theta | A, X).
 \label{eqn:theta-unbiased}
 \end{equation}
-%
+
 This is an example of a pseudo-marginal approach. Indeed, Andrieu and Roberts \cite{pseudo-marginal} show that~(\ref{eqn:theta-unbiased})
-% the unbiased result in equation 
 is sufficient to prove that, for large enough $t$, $\theta^{(t)} \sim p(\theta | A, X)$, as required.
 %
 \begin{figure}[!h]
@@ -66,13 +70,11 @@ is sufficient to prove that, for large enough $t$, $\theta^{(t)} \sim p(\theta |
 		\draw[dashed, ->] (b0) to (6.5, 0.8);
 		
 	\end{tikzpicture}
-	\caption{Sampling sequence.}
+	\caption{$\theta$-sample generation.}
 	\label{fig:samp-sequence}
 \end{figure}
-
-We have split the Markov chain into two levels as the summation over all latent $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$, is intractable. 
+ 
 Figure \ref{fig:samp-sequence} shows an overview of the proposed method, with $q$ and $\alpha$ denoting the MH proposal distribution and acceptance probability respectively.
-
 Note the importance of the simplification in~(\ref{eqn:b-pseudo-prior}). 
 As evaluating $p(b| X)$ does not depend on $X$, 
 we do not need $X$ to sample $b$.

@@ -4,10 +4,8 @@ A typical inference goal is to determine how the vertex labels
 (or {\em features}) affect the network's structure.
 
 In this work, we introduce a new generative model, the feature-first block model (FFBM),
-which facilitates the use of richer queries on labelled network structure.
-We develop a Bayesian framework for inference with this model,
-and we present a method to efficiently sample from the posterior
-distribution of the FFBM parameters.
+to facilitate the use of richer queries on labelled network structure.
+We develop a Bayesian framework and devise a two-level Markov-Chain Monte-Carlo approach to efficiently sample the FFBM parameters. This allows us to infer if and how the observed vertex-features affect macro-structure.
 
 We apply the proposed methods to a variety of network data
 to extract the most important features along which the vertices

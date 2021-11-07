@@ -105,43 +105,47 @@ for all $i$.
 \label{appdx:hyperparams}
 
 All data analysis and visualisation was implemented in Python. Full source code is available at:
-\url{https://github.com/LozzaTray/Jormungandr-code}. Table~\ref{tab:hyperparams} contains the hyper-parameters for each experiment run. The thinned samples are generated as,
-\begin{equation}
+\url{https://github.com/LozzaTray/Jormungandr-code}. Table~\ref{tab:hyperparams} contains the hyper-parameters for each experiment run. The set of retained samples are generated as,
+$
 	\Tcal_\star = \{T_\star \kappa_\star + i \lambda_\star :  
-	0 \leq i \leq \lfloor T_\star(1 - \kappa_\star) / \lambda_\star \rfloor \}.
-\end{equation}
+	0 \leq i \leq \lfloor T_\star(1 - \kappa_\star) / \lambda_\star \rfloor \},
+$
+with $\kappa_star$ controlling burn-in and $\lambda_star$ controlling thinning.
 
 \begin{table}[!h]
 	\centering
 	\caption{Hyper-parameter values for each experiment}
 	\label{tab:hyperparams}
 	\resizebox{\textwidth}{!}{%
-		\begin{tabular}{c|ccc|ccc|cccc|cc|cccc}
+		\begin{tabular}{c|ccc|ccc|ccc|cc|ccc}
 			Dataset & 
 			$B$ & $f$ & $\sigma_\theta$ & 
 			$T_b$ & $\kappa_b$ & $\lambda_b$ & 
-			$T_\theta$ & $\kappa_\theta$ & $\lambda_\theta$ & $s$ &
+			$T_\theta$ & $\kappa_\theta$ & $\lambda_\theta$ & %$s$ &
 			$k$ & $D'$ &
-			$T_\theta'$ & $\kappa_\theta'$ & $\lambda_\theta'$ & $s'$
+			$T_\theta'$ & $\kappa_\theta'$ & $\lambda_\theta'$ %& $s'$
 			\\ \hline
 			Polbooks &
 			3 & 0.7 & 1 &
 			1,000 & 0.2 & 5 &
-			10,000 & 0.4 & 10 & 0.05 &
+			10,000 & 0.4 & 10 & %0.05 &
 			-- & -- & 
-			-- & -- & -- & -- \\
+			-- & -- & -- %& -- 
+			\\
 			School &
 			10 & 0.7 & 1 &
 			1,000 & 0.2 & 5 &
-			10,000 & 0.4 & 10 & 0.2 &
+			10,000 & 0.4 & 10 & %0.2 &
 			1 & 10 & 
-			10,000 & 0.4 & 10 & 0.2 \\
+			10,000 & 0.4 & 10 %& 0.2 
+			\\
 			FB Egonet &
 			10 & 0.7 & 1 &
 			1,000 & 0.2 & 5 &
-			10,000 & 0.4 & 10 & 0.017 &
+			10,000 & 0.4 & 10 & %0.017 &
 			1 & 10 & 
-			10,000 & 0.4 & 10 & 0.5 \\
+			10,000 & 0.4 & 10 %& 0.5 
+			\\
 		\end{tabular}
 	}
 \end{table}
