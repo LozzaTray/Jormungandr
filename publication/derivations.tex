@@ -1,4 +1,4 @@
-\section{Appendix: Derivations}
+\section{Appendix}
 
 \subsection{Derivation of {\boldmath $p(b|X)$}}
 \label{appdx:b|x}
@@ -27,7 +27,7 @@ $b$ takes values in $[B]^N$, we necessarily have:
 	p(b | X) = \frac{1}{\big|[B]^N\big|}=B^{-N}.
 \end{equation}
 
-\subsection{Derivation of {\boldmath $\;U(\theta)$}}
+\subsection{Derivation of {\boldmath $U(\theta)$} and {\boldmath $\nabla U(\theta)$}}
 \label{appdx:form-U}
 
 Recall from~(\ref{eq:U}) in Section~\ref{s:sfb} that,
@@ -60,10 +60,6 @@ obtain,
 	+ \frac{1}{2\sigma_\theta^2} \|\theta\|^2.
 \end{equation}
 
-\subsection{Derivation of {\boldmath $\;\nabla U(\theta)$}}
-\label{appdx:gradu}
-Here we show how the gradient 
-$\nabla U(\theta)$ can be computed explicitly.
 As
 $\theta = \{ w_k \}_{k=1}^{B}$,
 to compute the gradient
@@ -104,3 +100,48 @@ This can be computed
 efficiently through matrix operations. The only property of $y_{ij}$ 
 we have used in the derivation is the constraint $\sum_{j \in [B]} y_{ij} = 1$,
 for all $i$.
+
+\subsection{Implementation details}
+\label{appdx:hyperparams}
+
+All data analysis and visualisation was implemented in Python. Full source code is available at:
+\url{https://github.com/LozzaTray/Jormungandr-code}. Table~\ref{tab:hyperparams} contains the hyper-parameters for each experiment run. The thinned samples are generated as,
+\begin{equation}
+	\Tcal_\star = \{T_\star \kappa_\star + i \lambda_\star :  
+	0 \leq i \leq \lfloor T_\star(1 - \kappa_\star) / \lambda_\star \rfloor \}.
+\end{equation}
+
+\begin{table}[!h]
+	\centering
+	\caption{Hyper-parameter values for each experiment}
+	\label{tab:hyperparams}
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{c|ccc|ccc|cccc|cc|cccc}
+			Dataset & 
+			$B$ & $f$ & $\sigma_\theta$ & 
+			$T_b$ & $\kappa_b$ & $\lambda_b$ & 
+			$T_\theta$ & $\kappa_\theta$ & $\lambda_\theta$ & $s$ &
+			$k$ & $D'$ &
+			$T_\theta'$ & $\kappa_\theta'$ & $\lambda_\theta'$ & $s'$
+			\\ \hline
+			Polbooks &
+			3 & 0.7 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.4 & 10 & 0.05 &
+			-- & -- & 
+			-- & -- & -- & -- \\
+			School &
+			10 & 0.7 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.4 & 10 & 0.2 &
+			1 & 10 & 
+			10,000 & 0.4 & 10 & 0.2 \\
+			FB Egonet &
+			10 & 0.7 & 1 &
+			1,000 & 0.2 & 5 &
+			10,000 & 0.4 & 10 & 0.017 &
+			1 & 10 & 
+			10,000 & 0.4 & 10 & 0.5 \\
+		\end{tabular}
+	}
+\end{table}

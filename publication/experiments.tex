@@ -18,8 +18,7 @@ description length per entity (nodes and edges) $\bar{S}_e$ as a suitable metric
 \end{equation}
 
 Next, to assess the performance of the feature-to-block predictor, 
-we randomly partition the vertex set $[N]$ into training and test sets: $\Gcal_0$ and $\Gcal_1$.
-\footnote{We choose $f=0.7$ as the fraction of vertices that go to form our test set. Please refer to \url{https://github.com/LozzaTray/Jormungandr-code} for full source code.}
+we randomly partition the vertex set $[N]$ such that a constant fraction $f$ forms our training set $\Gcal_0$ and the remainder form our test set $\Gcal_1$.
 The $b$-chain is run using the whole network but we only use vertices $v \in \Gcal_0$ to train the $\theta$-chain. As $|\Gcal_0| \neq |\Gcal_1|$ in general, we use the average cross-entropy loss 
 over each set to gauge fit,
 %
