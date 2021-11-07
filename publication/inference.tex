@@ -7,15 +7,15 @@ this means characterising the posterior distribution:
 $
 p(\theta|A, X) \propto p(\theta) \cdot p(A | X, \theta).
 $
-Although the prior is easily computable, computing the likelihood would require a summation over all latent block-states, $p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$, and is therefore intractable. This approach is made doubly intractable as we would also need to compute the normalising constant $p(A|X) = \int p(\theta) \cdot p(A | X, \theta) d\theta$. Clearly we cannot directly compute the form of the posterior, so instead we aim to draw samples from it,
+Although the prior is easily computable, computing the likelihood would require a summation over all latent block-states, $p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$, and is therefore intractable. This approach is doubly intractable as we would also need to compute the normalising constant $p(A|X)$. Clearly we cannot directly compute the form of the posterior, so instead we aim to draw samples from it,
 %
 \begin{equation}
 	\label{eqn:theta-target}
 	\theta^{(t)} \sim p(\theta | A, X).
 \end{equation}
-
+%
 We propose an iterative approach to obtain these samples
-$\{\theta^{(t)}\}_t$. We first draw a sample $b^{(t)}$ 
+$\{\theta^{(t)}\}$. We first draw a sample $b^{(t)}$ 
 from the block membership posterior,
 and then use $b^{(t)}$ to obtain a corresponding
 sample $\theta^{(t)}$:
@@ -24,7 +24,7 @@ sample $\theta^{(t)}$:
 	b^{(t)} \sim p \Big( b | A, X \Big) \quad \textrm{then} \quad
 	\theta^{(t)} \sim p\left(\theta | X, b^{(t)} \right).
 \end{equation}
-
+%
 This can be implemented through a two-level
 Markov-Chain via the Metropolis-Hastings (MH) 
 algorithm \cite{hastings-alg}.
@@ -37,7 +37,7 @@ their distribution is the true posterior:
 \Expect_{b^{(t)}} \left[p \left( \theta | X, b^{(t)} \right) \right] = \sum_{b \in [B]^N} p(\theta | X, b) p(b | A, X) = p(\theta | A, X).
 \label{eqn:theta-unbiased}
 \end{equation}
-
+%
 This is an example of a pseudo-marginal approach. Indeed, Andrieu and Roberts \cite{pseudo-marginal} show that~(\ref{eqn:theta-unbiased})
 is sufficient to prove that, for large enough $t$, $\theta^{(t)} \sim p(\theta | A, X)$, as required.
 %
@@ -175,13 +175,13 @@ The same matrix $\hat{y}$ is used in the update step
 for each $\theta^{(t)}$.
 This way, it is not necessary to run the $b$ and $\theta$ Markov chains 
 concurrently. Instead, we run the $b$-chain to completion and use it 
-to generate $\hat{y}$ also allowing us to vary the lengths of each. This change shortens the burn-in of the $\theta$-chain by reducing the variance of our proposal distribution.
+to generate $\hat{y}$ also allowing us to vary the lengths of each.
 
 \subsection{Dimensionality reduction}
 \label{sec:dim-reduction}
 
-Once the samples $\left\{ \theta^{(t)} \right\} \sim p(\theta | A, X)$
-have been obtained, we can compute the empirical mean and standard deviation of each component of $\theta$. Switching to matrix notation $\theta = W$ we define:
+Evaluating $U$ and $\nabla U$ is linear in the dimension of our feature-space $D$ so there is computational incentive to reduce $D$.
+Given the samples $\left\{ \theta^{(t)} \right\} \sim p(\theta | A, X)$, we can compute the empirical mean and standard deviation of each component of $\theta$. Switching to matrix notation $\theta = W$ we define:
 %
 \begin{equation}
 	\hat{\mu}_{ij} \coloneqq \frac{1}{|\Tcal_\theta|} \sum_{t \in \Tcal_\theta} W_{ij}^{(t)} \qquad \textrm{and} \qquad
@@ -200,7 +200,7 @@ as in~(\ref{eqn:fij}) and only keep features with indices $d \in \Dcal'$, where 
 %
 Intuitively, this means discarding any feature $j$ for which 
 $(\hat{\mu}_{ij} - k\hat{\sigma}_{ij}, \hat{\mu}_{ij} + k \hat{\sigma}_{ij})$ overlaps with
-$(-c, c)$ for all block indices $i$. If we were to use the Laplace approximation for the posterior $p(W_{ij} | A, X) \approx \Gaussian(W_{ij}; \hat{\mu}_{ij}, \hat{\sigma}_{ij}^2)$, then this would be analogous to a hypothesis test on the magnitude of $W_{ij}$ compared to $c$ with multiplier $k$ in~(\ref{eqn:fij}) determines the degree of significance of the result. However, as the Laplace approximation is not exact, we regard this as a useful heuristic and not an exact method. Conversely, if we want to fix the number of dimensions in our reduced feature set $|\Dcal'|=D'$, the problem then becomes finding the largest value of $c$ such that $|\Dcal'|=D'$ given $k=k_0$:
+$(-c, c)$ for all block indices $i$. If we were to use the Laplace approximation for the posterior $p(W_{ij} | A, X) \approx \Gaussian(W_{ij}; \hat{\mu}_{ij}, \hat{\sigma}_{ij}^2)$, then this would be analogous to a hypothesis test on the magnitude of $W_{ij}$ compared to $c$ with multiplier $k$ in~(\ref{eqn:fij}) determining the degree of significance of the result. Conversely, if we want to fix the number of dimensions in our reduced feature set $|\Dcal'|=D'$, the problem then becomes finding the largest value of $c$ such that $|\Dcal'|=D'$ given $k=k_0$:
 %
 \begin{equation}
 	c^* = \argmax \{c>0\; : \;|\Dcal'| = D', k=k_0\}.

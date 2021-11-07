@@ -1,7 +1,7 @@
 \section{Experiments}
 \label{sec:experiments}
 
-We apply the outlined methods to a variety of labelled networks. For reference, the inferred partitions for all of these are potted on Figure~\ref{fig:graphs-all}.
+We apply the outlined methods to a variety of labelled networks:
 
 \begin{itemize}
 	\item \textbf{Political books} \cite{polbooks} ($N=105, E=441, D=3$) -- network of Amazon political book sales, published close to the 2004 presidential election. Two books are connected if they were frequently co-purchased. Vertex features encode the political affiliation of the author (liberal, conservative, or neutral).
@@ -9,6 +9,7 @@ We apply the outlined methods to a variety of labelled networks. For reference, 
 	\item \textbf{Facebook egonet} \cite{fb-snap} ($N=747, E=30025, D=480$) -- an assortment of Facebook users' friends lists. Vertex features are fully anonymised and encode information about each user's education history, languages spoken, gender, home-town, birthday etc. We focus on the egonet with id 1912.
 \end{itemize}
 %
+For reference, the inferred partitions for all of these are given on Figure~\ref{fig:graphs-all}.
 We first require metrics to assess model performance. We define the average
 description length per entity (nodes and edges) $\bar{S}_e$ as a suitable metric to gauge the SBM fit:
 %
@@ -16,7 +17,7 @@ description length per entity (nodes and edges) $\bar{S}_e$ as a suitable metric
 	\bar{S}_e \coloneqq \frac{1}{(N+E) |\Tcal_b|} \sum_{t\in \Tcal_b} S \left( b^{(t)} \right).
 	\label{eqn:mean-dl}
 \end{equation}
-
+%
 Next, to assess the performance of the feature-to-block predictor, 
 we randomly partition the vertex set $[N]$ such that a constant fraction $f$ forms our training set $\Gcal_0$ and the remainder form our test set $\Gcal_1$.
 The $b$-chain is run using the whole network but we only use vertices $v \in \Gcal_0$ to train the $\theta$-chain. As $|\Gcal_0| \neq |\Gcal_1|$ in general, we use the average cross-entropy loss 
@@ -48,7 +49,14 @@ Now $\Bcal_\star(j)$ is the set of vertices that have maximum a posteriori proba
 	\one \left\{\hat{b}_i = \argmax_j \phi_j \left( x_i; \theta^{(t)} \right) \right\}.
 	\label{eqn:accuracy}
 \end{equation}
-
+%
+For the higher-dimensional datasets, we also apply the 
+dimensionality reduction method 
+of Section~\ref{sec:dim-reduction}.  
+We then retrain the feature-block predictor using only the retained 
+feature set $\Dcal'$, and report the log-loss over the training and 
+test sets for the reduced classifier -- 
+denoted $\bar{\Lcal}_0'$ and $\bar{\Lcal}_1'$ respectively. 
 \input{experiments-figures}
 \input{experiments-detailed}
 

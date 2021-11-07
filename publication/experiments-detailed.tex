@@ -1,16 +1,8 @@
-For the higher-dimensional datasets, we also apply the 
-dimensionality reduction method 
-of Section~\ref{sec:dim-reduction}.  
-We then retrain the feature-block predictor using only the retained 
-feature set $\Dcal'$, and report the log-loss over the training and 
-test sets for the reduced classifier -- 
-denoted $\bar{\Lcal}_0'$ and $\bar{\Lcal}_1'$ respectively. 
-
-Table~\ref{tab:results} summarises the results for each experiment.
+Table~\ref{tab:results} summarises the results for each experiment. 
 We see that the dimensionality reduction procedure 
 brings the training and test losses closer together. This implies that 
 the features we keep are indeed correlated with the underlying graphical 
-partition and that the approach generalises correctly.
+partition and that the approach generalises correctly. The test loss variance is higher than the training loss variance as the test set is smaller and so more susceptible to variability in its construction.
 %
 The average description length per entity,
 $\bar{S}_e$, of the graph, 
@@ -20,7 +12,7 @@ relabelling of blocks).
 
 \paragraph{\textbf{Political books.}}
 
-We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation (conservative, liberal or neutral).
+We choose to partition the network into $B=3$ communities as we only have this many distinct values for political affiliation.
 From Figure~\ref{fig:polbooks-null} we see that all 3 blocks have a distinct political affiliation as their largest positive component.  
 Furthermore, the training and test losses from Table~\ref{tab:results}  
 are very similar and both are low in magnitude. This is strong evidence 
@@ -31,13 +23,13 @@ However, from Figure~\ref{fig:polbooks-accuracy} we see that block 1 has low acc
 This suggests that detected block 1 is not solely composed of ``neutral" books but also 
 contains some ``liberal" and ``conservative" authors. Examining 
 Figure~\ref{fig:polbooks-graph}, we see the majority of paths between blocks 2 and 3 go through block 1.
-Block 1 is in effect a bridge between the ``conservative'' and ``liberal'' blocks so it is unsurprising that some books from either side leak into block 1.
+Block 1 is in effect a bridge between the ``conservative'' and ``liberal'' blocks so it is unsurprising that some of these leak into block 1.
 
 \paragraph{\textbf{Primary school.}}
 
 We choose the number of communities $B=10$, in line with the total number of 
 school classes. Only the pupils' class memberships (1A-5B) survive
-the dimensionality-reduction process (Figur~\ref{fig:school-null}e);
+the dimensionality-reduction process (Figure~\ref{fig:school-null});
 gender and teacher/student status have been discarded,
 meaning these are poor predictors of overall macro-structure.
 %
@@ -47,12 +39,16 @@ Conversely, some classes are found to extend over two
 detected blocks (class 2B spans blocks 8 and 9) but we do 
 not have a feature which explains the division.
 %
-Figure~\ref{fig:school-accuracy} shows excellent accuracy for the majority of blocks. In fact the only blocks with low accuracy are those that have a school-class span two blocks such that we cannot reliably distinguish between the two. This is more pronounced when we apply hard classification rather than the soft cross-entropy loss. Perhapsthere are unobserved features which explain this divide.
+Figure~\ref{fig:school-accuracy} shows excellent accuracy for the majority of blocks. In fact the only blocks with low accuracy are those that have a school-class span two blocks such that we cannot reliably distinguish between the two. This is more pronounced when we apply hard classification rather than the soft cross-entropy loss. Perhaps there are unobserved features which explain this divide.
 
 \paragraph{\textbf{Facebook egonet.}}
 
-We choose $B=10$ and $D'=10$ for this experiment. The selected features 
+The retained features 
 (Figure~\ref{fig:fb-null}) are those that best explain the high-level 
-community structure. The majority of them are education related. 
+community structure. The majority of these are education related. 
 Nevertheless, for $D'=10$ we only have good explanations for some of the detected blocks; several blocks in 
-Figure~\ref{fig:fb-null} do not have high-magnitude components for $D'=10$. This is further emphasised by the disparate accuracies in Figure~\ref{fig:fb-accuracy}.
+Figure~\ref{fig:fb-null} do not have high-magnitude components. This is further emphasised by the disparate accuracies in Figure~\ref{fig:fb-accuracy}.
+%
+For a high-dimensional feature-space, it is likely that a particular
+feature may uniquely identify a small set of vertices; if these are all in the same block, then the classifier may overfit despite the penalty imposed by the prior. Indeed, we see in
+Figure~\ref{fig:fb-null} that the feature birthday-5 has a very high weight as it relates to block 1 – but it is unlikely that birthdays determine graphical structure.
