@@ -2,20 +2,38 @@
 \label{sec:conclusion}
 
 The proposed Feature-First Block Model (FFBM)
-is a new generative model for labelled networks well-suited for describing how features
-affect structure.
-It is easy to find vertex features that are in some way 
-correlated with the graphical structure; only when 
-we find the feature that best describes the most pronounced partition,
-do we have a stronger case for causation.
+is a new generative model for labelled networks.
+It is a hierachical Bayesian model, 
+well-suited for describing how features
+affect network structure.
+The Bayesian inference tools developed in this 
+work facilitate the identification of 
+vertex features that are in some way 
+correlated with the network's graphical structure.
+Consequently, 
+finding the features that best describe the most 
+pronounced partition, makes it possible in practice
+to examine the existence of -- and to make a case for --
+causal relationships.
 
-Using this new model,
-we go on to describe an efficient inference algorithm to sample 
-the parameters of the FFBM.
-The idea is to divide the graph into its most natural partition and determine whether 
-the vertex features can accurately explain this partition. 
-This is shown to be effective at extracting and describing 
-the most natural communities in a labelled network. Nevertheless, the approach 
-can only currently explain the structure at the macro-scale. Future work will benefit from extending 
-the FFBM to be hierarchical in nature. That way, the structure of the network 
-can be explained at all length-scales of interest.
+An an efficient MCMC algorithm 
+is developed for sampling 
+from the posterior distribution of the
+the relevanat parameters in the FFBM:
+The main idea is to divide up the graph into 
+the most natural partition under the associated
+parameter values, and then to determine whether 
+the vertex features can accurately explain the partition. 
+Through several applications on empirical
+network data, this approach 
+is shown to be effective at extracting and describing 
+the most natural communities in a labelled network. 
+Nevertheless, it
+can only currently explain the structure at the macroscopic
+scale. Future work will benefit from extending 
+the FFBM to a further hierarchical model,
+so that
+the structure of the network 
+can be explained at all scales of interest.
+
+

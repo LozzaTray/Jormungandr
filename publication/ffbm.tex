@@ -1,12 +1,15 @@
 \section{Feature-First Block Model}
 
-In this section we propose a novel generative model for labelled networks. We call this the feature-first block model (FFBM -- illustrated in Figure~\ref{fig:ffbm}).
+In this section we propose a novel generative model for labelled networks. We call this the feature-first block model (FFBM),
+illustrated in Figure~\ref{fig:ffbm}).
 
 Let $N$ denote the number of vertices, $B$ the number of blocks
 and ${\cal X}$ the set of values each feature can take.
 We define the vector $x_i \in \Xcal^D$ as the feature vector for vertex $i$, 
 where $D$ is the number of features associated with each vertex.
-For the datasets we analyse, we deal with binary feature flags so $\Xcal = \{0, 1\}$. We write $X$ for the $N\times D$ {\em feature matrix} containing
+For example, in the datasets we analyse we deal with binary feature flags
+(denoting the presence/absence of each feature),
+so $\Xcal = \{0, 1\}$. We write $X$ for the $N\times D$ {\em feature matrix} containing
 the feature vectors $\{x_i\}_{i=1}^{N}$ 
 as its rows.
 
@@ -30,7 +33,7 @@ More complex models based on different choices for the distributions
 $\phi_{b_i}$ above are also possible, but then deriving meaning from 
 the inferred parameter distributions is more difficult. 
 %
-\begin{figure}
+\begin{figure}[!ht]
 	\centering
 	\begin{tikzpicture}[
 		roundnode/.style={circle, draw=black, minimum size=7mm},
@@ -79,9 +82,9 @@ simple form for the conditional distribution of the block membership vector $b$ 
 	\label{eqn:b-pseudo-prior}
 \end{equation}
 %
-The proof is given in Appendix~\ref{appdx:b|x}. This an important simplification as evaluating $p(b | X)$ does not require an expensive  integration over $\theta$ nor does it require the exact value of $X$.
+The proof is given in Appendix~\ref{appdx:b|x}. This an important simplification as evaluating $p(b | X)$ does not require an expensive  integration over $\theta$ nor does it depend on $X$.
 Peixoto \cite{Peixoto-Bayesian-Microcanonical} proposes careful choices for 
-the priors on the additional microcanonical SBM parameters $\psi$, which we adopt. 
+the priors on the additional microcanonical SBM parameters $\psi$, which we adopt without repeating their exact form here. 
 The idea is to write the joint distribution on $(b, e, k)$ as a product of 
 conditionals, $p(b, e, k) = p(b) p(e | b) p(k | e, b)= p(b) p(\psi | b)$. 
 In our case, conditioning on $X$ is also necessary, leading to,
@@ -90,5 +93,5 @@ $
 $
 where we used the fact $\psi$ and $X$ are conditionally 
 independent given $b$.
-All that concerns the main argument is that it has
+All that concerns the main argument is that $p(\psi|b)$ has
 an easily computable form.

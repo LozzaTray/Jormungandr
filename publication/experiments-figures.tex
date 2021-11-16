@@ -1,18 +1,4 @@
-\begin{table}[!h]
-	\centering
-	\caption{Experimental results averaged over $n=10$ iterations (mean $\pm$ std. dev.).}
-	\label{tab:results}
-	\resizebox{\textwidth}{!}{%
-		\begin{tabular}{c|ccc|c|cc|ccc}
-			Dataset  & $B$ & $D$ & $D'$ & $\bar{S}_e$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $c^*$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$  \\ \hline
-			Polbooks & 3 & 3 & -- & $2.250 \pm 0.000$ & $0.563 \pm 0.042$ & $0.595 \pm 0.089$ & -- & -- & -- \\
-			School & 10 & 13 & 10 & $1.894 \pm 0.004$ & $0.787 \pm 0.127$ & $0.885 \pm 0.129$ & $1.198 \pm 0.249$ & $0.793 \pm 0.132$ & $0.853 \pm 0.132$ \\
-			FB egonet & 10  & 480 & 10 & $1.626 \pm 0.003$ & $1.326 \pm 0.043$ & $1.538 \pm 0.069$ & $0.94 \pm 0.019$ & $1.580 \pm 0.150$ & $1.605 \pm 0.106$
-		\end{tabular}
-	}
-\end{table}
-%
-\begin{figure}[!h]
+\begin{figure}[!ht]
 	\centering
 	\begin{subfigure}[t]{0.28\linewidth}
 		\centering
@@ -40,79 +26,93 @@
 		\caption{Block Legend}
 		\label{fig:10-legend}
 	\end{subfigure}
-	\caption{Networks laid out and coloured according to inferred block memberships $\hat{y}$ for a given experiment iteration. Visualisation performed using \textit{graph-tool} \cite{peixoto_graph-tool_2014}.}
+	\caption{Networks laid out and coloured according to inferred block memberships for a given experiment iteration. Visualisation performed using \texttt{graph-tool} \cite{peixoto_graph-tool_2014}.}
 	\label{fig:graphs-all}
 \end{figure}
 %
-\begin{figure}[!h]
+\begin{table}[!ht]
+	\centering
+	\caption{Experimental results averaged over $n=10$ iterations (mean $\pm$ std. dev.).}
+	\label{tab:results}
+	\resizebox{\textwidth}{!}{%
+		\begin{tabular}{c|ccc|c|cc|ccc}
+			Dataset  & $B$ & $D$ & $D'$ & $\bar{S}_e$ & $\bar{\Lcal}_0$ & $\bar{\Lcal}_1$ & $c^*$ & $\bar{\Lcal}_0'$ & $\bar{\Lcal}_1'$  \\ \hline
+			Polbooks & 3 & 3 & -- & $2.250 \pm 0.000$ & $0.563 \pm 0.042$ & $0.595 \pm 0.089$ & -- & -- & -- \\
+			School & 10 & 13 & 10 & $1.894 \pm 0.004$ & $0.787 \pm 0.127$ & $0.885 \pm 0.129$ & $1.198 \pm 0.249$ & $0.793 \pm 0.132$ & $0.853 \pm 0.132$ \\
+			FB egonet & 10  & 480 & 10 & $1.626 \pm 0.003$ & $1.326 \pm 0.043$ & $1.538 \pm 0.069$ & $0.94 \pm 0.019$ & $1.580 \pm 0.150$ & $1.605 \pm 0.106$
+		\end{tabular}
+	}
+\end{table}
+%
+\begin{figure}[!ht]
 	\centering
 	\begin{subfigure}{0.32\linewidth}
 		\centering
 		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{polbooks-null-1}}
-		\caption{Political Books.}
+		\caption{Political books}
 		\label{fig:polbooks-null}
 	\end{subfigure}
 	\begin{subfigure}{0.32\linewidth}
 		\centering
 		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{school-null-1}}
-		\caption{Primary School.}
+		\caption{Primary school}
 		\label{fig:school-null}
 	\end{subfigure}
 	\begin{subfigure}{0.32\linewidth}
 		\centering
 		\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-null-1}}
-		\caption{Facebook Egonet.}
+		\caption{Facebook egonet}
 		\label{fig:fb-null}
 	\end{subfigure}
 	\caption{Top $D'$ $\theta$-samples for each dataset. Coarse steps on x-axis give block index and the fine steps denote give index. Dotted line is $\pm c^*$.}
 \end{figure}
 %
-\begin{figure}[!h]
+\begin{figure}[!ht]
 	\centering
 	\begin{subfigure}{0.32\linewidth}
 		\centering
 		\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{polbooks-accuracy-2}}
-		\caption{Political Books.}
+		\caption{Political books}
 		\label{fig:polbooks-accuracy}
 	\end{subfigure}
 	\begin{subfigure}{0.32\linewidth}
 		\centering
 		\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{school-accuracy-1}}
-		\caption{Primary School.}
+		\caption{Primary school}
 		\label{fig:school-accuracy}
 	\end{subfigure}
 	\begin{subfigure}{0.32\linewidth}
 		\centering
 		\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
-		\caption{Facebook Egonet.}
+		\caption{Facebook egonet}
 		\label{fig:fb-accuracy}
 	\end{subfigure}
 	\caption{Per-block accuracy $\eta(j)$ for each dataset.}
 \end{figure}
 \FloatBarrier
 % vertical layout takes up too much space
-%\begin{figure}[!h]
+%\begin{figure}[!ht]
 %	\centering
 %	\begin{minipage}{0.42\linewidth}
 %		\centering
 %		\begin{subfigure}{\linewidth}
 %			\centering
 %			\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{polbooks-null-1}}
-%			\caption{Political Books.}
+%			\caption{Political books}
 %			\label{fig:polbooks-null}
 %		\end{subfigure}
 %		
 %		\begin{subfigure}{\linewidth}
 %			\centering
 %			\imagebox{0.85\linewidth}{\includegraphics[width=\linewidth]{school-null-1}}
-%			\caption{Primary School.}
+%			\caption{Primary school}
 %			\label{fig:school-null}
 %		\end{subfigure}
 %		
 %		\begin{subfigure}{\linewidth}
 %			\centering
 %			\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-null-1}}
-%			\caption{Facebook Egonet.}
+%			\caption{Facebook egonet}
 %			\label{fig:fb-null}
 %		\end{subfigure}
 %		\caption{$\theta$-samples. Dotted line $\pm c^*$.}
@@ -123,21 +123,21 @@
 %		\begin{subfigure}[t]{\linewidth}
 %			\centering
 %			\imagebox{0.8\linewidth}{\includegraphics[width=\linewidth]{polbooks-accuracy-2}}
-%			\caption{Political Books.}
+%			\caption{Political books}
 %			\label{fig:polbooks-accuracy}
 %		\end{subfigure}
 %		
 %		\begin{subfigure}{\linewidth}
 %			\centering
 %			\imagebox{0.85\linewidth}{\includegraphics[width=\linewidth]{school-accuracy-1}}
-%			\caption{Primary School.}
+%			\caption{Primary school}
 %			\label{fig:school-accuracy}
 %		\end{subfigure}
 %		
 %		\begin{subfigure}{\linewidth}
 %			\centering
 %			\imagebox{0.9\linewidth}{\includegraphics[width=\linewidth]{fb-accuracy-1}}
-%			\caption{Facebook Egonet.}
+%			\caption{Facebook egonet}
 %			\label{fig:fb-accuracy}
 %		\end{subfigure}
 %		\caption{Per-block accuracy $\eta(j)$.}

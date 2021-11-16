@@ -19,13 +19,10 @@ the value of the integral is independent
 of the value of $b_i \in [B]$ as
 the integrand has the same form regardless of $b_i$. This is
 because the prior is the same for each $w_j$. 
-Therefore, the integral can only be a function of at most $x_i$ and $\sigma_\theta^2$,
+Therefore, the integral can only be a function of $x_i$ and $\sigma_\theta^2$,
 which means that, as a function of $b$, $p(b|X)\propto 1$. As
 $b$ takes values in $[B]^N$, we necessarily have:
-%
-\begin{equation}
-	p(b | X) = \frac{1}{\big|[B]^N\big|}=B^{-N}.
-\end{equation}
+$p(b | X) =1/\big|[B]^N\big|=B^{-N}$.
 
 \subsection{Derivation of {\boldmath $U(\theta)$} and {\boldmath $\nabla U(\theta)$}}
 \label{appdx:form-U}
@@ -40,7 +37,7 @@ U(\theta)
 $$
 Writing,
 $y_{ij} \coloneqq \one \left\{ b_i = j \right\}$ and 
-$a_{ij} \coloneqq \phi_j(x_i; \theta)$, we have that,
+$a_{ij} \coloneqq \phi_j(x_i; \theta)$ as before, we have that,
 %
 \begin{equation*}
 	\log p(b | X, \theta) = \sum_{i \in [N]} \sum_{j \in [B]} y_{ij} \log a_{ij}  \quad \textrm{and} \quad
@@ -63,7 +60,7 @@ obtain,
 %
 Now to find $\nabla U(\theta)$, we need to compute
 each of its components,
-$\nicefrac{\partial U}{\partial w_k}$ for $k \in [B]$.
+$\nicefrac{\partial U}{\partial w_k}$, for $k \in [B]$.
 To that end, we first compute,
 %
 \begin{align}
@@ -101,16 +98,19 @@ for all $i$.
 \subsection{Implementation details}
 \label{appdx:hyperparams}
 
-Full source code is available at:
-\url{https://github.com/LozzaTray/Jormungandr-code}. Table~\ref{tab:hyperparams} contains the hyper-parameters for each experiment run. The set of retained samples are generated as,
+Full source code is available at:\\
+\centerline{\url{https://github.com/LozzaTray/Jormungandr-code}}
+Table~\ref{tab:hyperparams} contains all 
+hyper-parameter values used in our experiments. The set of retained 
+samples are generated as,
 $
 	\Tcal_\star = \{T_\star \kappa_\star + i \lambda_\star :  
 	0 \leq i \leq \lfloor T_\star(1 - \kappa_\star) / \lambda_\star \rfloor \}.
 $
 %
-\begin{table}[!h]
+\begin{table}[!ht]
 	\centering
-	\caption{Hyper-parameter values for each experiment}
+	\caption{Hyper-parameter values for each experiment.}
 	\label{tab:hyperparams}
 	\begin{tabular}{c|ccc|ccc|ccc|cc|ccc}
 		Dataset & 
@@ -134,7 +134,7 @@ $
 		1 & 10 & 
 		10,000 & 0.4 & 10 %& 0.2 
 		\\
-		FB Egonet &
+		FB egonet &
 		10 & 0.7 & 1 &
 		1,000 & 0.2 & 5 &
 		10,000 & 0.4 & 10 & %0.017 &

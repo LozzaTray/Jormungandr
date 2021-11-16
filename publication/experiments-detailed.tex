@@ -1,11 +1,12 @@
 Table~\ref{tab:results} summarises the results for each experiment. 
 We see that the dimensionality reduction procedure 
-brings the training and test losses closer together. This implies that 
-the features we keep are indeed correlated with the underlying graphical 
+brings the training and test losses closer. This indicates that 
+the retained
+are indeed well correlated with the underlying graphical 
 partition and that the approach generalises correctly. The test loss variance is higher than the training loss variance as the test set is smaller and so more susceptible to variability in its construction.
 %
-The average description length per entity,
-$\bar{S}_e$, of the graph, 
+The average description length per entity of the graph,
+$\bar{S}_e$,
 has very small variance, suggesting that
 the detected communities can be found reliably (to within an arbitrary 
 relabelling of blocks).
@@ -33,13 +34,15 @@ the dimensionality-reduction process (Figure~\ref{fig:school-null});
 gender and teacher/student status have been discarded,
 meaning these are poor predictors of overall macro-structure.
 %
-The vast majority of blocks are composed of a single class. 
+Almost all blocks are composed of a single class. 
 However, some blocks have two comparably strong classes as their predictors (e.g. blocks 2 and 5). 
 Conversely, some classes are found to extend over two 
 detected blocks (class 2B spans blocks 8 and 9) but we do 
 not have a feature which explains the division.
 %
-Figure~\ref{fig:school-accuracy} shows excellent accuracy for the majority of blocks. In fact the only blocks with low accuracy are those that have a school-class span two blocks such that we cannot reliably distinguish between the two. This is more pronounced when we apply hard classification rather than the soft cross-entropy loss. Perhaps there are unobserved features which explain this divide.
+Figure~\ref{fig:school-accuracy} shows excellent accuracy for most blocks. In fact the only blocks with low accuracy are those with a `school-class'
+feature that spans two blocks, such that we cannot reliably distinguish between the two. This is more pronounced when we apply hard classification rather than cross-entropy loss. It is possible that there are unobserved features here
+which explain this divide.
 
 \paragraph{\textbf{Facebook egonet.}}
 
@@ -51,4 +54,4 @@ Figure~\ref{fig:fb-null} do not have high-magnitude components. This is further 
 %
 For a high-dimensional feature-space, it is likely that a particular
 feature may uniquely identify a small set of vertices; if these are all in the same block, then the classifier may overfit despite the penalty imposed by the prior. Indeed, we see in
-Figure~\ref{fig:fb-null} that the feature birthday-5 has a very high weight as it relates to block 1 – but it is unlikely that birthdays determine graphical structure.
+Figure~\ref{fig:fb-null} that the feature `birthday-5' has a very high weight as it relates to block 1 – but it is unlikely that birthdays determine graphical structure.
