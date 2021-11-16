@@ -1,13 +1,13 @@
 \section{Feature-First Block Model}
 
 In this section we propose a novel generative model for labelled networks. We call this the feature-first block model (FFBM),
-illustrated in Figure~\ref{fig:ffbm}).
+illustrated in Figure~\ref{fig:ffbm}.
 
 Let $N$ denote the number of vertices, $B$ the number of blocks
 and ${\cal X}$ the set of values each feature can take.
 We define the vector $x_i \in \Xcal^D$ as the feature vector for vertex $i$, 
 where $D$ is the number of features associated with each vertex.
-For example, in the datasets we analyse we deal with binary feature flags
+For example, in the datasets we analyse, we deal with binary feature flags
 (denoting the presence/absence of each feature),
 so $\Xcal = \{0, 1\}$. We write $X$ for the $N\times D$ {\em feature matrix} containing
 the feature vectors $\{x_i\}_{i=1}^{N}$ 
@@ -82,7 +82,7 @@ simple form for the conditional distribution of the block membership vector $b$ 
 	\label{eqn:b-pseudo-prior}
 \end{equation}
 %
-The proof is given in Appendix~\ref{appdx:b|x}. This an important simplification as evaluating $p(b | X)$ does not require an expensive  integration over $\theta$ nor does it depend on $X$.
+The proof is given in Appendix~\ref{appdx:b|x}. This is an important simplification as evaluating $p(b | X)$ does not require an expensive  integration over $\theta$ nor does it depend on $X$.
 Peixoto \cite{Peixoto-Bayesian-Microcanonical} proposes careful choices for 
 the priors on the additional microcanonical SBM parameters $\psi$, which we adopt without repeating their exact form here. 
 The idea is to write the joint distribution on $(b, e, k)$ as a product of 

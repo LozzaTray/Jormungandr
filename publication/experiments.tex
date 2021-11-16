@@ -1,4 +1,4 @@
-\section{Experimental Results}
+\section{Experimental results}
 \label{sec:experiments}
 
 We apply our proposed methods to a variety of labelled networks:
@@ -29,9 +29,8 @@ the vertex set $[N]$
 is partitioned at random so that 
 a constant fraction $f$ of vertices form the training set $\Gcal_0$ and 
 the remainder form the test set $\Gcal_1$.
-The $b$-chain is run using the whole network but we $\in \Gcal_0$ is 
-used to train the $\theta$-chain. 
-% As $|\Gcal_0| \neq |\Gcal_1|$, in general, 
+The $b$-chain is run using the whole network but only vertices $v \in \Gcal_0$ are 
+used for the $\theta$-chain. 
 Then the  the average cross-entropy loss 
 over each set is used to gauge the quality of the fit,
 %
@@ -42,7 +41,7 @@ over each set is used to gauge the quality of the fit,
 	\label{eqn:cross-entropy-loss}
 \end{equation}
 %
-where $\star \in \{0, 1\}$ toggles between the training and test sets.
+where $\star \in \{0, 1\}$ toggles between the training and test sets
 and $\hat{y}_{ij}$ is defined in~(\ref{eqn:y-hat}).
 %
 Nevertheless, the cross-entropy loss is a coarse measure of fit. 
