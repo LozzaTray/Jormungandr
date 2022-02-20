@@ -1,0 +1,79 @@
+\section{Experimental results}
+\label{sec:experiments}
+
+We apply our proposed methods to a variety of labelled networks:
+
+\begin{itemize}
+	\item \textbf{Political books} \cite{polbooks} ($N=105, E=441, D=3$) -- network of Amazon political books published close to the 2004 presidential election. Two books are connected if they were frequently co-purchased. Vertex features encode the political affiliation of the author (liberal, conservative, or neutral).
+	\item \textbf{Primary school dynamic contacts} \cite{schools} ($N=238, E=5539, D=13$) -- network of 238 individuals (students and teachers),
+with edges denoting face-to-face contacts at a primary school in Lyon, France. 
+The vertex features are class membership (one of 10 values: 1A-5B), gender (male, female), and status (teacher, student). We choose to analyse just the second day of results.
+	\item \textbf{Facebook egonet} \cite{fb-snap} ($N=747, E=30025, D=480$) -- network of Facebook users with edges denoting ``friends''.
+Vertex features are fully anonymised and encode information about each user's education history, languages spoken, gender, home-town, birthday etc. We focus on the egonet with id 1912.
+\end{itemize}
+%
+For reference, the inferred partitions for all of these are given on Figure~\ref{fig:graphs-all}.
+We employ the following metrics to assess model performance. 
+First, the average
+description length per entity (nodes and edges) 
+$\bar{S}_e$ 
+used to gauge the SBM fit is defined as:
+%
+\begin{equation}
+	\bar{S}_e \triangleq \frac{1}{(N+E) |\mathcal{T}_b|} \sum_{t\in \mathcal{T}_b} S \left( b^{(t)} \right).
+	\label{eqn:mean-dl}
+\end{equation}
+%
+Next, to assess the performance of the feature-to-block predictor, 
+the vertex set $[N]$ 
+is partitioned at random so that 
+a constant fraction $f$ of vertices form the training set $\mathcal{G}_0$ and 
+the remainder form the test set $\mathcal{G}_1$.
+The $b$-chain is run using the whole network but only vertices $v \in \mathcal{G}_0$ are 
+used for the $\theta$-chain. 
+Then the  the average cross-entropy loss 
+over each set is used to gauge the quality of the fit,
+%
+\begin{equation}
+	\bar{\mathcal{L}}_\star \triangleq \frac{1}{|\mathcal{T}_\theta|} \sum_{t \in \mathcal{T}_\theta} \mathcal{L}_\star^{(t)},
+	\quad \textrm{where} \quad
+	\mathcal{L}_\star^{(t)} \triangleq \frac{1}{|\mathcal{G}_\star|} \sum_{i \in \mathcal{G}_\star}\sum_{j \in [B]} \hat{y}_{ij} \log \frac{1}{\phi_j \left(x_i; \theta^{(t)} \right)},
+	\label{eqn:cross-entropy-loss}
+\end{equation}
+%
+where $\star \in \{0, 1\}$ toggles between the training and test sets
+and $\hat{y}_{ij}$ is defined in~(\ref{eqn:y-hat}).
+%
+Nevertheless, the cross-entropy loss is a coarse measure of fit. 
+A new measure, specific to each detected block,
+can be defined as follows. Let
+$\mathcal{B}_\star(j)$ 
+be the set of vertices with maximum a posteriori probability of belonging 
+to block~$j$,
+$
+	\mathcal{B}_\star(j) \triangleq \{i \in \mathcal{G}_\star : \hat{b}_i = j\},
+$
+where
+$ 
+	\hat{b}_i \triangleq \underset{j}{\operatorname{argmax}}\hat{y}_{ij},
+$
+and
+define the {\em block-accuracy} for block $j$ as,
+%
+\begin{equation}
+	\eta_\star(j) \triangleq \frac{1}{|\mathcal{B}_\star (j)| \cdot 
+	|\mathcal{T}_\theta| } 
+	\sum_{i \in \mathcal{B}_\star (j)}  \sum_{t \in \mathcal{T}_\theta}
+	\boldsymbol{1} \left\{\hat{b}_i = \underset{j}{\operatorname{argmax}}\phi_j \left( x_i; \theta^{(t)} \right) \right\}.
+	\label{eqn:accuracy}
+\end{equation}
+%
+This effectively tests whether the feature-to-block and 
+graph-to-block predictions agree in their largest component.
+For the higher-dimensional datasets, we also apply the 
+dimensionality reduction method 
+of Section~\ref{sec:dim-reduction}.  
+We then retrain the feature-block predictor using only the retained 
+feature set $\mathcal{D}'$, and report the log-loss over the training and 
+test sets for the reduced classifier -- 
+denoted $\bar{\mathcal{L}}_0'$ and $\bar{\mathcal{L}}_1'$ respectively. 

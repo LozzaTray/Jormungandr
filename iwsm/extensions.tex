@@ -1,0 +1,5 @@
+\section{Extensions}
+
+The current FFBM formulation can only explain macro-structure and not structure within each detected block. Future work will benefit from extending the FFBM to be hierarchical in nature. Indeed, the SBM has already been extended to a hierarchical form, often called the nested SBM \cite{SBM-hierarchical}.
+
+The necessary modification of the feature-to-block generator is also rather natural. Given the nested SBM, we would have a hierarchy of generators, each generating a block membership at a particular level of the hierarchy. To avoid exponential growth in the number of model parameters, we could apply some form of dimensionality reduction as we descend the layers so that each generator is only given relevant features as input.

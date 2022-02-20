@@ -1,0 +1,101 @@
+\section{Inference}
+\label{sec:inference}
+
+Having completed the definition of the FFBM, we wish to leverage it 
+to perform inference. Specifically, given a labelled network $(A, X)$, we wish to infer if and how the observed features $X$ impact the graphical structure $A$. Formally,
+this means characterising the posterior distribution:
+$
+p(\theta|A, X) \propto p(\theta) \cdot p(A | X, \theta).
+$
+Although the prior is easily computable, 
+computing the likelihood 
+requires summing over all latent block-states, 
+$p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$, which is 
+clearly impractical. In fact, this
+approach is doubly intractable as we would also 
+need to compute the normalising constant $p(A|X)$.
+Therefore, following standard Bayesian practice,
+instead we aim to draw samples from the posterior,
+%
+\begin{equation}
+	\label{eqn:theta-target}
+	\theta^{(t)} \sim p(\theta | A, X).
+\end{equation}
+%
+We propose an iterative Markov chain Monte Carlo
+(MCMC) approach to obtain these samples
+$\{\theta^{(t)}\}$. We first draw a sample $b^{(t)}$ 
+from the block membership posterior,
+and then use $b^{(t)}$ to obtain a corresponding
+sample $\theta^{(t)}$:
+%
+\begin{equation}
+	b^{(t)} \stackrel{\rm distr}{\approx} p \big( b | A, X \big) 
+	\quad \textrm{then} \quad
+	\theta^{(t)} \stackrel{\rm distr}{\approx} 
+	p\big(\theta | X, b^{(t)} \big),
+\end{equation}
+%
+where these approximations become exact as
+the number of MCMC iterations $t\to\infty$.
+As described in the following subsections,
+this can be implemented through a two-level
+Markov chain via the Metropolis-Hastings (MH) 
+algorithm \cite{hastings-alg}.
+The splitting of the Markov chain into two levels allows us to side-step the summation over
+all latent $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta)$.
+The resulting $\theta^{(t)}$ samples are asymptotically
+unbiased in that the expectation of 
+their distribution converges to the true posterior:
+%
+\begin{equation}
+\lim_{t\to\infty}
+\mathbb{E}_{b^{(t)}} \left[p \left( \theta | X, b^{(t)} \right) \right] = \sum_{b \in [B]^N} p(\theta | X, b) p(b | A, X) = p(\theta | A, X).
+\label{eqn:theta-unbiased}
+\end{equation}
+%
+This is an example of a pseudo-marginal approach;
+see, e.g., Andrieu and Roberts~\cite{pseudo-marginal} 
+for a detailed rigorous derivation based on~(\ref{eqn:theta-unbiased}).
+%
+\begin{figure}[!ht]
+	\centering
+
+%	\begin{tikzpicture}[
+%		scale=0.8, every node/.style={transform shape},
+%		roundnode/.style={circle, draw=black, minimum size=12mm},
+%		squarednode/.style={rectangle, draw=black, minimum size=12mm}
+%		]
+%		% nodes
+%		\node[roundnode] (b0) at (0, 2) {$b^{(t)}$};
+%		\node[roundnode] (b1) at (5, 2) {$b'$};
+%		\node[roundnode] (b2) at (10, 2) {$b^{(t+1)}$};
+%		\node[roundnode] (t0) at (0, 0) {$\theta^{(t)}$};
+%		\node[roundnode] (t1) at (5, 0) {$\theta'$};
+%		\node[roundnode] (t2) at (10, 0) {$\theta^{(t+1)}$};
+%		
+%		% arrows
+%		\draw[->] (b0) to node[above] {$\sim q_b ( b^{(t)}, b' | A )$} (b1);
+%		\draw[->] (b1) to node[above] {$\alpha_b (b, b' | A )$} (b2);
+%		\draw[->] (b0) [out=25, in=155] to node[above] {$1-\alpha_b$} (b2);
+%		
+%		\draw[->] (t0) to node[above] {$\sim q_\theta(\theta^{(t)}, \theta' | X, b^{(t)})$} (t1);
+%		\draw[->] (t1) to node[above] {$\alpha_\theta (\theta, \theta' | X, b^{(t)})$} (t2);
+%		\draw[->] (t0) [out=-25, in=-155] to node[below] {$1-\alpha_\theta$} (t2);
+%		
+%		\draw[dashed, ->] (b0) to (2, 0.8);
+%		\draw[dashed, ->] (b0) to (6.5, 0.8);
+%		
+%	\end{tikzpicture}
+	\includegraphics[width=0.8\textwidth]{img/sampling-sequence}
+	\caption{$\theta$-sample generation.}
+	\label{fig:samp-sequence}
+\end{figure}
+ 
+Figure \ref{fig:samp-sequence} shows an overview of the proposed method, with $q$ and $\alpha$ denoting the MH proposal distribution and acceptance probability respectively.
+Note the importance of the simplification in~(\ref{eqn:b-pseudo-prior}). 
+As evaluating $p(b| X)$ does not depend on $X$, 
+we do not need $X$ to sample $b$.
+And on the other level, in order to obtain 
+samples for $\theta$
+we use only $b$ but not $A$, as $(\theta \perp \!\!\! \perp A )| b$. 

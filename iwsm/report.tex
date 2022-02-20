@@ -1,0 +1,70 @@
+\documentclass{iwsm}
+
+\usepackage[numbers, sectionbib]{natbib}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{bbm}
+\usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{enumitem}
+
+%images
+\graphicspath{{./img/}}
+
+
+%bibliography
+\bibliographystyle{splncs04}
+
+
+\title{The Feature-First Block Model}
+
+\author{Lawrence Tray \inst{1} \and Ioannis Kontoyiannis \inst{2}}
+
+\institute{Department of Engineering, University of Cambridge, \email{lpt30@cantab.ac.uk} \and 
+Statistical Laboratory, University of Cambridge, \email{yiannis@maths.cam.ac.uk}}
+
+%custom commands
+\DeclareMathOperator*{\argmax}{arg\,max} % Jan Hlavacek
+\DeclareMathOperator*{\argmin}{arg\,min} % Jan Hlavacek
+
+\def\imagebox#1#2{\vtop to #1{\null\hbox{#2}\vfill}}
+
+
+\begin{document}
+	
+	\maketitle
+	
+	\input{abstract}
+
+	\input{introduction}
+	\input{prelim}
+	\input{ffbm}
+	\input{inference}
+	\input{experiments}
+	%\input{extensions}
+	\input{conclusion}
+	
+	\appendix
+	%\input{additional}
+	\input{derivations}
+	%\input{computation}
+	
+	\bibliography{sources.bib}
+		
+\end{document}

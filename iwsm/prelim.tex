@@ -1,0 +1,32 @@
+\section{Preliminaries}
+
+We first need a model for community-like structure in a network. For this we adopt the widely-used stochastic block model (SBM). This is a latent variable model where each vertex belongs to a single block and the probability two vertices are connected depends only on the block memberships of each.
+Specifically, we will use the microcanonical variant of the SBM, proposed by Peixoto \cite{Peixoto-Bayesian-Microcanonical}. To allow for degree-variability between members of the same block, we adopt the following degree-corrected 
+formulation (DC-SBM):
+% , defined in~(\ref{defn:microcan-dc-sbm}).
+
+\textbf{Microcanonical DC-SBM} --
+Let $N \geq 1$ denote the number of vertices in an undirected graph
+with $E$ edges. The block memberships are encoded by a vector $b \in [B]^N$,
+where $B$ is the number of non-empty blocks.\footnote{For each integer $K\geq 1$, we use the notation $[K]:=\{1,2,\ldots,K\}$.}
+	Let $e=(e_{rs})$ be the $B \times B$ symmetric matrix of edge counts 
+between blocks, such that $e_{rs}$ is the number of edges from block $r$ to 
+block $s$. 
+	Let $k =(k_i)$ denote a vector of length $N$, with $k_i$ being the degree of vertex $i$.
+
+The graph's adjacency matrix $A \in \{0,1\}^{N \times N}$ is generated 
+by placing edges uniformly at random, conditional
+on the constraints imposed by $b$, $e$ and $k$ being satisfied.
+Specifically, if $A \sim \mbox{\rm DC-SBM}_{\rm MC} (b, e, k)$,
+then with probability~1 it satisfies,
+for all $r,s\in[B]$
+and all $i\in[N]$:
+%
+\begin{equation}
+	e_{rs} = \sum_{i, j \in [N]} A_{ij} 
+\boldsymbol{1} \{b_i = r\} \boldsymbol{1} \{b_j = s\} 
+	\qquad 
+	\textrm{and} \qquad
+	k_i = \sum_{j \in [N]} A_{ij}.
+	\label{eqn:sbm-constraints}
+\end{equation}

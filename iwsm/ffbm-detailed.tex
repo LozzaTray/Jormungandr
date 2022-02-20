@@ -1,0 +1,34 @@
+\subsection{Prior selection}
+
+To complete the description of our Bayesian framework,
+priors on $\theta$ and $\psi$ must also be specified. 
+We place a Gaussian prior on $\theta$ such that
+each element of $\theta$ has an independent ${\cal N}(0,\sigma_\theta^2)$
+prior, with hyperparameter $\sigma_\theta^2$:
+%
+\begin{equation}
+	p(\theta) \sim \mathcal{N} \left( \theta ; 0, \sigma_\theta^2 I \right).
+	\label{eqn:theta-prior}
+\end{equation}
+%
+This choice of prior gives a very
+simple form for the conditional distribution of the block membership vector $b$ given $X$; it is a uniform distribution:
+%
+\begin{equation}
+	p(b | X) = \int p(b | X, \theta) p(\theta) d\theta = B^{-N}.
+	\label{eqn:b-pseudo-prior}
+\end{equation}
+%
+The proof is given in Appendix~\ref{appdx:b|x}. This is an important simplification as evaluating $p(b | X)$ does not require an expensive  integration over $\theta$ nor does it depend on $X$.
+Peixoto \cite{Peixoto-Bayesian-Microcanonical} proposes careful choices for 
+the priors on the additional microcanonical SBM parameters $\psi$, which we adopt without repeating their exact form here. 
+The idea is to write the joint distribution on $(b, e, k)$ as a product of 
+conditionals, $p(b, e, k) = p(b) p(e | b) p(k | e, b)= p(b) p(\psi | b)$. 
+In our case, conditioning on $X$ is also necessary, leading to,
+$
+p(b, \psi | X) = p(b | X) p(\psi | b, X) = p(b | X) p(\psi | b),
+$
+where we used the fact $\psi$ and $X$ are conditionally 
+independent given $b$.
+All that concerns the main argument is that $p(\psi|b)$ has
+an easily computable form.
