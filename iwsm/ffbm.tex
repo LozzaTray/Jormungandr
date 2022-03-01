@@ -24,7 +24,7 @@ to write $\theta$ as a $B \times D$ matrix of weights $W$. Specifically,
 the distribution of $b$ given $X$ and $\theta$ is,
 %
 \begin{equation}
-	p(b| X, \theta) = \prod_{i \in [N]} p(b_i | x_i, \theta) = \prod_{i \in [N]} \phi_{b_i} (x_i; \theta)
+	p(b| X, \theta) = \prod_{i \in [N]} \phi_{b_i} (x_i; \theta)
 	= \prod_{i \in [N]} \frac{\exp\left(w_{b_i}^T x_i\right)}{\sum_{k \in [B]} \exp \left( w_k^T x_i\right)}.
 \end{equation}
 %

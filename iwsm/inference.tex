@@ -8,9 +8,8 @@ $
 p(\theta|A, X) \propto p(\theta) \cdot p(A | X, \theta).
 $
 Although the prior is easily computable, 
-computing the likelihood 
-requires summing over all latent block-states, 
-$p(A| X, \theta) = \sum_{b \in [B]^N} p(A | b) P(b | X, \theta)$, which is 
+computing the likelihood $p(A| X. \theta)$
+requires summing over all $B^N$ latent block-states which is 
 clearly impractical. In fact, this
 approach is doubly intractable as we would also 
 need to compute the normalising constant $p(A|X)$.
@@ -41,7 +40,7 @@ the number of MCMC iterations $t\to\infty$.
 As described in the following subsections,
 this can be implemented through a two-level
 Markov chain via the Metropolis-Hastings (MH) 
-algorithm \cite{hastings-alg}.
+algorithm [Hastings (1970)].
 The splitting of the Markov chain into two levels allows us to side-step the summation over
 all latent $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta)$.
 The resulting $\theta^{(t)}$ samples are asymptotically
@@ -55,7 +54,7 @@ their distribution converges to the true posterior:
 \end{equation}
 %
 This is an example of a pseudo-marginal approach;
-see, e.g., Andrieu and Roberts~\cite{pseudo-marginal} 
+see, e.g., Andrieu and Roberts (2009) 
 for a detailed rigorous derivation based on~(\ref{eqn:theta-unbiased}).
 %
 \begin{figure}[!ht]
@@ -93,8 +92,7 @@ for a detailed rigorous derivation based on~(\ref{eqn:theta-unbiased}).
 \end{figure}
  
 Figure \ref{fig:samp-sequence} shows an overview of the proposed method, with $q$ and $\alpha$ denoting the MH proposal distribution and acceptance probability respectively.
-Note the importance of the simplification in~(\ref{eqn:b-pseudo-prior}). 
-As evaluating $p(b| X)$ does not depend on $X$, 
+Due to our formulation, evaluating $p(b| X)$ does not depend on $X$ so
 we do not need $X$ to sample $b$.
 And on the other level, in order to obtain 
 samples for $\theta$
