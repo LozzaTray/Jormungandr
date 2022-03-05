@@ -6,13 +6,6 @@ this means characterising the posterior distribution:
 $
 p(\theta|A, X) \propto p(\theta) \cdot p(A | X, \theta).
 $
-%Although the prior is easily computable, 
-%computing the likelihood $p(A| X. \theta)$
-%requires summing over all $B^N$ latent block-states which is 
-%clearly impractical.
-%In fact, this
-%approach is doubly intractable as we would also 
-%need to compute the normalising constant $p(A|X)$.
 Therefore, following standard Bayesian practice,
 instead we aim to draw samples from the posterior,
 $
@@ -33,27 +26,17 @@ sample $\theta^{(t)}$:
 	p\big(\theta | X, b^{(t)} \big),
 \end{equation}
 %
-%where these approximations become exact as
-%the number of MCMC iterations $t\to\infty$.
+where these approximations become exact as
+the number of MCMC iterations $t\to\infty$.
 Splitting the Markov chain into two levels side-steps the intractable summation over
 all latent $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta)$.
 The resulting $\theta^{(t)}$ samples are asymptotically
 unbiased in that the expectation of 
 their distribution converges to the true posterior.
-%%
-%\begin{equation}
-%\lim_{t\to\infty}
-%\mathbb{E}_{b^{(t)}} \left[p \left( \theta | X, b^{(t)} \right) \right] = \sum_{b \in [B]^N} p(\theta | X, b) p(b | A, X) = p(\theta | A, X).
-%\label{eqn:theta-unbiased}
-%\end{equation}
-%%
-%This is an example of a pseudo-marginal approach;
-%see, e.g., Andrieu and Roberts (2009) 
-%for a detailed rigorous derivation based on~(\ref{eqn:theta-unbiased}).
 %
 \begin{figure}[!ht]
 	\centering
-
+%   IWSM Template does not support tikz
 %	\begin{tikzpicture}[
 %		scale=0.8, every node/.style={transform shape},
 %		roundnode/.style={circle, draw=black, minimum size=12mm},

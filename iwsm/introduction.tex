@@ -1,17 +1,9 @@
 \section{Introduction}
 
 Many real-world networks exhibit strong community structure, with most nodes belonging to densely connected clusters. 
-%Finding ways to recover the latent communities from the observed graph is an important
-%task in many applications,
-%including
-%compression [Abbe (2016)] and link prediction 
-%[Zhu et al. (2016)].
 In this work, we examine vertex-labelled networks, 
 referring to the labels as {\em features}. A typical goal is to determine whether a given feature impacts graphical structure. Answering this requires a random graph model;
 the standard is the stochastic block model (SBM) -- see Peixoto (2017).
-%Numerous variants of the SBM  have been proposed, e.g., the MMSBM -- Airoldi et al. (2009) --
-%and OSBM -- Zhu et al. (2016) -- but these do not include features in the graph generation
-%process.
 
 Analysing a labelled network with a simple SBM variant, requires partitioning the graph into blocks grouped by distinct values of the feature of interest. The associated model can then be used to test for evidence of heterogeneous connectivity between the feature-grouped blocks. Nevertheless, this approach can only consider disjoint feature sets and the feature-grouped blocks are often an unnatural partition of the graph.
 

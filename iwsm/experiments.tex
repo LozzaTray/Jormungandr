@@ -3,61 +3,19 @@
 
 We apply our proposed methods to a variety of real-world datasets.
 For reference, the inferred partitions $b$ for all of these are given on Figure~\ref{fig:graphs-all}.
-We require metrics to assess model performance. 
+We require metrics to assess model performance.
+%
 First, the average
 description length per entity (nodes and edges) 
 $\bar{S}_e$ 
 is used to gauge the SBM fit.
-%%
-%\begin{equation}
-%	\bar{S}_e \triangleq \frac{1}{(N+E) |\mathcal{T}_b|} \sum_{t\in \mathcal{T}_b} S \left( b^{(t)} \right).
-%	\label{eqn:mean-dl}
-%\end{equation}
-%%
+%
 Second, to assess the performance of the feature-to-block predictor, 
 the vertex set $[N]$ 
 is partitioned at random into training and test sets, $\mathcal{G}_0$ and $\mathcal{G}_1$. 
 Then the average cross-entropy loss 
-over each set is used to gauge the quality of the fit, $\bar{\mathcal{L}}_\star$,
-%%
-%\begin{equation}
-%	\bar{\mathcal{L}}_\star \triangleq \frac{1}{|\mathcal{T}_\theta|} \sum_{t \in \mathcal{T}_\theta} \mathcal{L}_\star^{(t)},
-%	\quad \textrm{where} \quad
-%	\mathcal{L}_\star^{(t)} \triangleq \frac{1}{|\mathcal{G}_\star|} \sum_{i \in \mathcal{G}_\star}\sum_{j \in [B]} \hat{y}_{ij} \log \frac{1}{\phi_j \left(x_i; \theta^{(t)} \right)},
-%	\label{eqn:cross-entropy-loss}
-%\end{equation}
-%%
-%where $\star \in \{0, 1\}$ toggles between the training and test sets.
-%
-%and $\hat{y}_{ij}$ is defined in~(\ref{eqn:y-hat}).
-%
-%Nevertheless, the cross-entropy loss is a coarse measure of fit. 
-%A new measure, specific to each detected block,
-%can be defined as follows. Let
-%$\mathcal{B}_\star(j)$ 
-%be the set of vertices with maximum a posteriori probability of belonging 
-%to block~$j$,
-%$
-%	\mathcal{B}_\star(j) \triangleq \{i \in \mathcal{G}_\star : \hat{b}_i = j\},
-%$
-%where
-%$ 
-%	\hat{b}_i \triangleq \underset{j}{\operatorname{argmax}}\hat{y}_{ij},
-%$
-%and
-%define the {\em block-accuracy} for block $j$ as,
-%%
-%\begin{equation}
-%	\eta_\star(j) \triangleq \frac{1}{|\mathcal{B}_\star (j)| \cdot 
-%	|\mathcal{T}_\theta| } 
-%	\sum_{i \in \mathcal{B}_\star (j)}  \sum_{t \in \mathcal{T}_\theta}
-%	\boldsymbol{1} \left\{\hat{b}_i = \underset{j}{\operatorname{argmax}}\phi_j \left( x_i; \theta^{(t)} \right) \right\}.
-%	\label{eqn:accuracy}
-%\end{equation}
-%%
-%This effectively tests whether the feature-to-block and 
-%graph-to-block predictions agree in their largest component.
-%
+over each set is used to gauge the quality of the fit -- denoted $\bar{\mathcal{L}}_\star$.
+
 For the higher-dimensional datasets, we also develop and apply a novel 
 dimensionality reduction method to select only the top $D'$ features.  
 We then retrain the feature-block predictor using only the retained 
@@ -71,10 +29,3 @@ brings the training and test losses closer. This indicates that
 the retained features
 are indeed well correlated with the underlying graphical 
 partition and that the approach generalises correctly. 
-%The test loss variance is higher than the training loss variance as the test set is smaller and so more susceptible to variability in its construction.
-%%
-%The average description length per entity of the graph,
-%$\bar{S}_e$,
-%has very small variance, suggesting that
-%the detected communities can be found reliably (to within an arbitrary 
-%relabelling of blocks). 
