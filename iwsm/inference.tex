@@ -7,12 +7,13 @@ this means characterising the posterior distribution:
 $
 p(\theta|A, X) \propto p(\theta) \cdot p(A | X, \theta).
 $
-Although the prior is easily computable, 
-computing the likelihood $p(A| X. \theta)$
-requires summing over all $B^N$ latent block-states which is 
-clearly impractical. In fact, this
-approach is doubly intractable as we would also 
-need to compute the normalising constant $p(A|X)$.
+%Although the prior is easily computable, 
+%computing the likelihood $p(A| X. \theta)$
+%requires summing over all $B^N$ latent block-states which is 
+%clearly impractical.
+%In fact, this
+%approach is doubly intractable as we would also 
+%need to compute the normalising constant $p(A|X)$.
 Therefore, following standard Bayesian practice,
 instead we aim to draw samples from the posterior,
 %
@@ -35,27 +36,23 @@ sample $\theta^{(t)}$:
 	p\big(\theta | X, b^{(t)} \big),
 \end{equation}
 %
-where these approximations become exact as
-the number of MCMC iterations $t\to\infty$.
-As described in the following subsections,
-this can be implemented through a two-level
-Markov chain via the Metropolis-Hastings (MH) 
-algorithm [Hastings (1970)].
-The splitting of the Markov chain into two levels allows us to side-step the summation over
+%where these approximations become exact as
+%the number of MCMC iterations $t\to\infty$.
+Splitting of the Markov chain into two levels side-steps the intractable summation over
 all latent $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta)$.
 The resulting $\theta^{(t)}$ samples are asymptotically
 unbiased in that the expectation of 
-their distribution converges to the true posterior:
-%
-\begin{equation}
-\lim_{t\to\infty}
-\mathbb{E}_{b^{(t)}} \left[p \left( \theta | X, b^{(t)} \right) \right] = \sum_{b \in [B]^N} p(\theta | X, b) p(b | A, X) = p(\theta | A, X).
-\label{eqn:theta-unbiased}
-\end{equation}
-%
-This is an example of a pseudo-marginal approach;
-see, e.g., Andrieu and Roberts (2009) 
-for a detailed rigorous derivation based on~(\ref{eqn:theta-unbiased}).
+their distribution converges to the true posterior.
+%%
+%\begin{equation}
+%\lim_{t\to\infty}
+%\mathbb{E}_{b^{(t)}} \left[p \left( \theta | X, b^{(t)} \right) \right] = \sum_{b \in [B]^N} p(\theta | X, b) p(b | A, X) = p(\theta | A, X).
+%\label{eqn:theta-unbiased}
+%\end{equation}
+%%
+%This is an example of a pseudo-marginal approach;
+%see, e.g., Andrieu and Roberts (2009) 
+%for a detailed rigorous derivation based on~(\ref{eqn:theta-unbiased}).
 %
 \begin{figure}[!ht]
 	\centering
@@ -86,13 +83,13 @@ for a detailed rigorous derivation based on~(\ref{eqn:theta-unbiased}).
 %		\draw[dashed, ->] (b0) to (6.5, 0.8);
 %		
 %	\end{tikzpicture}
-	\includegraphics[width=0.8\textwidth]{img/sampling-sequence}
+	\includegraphics[width=0.6\textwidth]{img/sampling-sequence}
 	\caption{$\theta$-sample generation.}
 	\label{fig:samp-sequence}
 \end{figure}
  
-Figure \ref{fig:samp-sequence} shows an overview of the proposed method, with $q$ and $\alpha$ denoting the MH proposal distribution and acceptance probability respectively.
-Due to our formulation, evaluating $p(b| X)$ does not depend on $X$ so
+Figure \ref{fig:samp-sequence} shows an overview of the proposed method, with $q$ and $\alpha$ denoting the Metropolis-Hastings proposal distribution and acceptance probability respectively.
+Due to the FFBM's formulation, evaluating $p(b| X)$ does not depend on $X$ so
 we do not need $X$ to sample $b$.
 And on the other level, in order to obtain 
 samples for $\theta$
