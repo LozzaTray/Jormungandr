@@ -8,13 +8,13 @@ Many real-world networks exhibit strong community structure, with most nodes bel
 %[Zhu et al. (2016)].
 In this work, we examine vertex-labelled networks, 
 referring to the labels as {\em features}. A typical goal is to determine whether a given feature impacts graphical structure. Answering this requires a random graph model;
-the standard is the stochastic block model (SBM) [Nowicki and Snijders (2001)].
-%Numerous variants of the SBM  have been proposed, e.g., the MMSBM [Airoldi et al. (2009)]
-%and OSBM [Zhu et al. (2016)], but these do not include features in the graph generation
+the standard is the stochastic block model (SBM) -- see Peixoto (2017).
+%Numerous variants of the SBM  have been proposed, e.g., the MMSBM -- Airoldi et al. (2009) --
+%and OSBM -- Zhu et al. (2016) -- but these do not include features in the graph generation
 %process.
 
-INSERT REBUTTAL OF CURRENT METHODS
+Analysing a labelled network with a simple SBM variant, requires partitioning the graph into blocks grouped by distinct values of the feature of interest. The associated model can then be used to test for evidence of heterogeneous connectivity between the feature-grouped blocks. Nevertheless, this approach can only consider disjoint feature sets and the feature-grouped blocks are often an unnatural partition of the graph.
 
-To analyse a labelled network using one of the simple SBM variants, a typical procedure would be to partition the graph into blocks grouped by distinct values of the feature of interest. The associated model can then be used to test for evidence of heterogeneous connectivity between the feature-grouped blocks. Nevertheless, this approach can only consider disjoint feature sets and the feature-grouped blocks are often an unnatural partition of the graph.
-
-We would instead prefer to partition the graph into its most natural blocks and then find which of the available features -- if any -- best predict the resulting partition. Thus motivated, we present a novel framework for modelling labelled networks, which we call the feature-first block model (FFBM). This is an extension of the SBM to labelled networks.
+We would instead prefer to partition the graph into its most natural blocks and then find which of the available features -- if any -- best predict the resulting partition. Thus motivated, we present a novel framework for modelling labelled networks.
+This would not the first extension of the SBM to labelled networks, e.g. Stanley et al (2019). However, most of the current approaches are focused on leveraging feature information to partition the graph more reliably in the presence of noise.
+We seek instead to develop a model well suited for inferring how vertex features impact graphical structure and to report our confidence in those conclusions.

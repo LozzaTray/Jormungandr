@@ -1,6 +1,6 @@
 \section{Feature-First Block Model}
 
-In this section, we propose a novel generative model for labelled networks. We call this the feature-first block model (FFBM),
+We propose a novel generative model for labelled networks -- which we call the feature-first block model (FFBM),
 illustrated in Figure~\ref{fig:ffbm}.
 %
 Let $N$ denote the number of vertices, $B$ the number of blocks
@@ -61,10 +61,9 @@ $p(b| X, \theta) = \prod_{i \in [N]} \phi_{b_i} (x_i; \theta)$.
 \end{figure}
 
 Once the block memberships $b$ have been generated, we then draw the 
-adjacency matrix of the graph, $A$, from the microcanonical DC-SBM [Peixoto (2017)] with additional parameters 
+adjacency matrix of the graph, $A$, from the microcanonical DC-SBM, Peixoto (2017), with additional parameters 
 $\psi$,
-%
-\begin{equation}
+$
 	A \sim \textrm{DC-SBM}_{\textrm{MC}} (b, \psi).
 	\label{eqn:A-generation}
-\end{equation}
+$

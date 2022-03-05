@@ -1,8 +1,7 @@
 \section{Inference}
 \label{sec:inference}
 
-Having completed the definition of the FFBM, we wish to leverage it 
-to perform inference. Specifically, given a labelled network $(A, X)$, we wish to infer if and how the observed features $X$ impact the graphical structure $A$. Formally,
+We wish to leverage the FFBM for inference. Specifically, given a labelled network $(A, X)$, we wish to infer if and how the observed features $X$ impact the graphical structure $A$. Formally,
 this means characterising the posterior distribution:
 $
 p(\theta|A, X) \propto p(\theta) \cdot p(A | X, \theta).
@@ -16,12 +15,10 @@ $
 %need to compute the normalising constant $p(A|X)$.
 Therefore, following standard Bayesian practice,
 instead we aim to draw samples from the posterior,
-%
-\begin{equation}
+$
 	\label{eqn:theta-target}
 	\theta^{(t)} \sim p(\theta | A, X).
-\end{equation}
-%
+$
 We propose an iterative Markov chain Monte Carlo
 (MCMC) approach to obtain these samples
 $\{\theta^{(t)}\}$. We first draw a sample $b^{(t)}$ 
@@ -88,8 +85,8 @@ their distribution converges to the true posterior.
 	\label{fig:samp-sequence}
 \end{figure}
  
-Figure \ref{fig:samp-sequence} shows an overview of the proposed method, with $q$ and $\alpha$ denoting the Metropolis-Hastings proposal distribution and acceptance probability respectively.
-Due to the FFBM's formulation, evaluating $p(b| X)$ does not depend on $X$ so
+Figure \ref{fig:samp-sequence} shows an overview of the proposed method, with $q$ and $\alpha$ denoting the Metropolis-Hastings proposal distribution and acceptance probability.
+Due to the formulation of the FFBM, evaluating $p(b| X)$ does not depend on $X$ so
 we do not need $X$ to sample $b$.
 And on the other level, in order to obtain 
 samples for $\theta$

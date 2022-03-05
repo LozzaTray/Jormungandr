@@ -2,27 +2,23 @@
 \label{sec:experiments}
 
 We apply our proposed methods to a variety of real-world datasets.
-For reference, the inferred partitions for all of these are given on Figure~\ref{fig:graphs-all}.
-%We employ the following metrics to assess model performance. 
-%First, the average
-%description length per entity (nodes and edges) 
-%$\bar{S}_e$ 
-%used to gauge the SBM fit is defined as:
+For reference, the inferred partitions $b$ for all of these are given on Figure~\ref{fig:graphs-all}.
+We require metrics to assess model performance. 
+First, the average
+description length per entity (nodes and edges) 
+$\bar{S}_e$ 
+is used to gauge the SBM fit.
 %%
 %\begin{equation}
 %	\bar{S}_e \triangleq \frac{1}{(N+E) |\mathcal{T}_b|} \sum_{t\in \mathcal{T}_b} S \left( b^{(t)} \right).
 %	\label{eqn:mean-dl}
 %\end{equation}
 %%
-%Next, to assess the performance of the feature-to-block predictor, 
-%the vertex set $[N]$ 
-%is partitioned at random so that 
-%a constant fraction $f$ of vertices form the training set $\mathcal{G}_0$ and 
-%the remainder form the test set $\mathcal{G}_1$.
-%The $b$-chain is run using the whole network but only vertices $v \in \mathcal{G}_0$ are 
-%used for the $\theta$-chain. 
-%Then the  the average cross-entropy loss 
-%over each set is used to gauge the quality of the fit,
+Second, to assess the performance of the feature-to-block predictor, 
+the vertex set $[N]$ 
+is partitioned at random into training and test sets, $\mathcal{G}_0$ and $\mathcal{G}_1$. 
+Then the average cross-entropy loss 
+over each set is used to gauge the quality of the fit, $\bar{\mathcal{L}}_\star$,
 %%
 %\begin{equation}
 %	\bar{\mathcal{L}}_\star \triangleq \frac{1}{|\mathcal{T}_\theta|} \sum_{t \in \mathcal{T}_\theta} \mathcal{L}_\star^{(t)},
@@ -31,9 +27,10 @@ For reference, the inferred partitions for all of these are given on Figure~\ref
 %	\label{eqn:cross-entropy-loss}
 %\end{equation}
 %%
-%where $\star \in \{0, 1\}$ toggles between the training and test sets
+%where $\star \in \{0, 1\}$ toggles between the training and test sets.
+%
 %and $\hat{y}_{ij}$ is defined in~(\ref{eqn:y-hat}).
-%%
+%
 %Nevertheless, the cross-entropy loss is a coarse measure of fit. 
 %A new measure, specific to each detected block,
 %can be defined as follows. Let
@@ -60,10 +57,24 @@ For reference, the inferred partitions for all of these are given on Figure~\ref
 %%
 %This effectively tests whether the feature-to-block and 
 %graph-to-block predictions agree in their largest component.
-%For the higher-dimensional datasets, we also apply the 
-%dimensionality reduction method 
-%of Section~\ref{sec:dim-reduction}.  
-%We then retrain the feature-block predictor using only the retained 
-%feature set $\mathcal{D}'$, and report the log-loss over the training and 
-%test sets for the reduced classifier -- 
-%denoted $\bar{\mathcal{L}}_0'$ and $\bar{\mathcal{L}}_1'$ respectively. 
+%
+For the higher-dimensional datasets, we also develop and apply a novel 
+dimensionality reduction method to select only the top $D'$ features.  
+We then retrain the feature-block predictor using only the retained 
+feature set, and report the cross-entropy loss over the training and 
+test sets for the reduced classifier -- 
+denoted $\bar{\mathcal{L}}_\star'$.
+
+Table~\ref{tab:results} summarises the high-level results for each experiment. 
+We see that the dimensionality reduction procedure 
+brings the training and test losses closer. This indicates that
+the retained features
+are indeed well correlated with the underlying graphical 
+partition and that the approach generalises correctly. 
+%The test loss variance is higher than the training loss variance as the test set is smaller and so more susceptible to variability in its construction.
+%%
+%The average description length per entity of the graph,
+%$\bar{S}_e$,
+%has very small variance, suggesting that
+%the detected communities can be found reliably (to within an arbitrary 
+%relabelling of blocks). 
