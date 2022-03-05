@@ -1,13 +1,13 @@
 \section{Inference}
 \label{sec:inference}
 
-We wish to leverage the FFBM for inference. Specifically, given a labelled network $(A, X)$, we wish to infer if and how the observed features $X$ impact the graphical structure $A$. Formally,
-this means characterising the posterior distribution:
+Given a labelled network $(A, X)$, we wish to infer if and how the observed features $X$ impact the graphical structure $A$. Formally,
+this means characterising the posterior distribution for $\theta$,
 $
 p(\theta|A, X) \propto p(\theta) \cdot p(A | X, \theta).
 $
 Therefore, following standard Bayesian practice,
-instead we aim to draw samples from the posterior,
+we aim to draw samples from this posterior,
 $
 	\label{eqn:theta-target}
 	\theta^{(t)} \sim p(\theta | A, X).

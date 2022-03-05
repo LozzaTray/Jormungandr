@@ -3,13 +3,13 @@
 We propose a novel generative model for labelled networks -- which we call the feature-first block model (FFBM),
 illustrated in Figure~\ref{fig:ffbm}.
 Let $N$ denote the number of vertices, $B$ the number of blocks
-and ${\cal X}$ the set of values each feature can take.
+and $D$ the number of features associated with each vertex.
 We write $X$ for the $N\times D$ {\em feature matrix} containing
 the feature vectors $\{x_i\}_{i=1}^{N}$ 
 as its rows.
-
+%
 For the FFBM, we start with the feature matrix $X$ and generate a random
-vector of block memberships $b \in [B]^N$. For each vertex $i$, the
+vector of block memberships $b \in [B]^N$ -- noting the notation $[K] = \{1, 2 \dots K\}$. For each vertex $i$, the
 block membership $b_i\in[B]$ is generated based on the feature
 vector $x_i$, independently between vertices, 
 $p(b| X, \theta) = \prod_{i \in [N]} \phi_{b_i} (x_i; \theta)$.
@@ -42,3 +42,4 @@ $
 	A \sim \textrm{DC-SBM}_{\textrm{MC}} (b, \psi).
 	\label{eqn:A-generation}
 $
+Priors on the parameters $\theta$ and $\psi$ are chosen to complete the Bayesian framework.
