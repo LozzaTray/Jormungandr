@@ -6,28 +6,24 @@ this means characterising the posterior distribution for $\theta$,
 $
 p(\theta|A, X) \propto p(\theta) \cdot p(A | X, \theta).
 $
-Therefore, following standard Bayesian practice,
-we aim to draw samples from this posterior,
-$
-	\label{eqn:theta-target}
-	\theta^{(t)} \sim p(\theta | A, X).
-$
-We propose an iterative Markov chain Monte Carlo
-(MCMC) approach to obtain these samples
-$\{\theta^{(t)}\}$. We first draw a sample $b^{(t)}$ 
+Following standard Bayesian practice,
+we propose an iterative Markov chain Monte Carlo
+(MCMC) approach to obtain 
+samples $\theta^{(t)}$ from this posterior.
+First we sample $b^{(t)}$ 
 from the block membership posterior,
 and then use $b^{(t)}$ to obtain a corresponding
-sample $\theta^{(t)}$:
+sample $\theta^{(t)}$,
 %
 \begin{equation}
-	b^{(t)} \stackrel{\rm distr}{\approx} p \big( b | A, X \big) 
+	b^{(t)} \sim p \big( b | A, X \big) 
 	\quad \textrm{then} \quad
-	\theta^{(t)} \stackrel{\rm distr}{\approx} 
-	p\big(\theta | X, b^{(t)} \big),
+	\theta^{(t)}\sim
+	p\big(\theta | X, b^{(t)} \big).
 \end{equation}
 %
-where these approximations become exact as
-the number of MCMC iterations $t\to\infty$.
+% where these approximations become exact as
+% the number of MCMC iterations $t\to\infty$.
 Splitting the Markov chain into two levels side-steps the intractable summation over
 all latent $b \in [B]^N$ required to directly compute the likelihood, $p(A| X, \theta)$.
 The resulting $\theta^{(t)}$ samples are asymptotically
@@ -64,6 +60,7 @@ their distribution converges to the true posterior.
 %		
 %	\end{tikzpicture}
 	\includegraphics[width=0.6\textwidth]{img/sampling-sequence}
+	\vspace*{-0.1in}
 	\caption{$\theta$-sample generation.}
 	\label{fig:samp-sequence}
 \end{figure}

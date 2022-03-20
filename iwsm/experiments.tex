@@ -2,30 +2,34 @@
 \label{sec:experiments}
 
 We apply our proposed methods to a variety of real-world datasets.
-For reference, the inferred partitions $b$ for all of these are given on Figure~\ref{fig:graphs-all}.
-We require metrics to assess model performance.
+The inferred partitions $b$ for all of these are given on Figure~\ref{fig:graphs-all}.
+To assess model performance,
 %
-First, the average
+the average
 description length per entity (nodes and edges) 
 $\bar{S}_e$ 
-is used to gauge the SBM fit.
+is used to gauge the SBM fit,
+and
+the vertex set $[N]$ is partitioned at random into training and test sets, 
+$\mathcal{G}_0$ and $\mathcal{G}_1$,
 %
-Second, to assess the performance of the feature-to-block predictor, 
-the vertex set $[N]$ 
-is partitioned at random into training and test sets, $\mathcal{G}_0$ and $\mathcal{G}_1$. 
-Then the average cross-entropy loss 
-over each set is used to gauge the quality of the fit -- denoted $\bar{\mathcal{L}}_\star$.
+to assess the performance of the feature-to-block predictor.
+The average cross-entropy loss 
+over each set,
+denoted $\bar{\mathcal{L}}_\star$,
+is used to gauge the quality of the fit.
 
-For the higher-dimensional datasets, we also develop and apply a novel 
+For higher-dimensional datasets, we develop a novel 
 dimensionality reduction method to select only the top $D'$ features.  
 We then retrain the feature-block predictor using only the retained 
-feature set, and report the cross-entropy loss over the training and 
-test sets for the reduced classifier -- 
-denoted $\bar{\mathcal{L}}_\star'$.
+feature set, and report the cross-entropy loss 
+$\bar{\mathcal{L}}_\star'$
+over the training and 
+test sets for the reduced classifier.
 
-Table~\ref{tab:results} summarises the high-level results for each experiment. 
+Table~\ref{tab:results} summarises the results for each experiment. 
 We see that the dimensionality reduction procedure 
-brings the training and test losses closer. This indicates that
+brings the training and test losses closer, indicating that
 the retained features
 are indeed well correlated with the underlying graphical 
 partition and that the approach generalises correctly. 
