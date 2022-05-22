@@ -1,0 +1,120 @@
+
+%***********************************************************************
+
+% This is a template to be used for the preparation of
+% papers submitted to the 34th International Workshop on
+% Statistical Modelling, to be held in Trieste, Italy,
+% July 18-22, 2022.
+
+% Please follow the following general guidelines:
+%
+% (1) Do not specify any definitions, commands or style parameters.
+%     Upon submission, your file will be checked for presence of
+%     \newcommand or \def statements and if found, error message will be reported
+%     by the submission form.
+%
+% (2) Follow the template below very tightly.
+%
+% (3) Include .pdf figures using the \includegraphics
+%      command, an example of which are given below.
+%
+% (4) Use file names which begin with the surname of the first author.
+%
+% (5) When creating labels for cross-references, please start always
+%     by surname of the first author, e.g., \label{smith:likelihood}
+%
+% (6) The template below contains some example materials
+%      to guide you through the preparation of your paper.  However,
+%      remove all the redundant material from your final document
+%      before submitting.
+
+% The guidelines above are needed in order to be able to combine all
+% the papers into a single proceedings book of acceptable quality.
+% Please follow the guidelines as strictly as possible. Deviations may
+% result in papers being either refused by the registration form
+% or sent back to the authors with the request to change
+% their documents according to the guidelines.
+
+% Special characters:
+% Please do not use special characters (e.g., accents).
+% Use TeX composition instead, such as \~n, \'a, \`e, \v{s}, \r{u} etc.
+
+% Changes as of IWSM 2013:
+%  * \usepackage{booktabs} added which allows \toprule et al. in the tabular environment
+%    (\hline\hline is not longer used)
+%  * '^\T' added in iwsm.sty to denote transposed vectors and matrices within math (see example below)
+%  * \usepackage{amsmath, amssymb} introduced since IWSM 2012 is allowed (allowing usage of boldsymbols
+%    and other handy constructions (align, pmatrix etc.) within math)
+%  * \usepackage{psfrag} introduced since IWSM 2012 is NOT allowed
+%
+%
+
+%***********************************************************************
+% PLEASE LEAVE THIS PART UNCHANGED
+%***********************************************************************
+
+\documentclass[twoside]{report}
+\usepackage{iwsm}
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+
+% Please do not specify any new definitions, any new commands,
+% and do not specify any style parameters.
+% The preamble of the document should be left unchanged.
+
+\begin{document}
+	
+	%***********************************************************************
+	% PLEASE INSERT YOUR CONTENT FROM HERE
+	%***********************************************************************
+	
+	% Title and running title to be used as left header:
+	\title{The Feature-First Block Model}
+	\titlerunning{The Feature-First Block Model}
+	
+	% Authors and running list of authors to be used as right header:
+	\author{Lawrence Tray\inst{1}, Ioannis Kontoyiannis\inst{2}}
+	\authorrunning{Tray and Kontoyiannis}    %% use \authorrunning{Surname 1} if only 1 author
+	%% use \authorrunning{Surname 1 and Surname2} if two authors
+	%% use \authorrunning{Surname 1 et al.} if more than two authors
+	
+	% Institutes of all authors
+	% Include city and country of each institute, do not include the full address.
+	\institute{Department of Engineering, University of Cambridge, UK
+		\and Statistical Laboratory, University of Cambridge, UK}
+	
+	% E-mail of presenting author for correspondence
+	\email{lpt30@cantab.ac.uk}
+	
+	% Brief abstract of the paper:
+	\input{abstract}
+	
+	% Keywords (at most 5):
+	\keywords{Stochastic Block Model; Labelled Networks; Inference.}
+	
+	% Produce the title:
+	\maketitle
+	
+	% Main text
+	\input{introduction}
+	
+	%\input{prelim}
+	
+	\input{ffbm}
+	%\input{ffbm-detailed}
+	
+	\input{inference}
+	\input{inference-detailed}
+	
+	\input{experiments}
+	\input{experiments-figures}
+	%\input{experiments-figures-detailed}
+	%\input{experiments-detailed}
+	
+	%\input{extensions}
+	\input{conclusion}
+	
+	\input{references}
+	
+\end{document}

@@ -1,0 +1,12 @@
+\section{Introduction}
+
+Many real-world networks exhibit strong community structure, with most nodes belonging to densely connected clusters. 
+In this work, we examine vertex-labelled networks, 
+referring to the labels as {\em features}. A typical goal is to determine whether a given feature impacts graphical structure. Answering this requires a random graph model;
+the standard is the stochastic block model (SBM), see Peixoto (2017).
+
+Analysing a labelled network with one of the standard SBM variants requires partitioning the graph into blocks grouped by distinct values of the feature of interest. The associated model can then be used to test for evidence of heterogeneous connectivity between the feature-grouped blocks. But this approach can only consider disjoint feature sets and the feature-grouped blocks often provide an unnatural partition.
+
+We would instead prefer to partition the graph into its most natural blocks and then find which of the available features -- if any -- best predict the resulting partition. Thus motivated, we present a novel framework for modelling labelled networks.
+This is not the first extension of the SBM to labelled networks, e.g. Stanley et al (2019). However, most of the current approaches are focused on leveraging feature information to partition the graph more reliably in the presence of noise.
+We seek instead to develop a model well suited for inferring how vertex features impact graphical structure and to report our confidence in those conclusions.
